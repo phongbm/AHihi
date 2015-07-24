@@ -8,8 +8,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Parse.initialize(this, "L3tNbRlz4GUUy7UXE65tiEQwVNYcHDX5GBXa2bBG",
-                "dLQjhoiFJiifs820COIac5Oih6fV2QU7X90QVoe8");
+        Parse.initialize(this, ServerInfo.PARSE_APPLICATION_ID, ServerInfo.PARSE_CLIENT_KEY);
     }
 
 }

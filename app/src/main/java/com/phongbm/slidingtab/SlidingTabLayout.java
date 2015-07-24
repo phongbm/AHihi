@@ -17,7 +17,6 @@
 package com.phongbm.slidingtab;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -29,10 +28,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
+import com.phongbm.ahihi.ViewPagerAdapter;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -71,7 +72,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private int mTitleOffset;
 
     private int mTabViewLayoutId;
-    private int mTabViewTextViewId;
+    private int mTabIconId;
     private boolean mDistributeEvenly;
 
     private ViewPager mViewPager;
@@ -144,7 +145,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
      */
     public void setCustomTabView(int layoutResId, int textViewId) {
         mTabViewLayoutId = layoutResId;
-        mTabViewTextViewId = textViewId;
+        mTabIconId = textViewId;
     }
 
     /**
@@ -191,21 +192,20 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         for (int i = 0; i < adapter.getCount(); i++) {
             View tabView = null;
-            TextView tabTitleView = null;
+            ImageView tabIcon = null;
 
             if (mTabViewLayoutId != 0) {
-                // If there is a custom tab view layout id set, try and inflate it
                 tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
                         false);
-                tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);
+                tabIcon = (ImageView) tabView.findViewById(R.id.tabIcon);
             }
 
             if (tabView == null) {
                 tabView = createDefaultTabView(getContext());
             }
 
-            if (tabTitleView == null && TextView.class.isInstance(tabView)) {
-                tabTitleView = (TextView) tabView;
+            if (tabIcon == null && ImageView.class.isInstance(tabView)) {
+                tabIcon = (ImageView) tabView;
             }
 
             if (mDistributeEvenly) {
@@ -214,7 +214,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 lp.weight = 1;
             }
 
-            tabTitleView.setText(adapter.getPageTitle(i));
+            tabIcon.setImageResource(((ViewPagerAdapter) adapter).getPageIcon(i));
             tabView.setOnClickListener(tabClickListener);
             String desc = mContentDescriptions.get(i, null);
             if (desc != null) {
@@ -225,9 +225,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (i == mViewPager.getCurrentItem()) {
                 tabView.setSelected(true);
             }
-
-            /*tabTitleView.setTextColor(getResources().getColorStateList(R.color.sliding_tab_color));
-            tabTitleView.setTextSize(14);*/
         }
     }
 

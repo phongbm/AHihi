@@ -2,6 +2,7 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -144,6 +145,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 ((MainFragment) this.getActivity()).showLoginSignupFragment();
                 break;
             case R.id.btnSignup:
+                final ProgressDialog progressDialog = new ProgressDialog(SignupFragment.this.getActivity());
+                progressDialog.setTitle("Signing up");
+                progressDialog.setMessage("Please wait...");
+                progressDialog.show();
+
                 String phoneNumber = edtPhoneNumber.getText().toString();
                 String password = edtPassword.getText().toString();
                 ParseUser parseUser = new ParseUser();
@@ -153,10 +159,13 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
+                            ParseUser.logOut();
                             ((MainFragment) SignupFragment.this.getActivity()).showLoginSignupFragment();
+                            progressDialog.dismiss();
                             Toast.makeText(SignupFragment.this.getActivity(),
                                     "Registered successfully", Toast.LENGTH_SHORT).show();
                         } else {
+                            progressDialog.dismiss();
                             Toast.makeText(SignupFragment.this.getActivity(),
                                     "There was an error signing up", Toast.LENGTH_LONG).show();
                         }

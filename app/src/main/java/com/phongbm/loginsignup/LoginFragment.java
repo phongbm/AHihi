@@ -2,6 +2,7 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -104,6 +105,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 ((MainFragment) this.getActivity()).showLoginSignupFragment();
                 break;
             case R.id.btnLogin:
+                final ProgressDialog progressDialog = new ProgressDialog(LoginFragment.this.getActivity());
+                progressDialog.setTitle("Logging in");
+                progressDialog.setMessage("Please wait...");
+                progressDialog.show();
+
                 String phoneNumber = edtPhoneNumber.getText().toString();
                 String password = edtPassword.getText().toString();
                 ParseUser.logInInBackground(phoneNumber, password, new LogInCallback() {
@@ -113,9 +119,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                             Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
                             LoginFragment.this.getActivity().startActivity(intent);
                             LoginFragment.this.getActivity().finish();
-                            Toast.makeText(LoginFragment.this.getActivity(),
-                                    "Logged successfully", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         } else {
+                            progressDialog.dismiss();
                             Toast.makeText(LoginFragment.this.getActivity(),
                                     "There was an error logging in", Toast.LENGTH_SHORT).show();
                         }
