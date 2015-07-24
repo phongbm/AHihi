@@ -148,6 +148,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 final ProgressDialog progressDialog = new ProgressDialog(SignupFragment.this.getActivity());
                 progressDialog.setTitle("Signing up");
                 progressDialog.setMessage("Please wait...");
+                progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
 
                 String phoneNumber = edtPhoneNumber.getText().toString();

@@ -108,6 +108,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 final ProgressDialog progressDialog = new ProgressDialog(LoginFragment.this.getActivity());
                 progressDialog.setTitle("Logging in");
                 progressDialog.setMessage("Please wait...");
+                progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
 
                 String phoneNumber = edtPhoneNumber.getText().toString();

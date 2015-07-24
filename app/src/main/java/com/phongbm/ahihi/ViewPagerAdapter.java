@@ -8,11 +8,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private static final int NUMBER_OF_FRAGMENT = 4;
 
     private TabOneFragment tabOneFragment = new TabOneFragment();
-    private TabTwoFragment tabTwoFragment = new TabTwoFragment();
+    private TabContactFragment tabTwoFragment = new TabContactFragment();
     private TabThreeFragment tabThreeFragment = new TabThreeFragment();
     private TabFourFragment tabFourFragment = new TabFourFragment();
-    private int[] tabIconIds = new int[]{R.drawable.ic_tab_message, R.drawable.ic_tab_contact,
-            R.drawable.ic_tab_friend, R.drawable.ic_tab_info};
+    private int[] tabIconIds = new int[]{R.drawable.bg_tab_message, R.drawable.bg_tab_contact,
+            R.drawable.bg_tab_friend, R.drawable.bg_tab_info};
 
     public ViewPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
