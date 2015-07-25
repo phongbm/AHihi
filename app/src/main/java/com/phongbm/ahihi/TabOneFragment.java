@@ -34,6 +34,7 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
                 ParseUser.logOut();
                 Intent intent = new Intent(TabOneFragment.this.getActivity(), MainFragment.class);
                 TabOneFragment.this.getActivity().startActivity(intent);
+                TabOneFragment.this.getActivity().finish();
                 break;
         }
     }

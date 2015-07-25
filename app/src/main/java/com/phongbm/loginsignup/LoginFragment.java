@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeComponent() {
+        view.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.anim_rightleft));
         previous = (ImageView) view.findViewById(R.id.previous);
         previous.setOnClickListener(this);
         btnLogin = (TextView) view.findViewById(R.id.btnLogin);
@@ -105,7 +107,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 ((MainFragment) this.getActivity()).showLoginSignupFragment();
                 break;
             case R.id.btnLogin:
-                final ProgressDialog progressDialog = new ProgressDialog(LoginFragment.this.getActivity());
+                final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Logging in");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);

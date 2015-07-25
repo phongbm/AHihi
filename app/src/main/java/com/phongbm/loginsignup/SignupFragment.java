@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -46,6 +47,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeComponent() {
+        view.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.anim_rightleft));
         previous = (ImageView) view.findViewById(R.id.previous);
         previous.setOnClickListener(this);
         btnSignup = (TextView) view.findViewById(R.id.btnSignup);
@@ -145,7 +147,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 ((MainFragment) this.getActivity()).showLoginSignupFragment();
                 break;
             case R.id.btnSignup:
-                final ProgressDialog progressDialog = new ProgressDialog(SignupFragment.this.getActivity());
+                final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Signing up");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);

@@ -41,7 +41,19 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="#2196f3"></RelativeLayout>
+            android:background="#2196f3">
+
+            <ImageView
+                android:id="@+id/addFriend"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="24dp"
+                android:background="@drawable/bg_rectangle"
+                android:padding="12dp"
+                android:src="@drawable/ic_add_friend" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

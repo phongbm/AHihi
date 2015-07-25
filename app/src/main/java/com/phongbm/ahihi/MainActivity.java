@@ -1,5 +1,6 @@
 package com.phongbm.ahihi;
 
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,7 +23,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
     private SlidingTabLayout slidingTabs;
-    private ImageView menu;
+    private ImageView menu, addFriend;
 
     private Handler handler = new Handler() {
         @Override
@@ -68,6 +69,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         menu = (ImageView) findViewById(R.id.menu);
         menu.setOnClickListener(this);
+        addFriend = (ImageView) findViewById(R.id.addFriend);
+        addFriend.setOnClickListener(this);
     }
 
     @Override
@@ -76,6 +79,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case R.id.menu:
                 drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
                 drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                break;
+            case R.id.addFriend:
                 break;
         }
     }

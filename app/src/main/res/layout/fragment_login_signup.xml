@@ -12,37 +12,30 @@
 
         <ImageView
             android:id="@+id/imgLogo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="250dp"
+            android:layout_height="190dp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="72dp"
+            android:layout_marginTop="40dp"
             android:scaleType="centerCrop"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/bbb" />
 
         <TextView
-            android:id="@+id/txtOne"
+            android:id="@+id/txtWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imgLogo"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"
-            android:text="Wellcome to"
+            android:layout_marginTop="16dp"
+            android:text="Welcome!"
             android:textColor="#2196f3"
-            android:textSize="40sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtOne"
-            android:layout_centerHorizontal="true"
-            android:text="AHihi"
-            android:textColor="#2196f3"
-            android:textSize="40sp" />
+            android:textSize="40sp"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2">

@@ -6,13 +6,18 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
 
 public class LoginSignupFragment extends Fragment implements View.OnClickListener {
     private View view;
-    private TextView btnLogin, btnSignup;
+    private TextView txtWelcome, btnLogin, btnSignup;
+    private ImageView imgLogo;
+    private RelativeLayout layout;
 
     @Override
     public void onAttach(Activity activity) {
@@ -31,6 +36,16 @@ public class LoginSignupFragment extends Fragment implements View.OnClickListene
         btnLogin.setOnClickListener(this);
         btnSignup = (TextView) view.findViewById(R.id.btnSignup);
         btnSignup.setOnClickListener(this);
+        imgLogo = (ImageView) view.findViewById(R.id.imgLogo);
+        txtWelcome = (TextView) view.findViewById(R.id.txtWelcome);
+        layout = (RelativeLayout) view.findViewById(R.id.layout);
+        startAnimation();
+    }
+
+    public void startAnimation() {
+        imgLogo.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_updown));
+        txtWelcome.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_rightleft));
+        layout.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_leftright));
     }
 
     @Override
