@@ -1,7 +1,10 @@
 package com.phongbm.ahihi;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,7 +14,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.phongbm.slidingtab.SlidingTabLayout;
 
@@ -24,12 +30,25 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private ViewPagerAdapter viewPagerAdapter;
     private SlidingTabLayout slidingTabs;
     private ImageView menu, addFriend;
+    private TextView txtInternet;
+    private InputMethodManager inputMethodManager;
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
         }
     };
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) MainActivity.this.
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null) {
+            return false;
+        } else
+            return true;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +58,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void initializeComponent() {
+        inputMethodManager = (InputMethodManager) MainActivity.this.
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
         // Initialize drawer layout
         drawerLayoutNavigation = (DrawerLayout) findViewById(R.id.drawerLayoutNavigation);
 
@@ -71,6 +93,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         menu.setOnClickListener(this);
         addFriend = (ImageView) findViewById(R.id.addFriend);
         addFriend.setOnClickListener(this);
+        txtInternet = (TextView) findViewById(R.id.txtInternet);
+        if (!isNetworkConnected()) {
+            txtInternet.setVisibility(LinearLayout.VISIBLE);
+        }
     }
 
     @Override
@@ -81,6 +107,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 break;
             case R.id.addFriend:
+                AddFriendDialog addFriendDialog = new AddFriendDialog(MainActivity.this, handler);
+                addFriendDialog.show();
+                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 break;
         }
     }
