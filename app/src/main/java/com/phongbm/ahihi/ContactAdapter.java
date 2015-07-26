@@ -75,16 +75,16 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        //if (convertView == null) {
-        convertView = layoutInflater.inflate(R.layout.item_contact, null);
-        viewHolder = new ViewHolder();
-        viewHolder.imgContactIcon = (CircleImageView) convertView.findViewById(R.id.imgContactIcon);
-        viewHolder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
-        viewHolder.txtContactDescription = (TextView) convertView.findViewById(R.id.txtContactDescription);
-        convertView.setTag(viewHolder);
-        //} else {
-        //viewHolder = (ViewHolder) convertView.getTag();
-        //}
+        if (convertView == null) {
+            convertView = layoutInflater.inflate(R.layout.item_contact, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.imgContactIcon = (CircleImageView) convertView.findViewById(R.id.imgContactIcon);
+            viewHolder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
+            viewHolder.txtContactDescription = (TextView) convertView.findViewById(R.id.txtContactDescription);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
         if (contactItems.get(position).getPhoto() != null) {
             viewHolder.imgContactIcon.setImageURI(Uri.parse(contactItems.get(position).getPhoto()));
         }

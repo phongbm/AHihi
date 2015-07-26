@@ -38,6 +38,7 @@
         android:layout_below="@+id/text"
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_button"
+        android:enabled="false"
         android:gravity="center"
         android:padding="16dp"
         android:text="Add Friend"

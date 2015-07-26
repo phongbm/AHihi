@@ -1,7 +1,10 @@
 package com.phongbm.loginsignup;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+
+import com.phongbm.ahihi.R;
 
 public class MainFragment extends Activity {
     private LoginSignupFragment loginSignupFragment = new LoginSignupFragment();
@@ -9,41 +12,25 @@ public class MainFragment extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // this.addAllFragments();
         this.showLoginSignupFragment();
     }
 
-   /* private void addAllFragments() {
-        this.getFragmentManager().beginTransaction().add(android.R.id.content,
-                loginSignupFragment, "LoginSignup").commit();
-        this.getFragmentManager().beginTransaction().add(android.R.id.content,
-                loginFragment, "Login").commit();
-        this.getFragmentManager().beginTransaction().add(android.R.id.content,
-                signupFragment, "Signup").commit();
-    }*/
-
     public void showLoginSignupFragment() {
-        /*this.getFragmentManager().beginTransaction().show(loginSignupFragment).commit();
-        this.getFragmentManager().beginTransaction().hide(loginFragment).commit();
-        this.getFragmentManager().beginTransaction().hide(signupFragment).commit();*/
-        this.getFragmentManager().beginTransaction().replace(
-                android.R.id.content, loginSignupFragment).commit();
+        this.getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.anim_in_left, R.anim.anim_out_right)
+                .replace(android.R.id.content, loginSignupFragment).commit();
     }
 
     public void showLoginFragment() {
-        /*this.getFragmentManager().beginTransaction().show(loginFragment).commit();
-        this.getFragmentManager().beginTransaction().hide(signupFragment).commit();
-        this.getFragmentManager().beginTransaction().hide(loginSignupFragment).commit();*/
-        this.getFragmentManager().beginTransaction().replace(
-                android.R.id.content, new LoginFragment()).commit();
+        this.getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.anim_in_right, R.anim.anim_out_left)
+                .replace(android.R.id.content, new LoginFragment()).commit();
     }
 
     public void showSigupFragment() {
-        /*this.getFragmentManager().beginTransaction().show(signupFragment).commit();
-        this.getFragmentManager().beginTransaction().hide(loginSignupFragment).commit();
-        this.getFragmentManager().beginTransaction().hide(loginFragment).commit();*/
-        this.getFragmentManager().beginTransaction().replace(
-                android.R.id.content, new SignupFragment()).commit();
+        this.getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.anim_in_right, R.anim.anim_out_left)
+                .replace(android.R.id.content, new SignupFragment()).commit();
     }
 
     @Override

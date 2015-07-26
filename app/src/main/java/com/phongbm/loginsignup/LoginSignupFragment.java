@@ -3,6 +3,7 @@ package com.phongbm.loginsignup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,13 +40,13 @@ public class LoginSignupFragment extends Fragment implements View.OnClickListene
         imgLogo = (ImageView) view.findViewById(R.id.imgLogo);
         txtWelcome = (TextView) view.findViewById(R.id.txtWelcome);
         layout = (RelativeLayout) view.findViewById(R.id.layout);
-        startAnimation();
+        // startAnimation();
     }
 
     public void startAnimation() {
-        imgLogo.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_updown));
-        txtWelcome.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_rightleft));
-        layout.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_leftright));
+        // imgLogo.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_updown));
+        // txtWelcome.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_in_right));
+        //layout.setAnimation(AnimationUtils.loadAnimation(this.getActivity(), R.anim.anim_out_left));
     }
 
     @Override
@@ -53,6 +54,10 @@ public class LoginSignupFragment extends Fragment implements View.OnClickListene
         switch (view.getId()) {
             case R.id.btnLogin:
                 ((MainFragment) this.getActivity()).showLoginFragment();
+                /*((MainFragment) this.getActivity()).overridePendingTransition(
+                        R.anim.anim_in_right, R.anim.anim_out_left);*/
+                //this.getFragmentManager().beginTransaction().
+                        //setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
             case R.id.btnSignup:
                 ((MainFragment) this.getActivity()).showSigupFragment();

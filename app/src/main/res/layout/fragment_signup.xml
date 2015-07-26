@@ -141,7 +141,8 @@
             android:gravity="center"
             android:padding="12dp"
             android:text="SIGN UP"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

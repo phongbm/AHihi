@@ -47,7 +47,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeComponent() {
-        view.setAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.anim_rightleft));
         previous = (ImageView) view.findViewById(R.id.previous);
         previous.setOnClickListener(this);
         btnSignup = (TextView) view.findViewById(R.id.btnSignup);
