@@ -72,7 +72,7 @@
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#2196f3"
+        android:background="#ffffff"
         android:scrollbars="vertical" />
 
 </android.support.v4.widget.DrawerLayout>

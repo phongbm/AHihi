@@ -197,7 +197,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mTabViewLayoutId != 0) {
                 tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
                         false);
-                tabIcon = (ImageView) tabView.findViewById(R.id.tabIcon);
+                tabIcon = (ImageView) tabView.findViewById(mTabIconId);
             }
 
             if (tabView == null) {
@@ -320,6 +320,5 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
         }
     }
-
 
 }

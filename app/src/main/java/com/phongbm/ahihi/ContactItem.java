@@ -13,24 +13,12 @@ public class ContactItem {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPhoto() {
         return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
     }
 
 }

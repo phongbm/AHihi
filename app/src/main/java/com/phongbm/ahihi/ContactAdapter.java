@@ -8,29 +8,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ContactAdapter extends BaseAdapter implements SectionIndexer {
+public class ContactAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private ArrayList<ContactItem> contactItems;
-    private HashMap<String, Integer> alphaIndexer;
-    private ArrayList<String> sections;
+    // private HashMap<String, Integer> alphaIndexer;
+    // private ArrayList<String> sections;
 
     public ContactAdapter(Context context) {
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         initializeListContact();
 
-        alphaIndexer = new HashMap<String, Integer>();
+        /*alphaIndexer = new HashMap<String, Integer>();
         for (int i = 0; i < contactItems.size(); i++) {
             String firstLetter = contactItems.get(i).getName().substring(0, 1).toUpperCase();
             if (!alphaIndexer.containsKey(firstLetter)) {
@@ -39,7 +35,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
         }
         Set<String> sectionLetters = alphaIndexer.keySet();
         sections = new ArrayList<String>(sectionLetters);
-        Collections.sort(sections);
+        Collections.sort(sections);*/
     }
 
     private void initializeListContact() {
@@ -75,16 +71,16 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.item_contact, parent, false);
-            viewHolder = new ViewHolder();
-            viewHolder.imgContactIcon = (CircleImageView) convertView.findViewById(R.id.imgContactIcon);
-            viewHolder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
-            viewHolder.txtContactDescription = (TextView) convertView.findViewById(R.id.txtContactDescription);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+        // if (convertView == null) {
+        convertView = layoutInflater.inflate(R.layout.item_contact, parent, false);
+        viewHolder = new ViewHolder();
+        viewHolder.imgContactIcon = (CircleImageView) convertView.findViewById(R.id.imgContactIcon);
+        viewHolder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
+        viewHolder.txtContactDescription = (TextView) convertView.findViewById(R.id.txtContactDescription);
+        convertView.setTag(viewHolder);
+        // } else {
+        // viewHolder = (ViewHolder) convertView.getTag();
+        // }
         if (contactItems.get(position).getPhoto() != null) {
             viewHolder.imgContactIcon.setImageURI(Uri.parse(contactItems.get(position).getPhoto()));
         }
@@ -93,7 +89,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
         return convertView;
     }
 
-    @Override
+    /*@Override
     public Object[] getSections() {
         return sections.toArray();
     }
@@ -106,7 +102,7 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
     @Override
     public int getSectionForPosition(int position) {
         return 0;
-    }
+    }*/
 
     private class ViewHolder {
         CircleImageView imgContactIcon;

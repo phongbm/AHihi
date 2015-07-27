@@ -2,6 +2,7 @@ package com.phongbm.ahihi;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,27 +18,26 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Na
 
     private LayoutInflater layoutInflater;
     private ArrayList<NavigationItem> navigationItems;
-    private Context context;
     private Handler handler;
 
+    private int userAvatar = R.drawable.avatar_default;
+    private String userName = "Phong Minh Bui", userEmail = "phongbm.it@gmail.com";
+
     public NavigationAdapter(Context context, Handler handler) {
-        this.context = context;
         this.handler = handler;
         this.layoutInflater = LayoutInflater.from(context);
         this.initializeArrayListItemNavigation();
     }
 
     private void initializeArrayListItemNavigation() {
-        String[] menuNames = new String[]{"Thông báo mới", "Thiết lập riêng tư", "Cài đặt", "Sản phẩm",
-                "Quản lý tài khoản"};
+        String[] menuNames = new String[]{"Notifications", "Privacy Settings", "Settings", "About",
+                "Account Management"};
         int[] menuIcons = new int[]{R.drawable.ic_menu_news, R.drawable.ic_menu_privacy_settings,
                 R.drawable.ic_menu_settings, R.drawable.ic_menu_about,
                 R.drawable.ic_menu_user,};
-        int idAvatar = R.mipmap.ic_launcher;
-        String name = "Phong Minh Bui", email = "phongbm.it@gmail.com";
         navigationItems = new ArrayList<NavigationItem>();
         for (int i = 0; i < menuNames.length; i++) {
-            navigationItems.add(new NavigationItem(idAvatar, name, email, menuIcons[i], menuNames[i]));
+            navigationItems.add(new NavigationItem(menuIcons[i], menuNames[i]));
         }
     }
 
@@ -76,9 +76,9 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Na
             navigationViewHolder.txtNameMenu.setText(navigationItems.get(position - 1).getNameMenu());
         } else {
             if (navigationViewHolder.idHolder == TYPE_HEADER) {
-                navigationViewHolder.imgAvatar.setImageResource(navigationItems.get(position).getIdAvatar());
-                navigationViewHolder.txtName.setText(navigationItems.get(position).getName());
-                navigationViewHolder.txtEmail.setText(navigationItems.get(position).getEmail());
+                navigationViewHolder.imgAvatar.setImageResource(userAvatar);
+                navigationViewHolder.txtName.setText(userName);
+                navigationViewHolder.txtEmail.setText(userEmail);
             }
         }
         return;
@@ -110,6 +110,10 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Na
 
         @Override
         public void onClick(View view) {
+            Message message = new Message();
+            message.what = NavigationViewHolder.this.getPosition() - 1;
+            message.setTarget(handler);
+            message.sendToTarget();
         }
     }
 
