@@ -10,9 +10,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +22,6 @@ import com.phongbm.ahihi.R;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
     private View view;
-    private ImageView previous;
     private EditText edtPhoneNumber, edtPassword;
     private TextView btnLogin;
     private TextWatcher textWatcherPhoneNumber, textWatcherPassword;
@@ -43,8 +40,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeComponent() {
-        previous = (ImageView) view.findViewById(R.id.previous);
-        previous.setOnClickListener(this);
         btnLogin = (TextView) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
@@ -102,9 +97,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.previous:
-                ((MainFragment) this.getActivity()).showLoginSignupFragment();
-                break;
             case R.id.btnLogin:
                 final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Logging in");

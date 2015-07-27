@@ -3,30 +3,25 @@ package com.phongbm.loginsignup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
-import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
     private View view;
-    private ImageView previous;
     private EditText edtPhoneNumber, edtPassword, edtConfirmPassword;
     private TextView btnSignup;
     private CheckBox checkBoxAgree;
@@ -47,8 +42,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeComponent() {
-        previous = (ImageView) view.findViewById(R.id.previous);
-        previous.setOnClickListener(this);
         btnSignup = (TextView) view.findViewById(R.id.btnSignup);
         btnSignup.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
@@ -142,9 +135,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.previous:
-                ((MainFragment) this.getActivity()).showLoginSignupFragment();
-                break;
             case R.id.btnSignup:
                 final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Signing up");

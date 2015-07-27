@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/text"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_button"
+        android:background="@drawable/bg_rect"
         android:enabled="false"
         android:gravity="center"
         android:padding="16dp"

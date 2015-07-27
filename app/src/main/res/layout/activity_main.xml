@@ -19,7 +19,7 @@
                 android:id="@+id/menu"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:background="@drawable/bg_rectangle"
+                android:background="@drawable/bg_rect"
                 android:padding="16dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_menu" />
@@ -59,7 +59,7 @@
                 android:layout_height="48dp"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="24dp"
-                android:background="@drawable/bg_rectangle"
+                android:background="@drawable/bg_rect"
                 android:padding="12dp"
                 android:src="@drawable/ic_add_friend" />
 

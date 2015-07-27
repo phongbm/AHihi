@@ -2,148 +2,133 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_material_light">
+    android:background="#2196f3"
+    android:padding="32sp">
 
-    <RelativeLayout
-        android:id="@+id/toolbar"
+    <TextView
+        android:id="@+id/txtSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="SIGN UP"
+        android:textColor="#ffffff"
+        android:textSize="40sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtSignup"
+        android:layout_marginTop="36dp"
+        android:text="Username (Phone Number)"
+        android:textColor="#ffffff"
+        android:textSize="15sp" />
+
+    <EditText
+        android:id="@+id/edtPhoneNumber"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_alignParentTop="true"
-        android:background="#2196f3">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtUsername"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edittext"
+        android:inputType="phone"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        android:textColor="#000000">
 
-        <ImageView
-            android:id="@+id/previous"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_centerVertical="true"
-            android:background="@drawable/bg_rectangle"
-            android:contentDescription="@null"
-            android:paddingBottom="16dp"
-            android:paddingEnd="16dp"
-            android:paddingLeft="32dp"
-            android:paddingRight="16dp"
-            android:paddingStart="32dp"
-            android:paddingTop="16dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_previous" />
+        <requestFocus />
+    </EditText>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@+id/previous"
-            android:layout_toRightOf="@+id/previous"
-            android:text="SIGN UP"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+    <TextView
+        android:id="@+id/txtPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edtPhoneNumber"
+        android:layout_marginTop="16dp"
+        android:text="Password"
+        android:textColor="#ffffff"
+        android:textSize="15sp" />
 
-    </RelativeLayout>
-
-
-    <RelativeLayout
+    <EditText
+        android:id="@+id/edtPassword"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"
-        android:layout_margin="16dp"
-        android:background="#ffffff"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edittext"
+        android:inputType="textPassword"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        android:textColor="#000000" />
 
-        <TextView
-            android:id="@+id/txtUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:text="Username"
-            android:textColor="#2196f3"
-            android:textSize="15sp" />
+    <TextView
+        android:id="@+id/txtConfirmPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/edtPassword"
+        android:layout_marginTop="16dp"
+        android:text="Confirm password"
+        android:textColor="#ffffff"
+        android:textSize="15sp" />
 
-        <EditText
-            android:id="@+id/edtPhoneNumber"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtUsername"
-            android:layout_centerHorizontal="true"
-            android:hint="Phone number"
-            android:inputType="phone"
-            android:padding="16dp"
-            android:textColor="#000000">
+    <EditText
+        android:id="@+id/edtConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtConfirmPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edittext"
+        android:inputType="textPassword"
+        android:paddingBottom="4dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        android:textColor="#000000" />
 
-            <requestFocus />
-        </EditText>
+    <CheckBox
+        android:id="@+id/checkBoxAgree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtConfirmPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text=" I agree to THE TERMS AND CONDITIONS"
+        android:textColor="#ffffff" />
 
-        <TextView
-            android:id="@+id/txtPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/edtPhoneNumber"
-            android:layout_marginTop="16dp"
-            android:text="Password"
-            android:textColor="#2196f3"
-            android:textSize="15sp" />
+    <TextView
+        android:id="@+id/btnSignup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/checkBoxAgree"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_btn_round"
+        android:enabled="false"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="SIGN UP"
+        android:textColor="#ffffff"
+        android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/edtPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtPassword"
-            android:layout_centerHorizontal="true"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:padding="16dp"
-            android:textColor="#000000" />
-
-        <TextView
-            android:id="@+id/txtConfirmPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/edtPassword"
-            android:layout_marginTop="16dp"
-            android:text="Confirm password"
-            android:textColor="#2196f3"
-            android:textSize="15sp" />
-
-        <EditText
-            android:id="@+id/edtConfirmPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtConfirmPassword"
-            android:layout_centerHorizontal="true"
-            android:hint="Confirm password"
-            android:inputType="textPassword"
-            android:padding="16dp"
-            android:textColor="#000000" />
-
-        <CheckBox
-            android:id="@+id/checkBoxAgree"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/edtConfirmPassword"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:text=" I agree to THE TERMS AND CONDITIONS"
-            android:textColor="#bdbdbd" />
-
-        <TextView
-            android:id="@+id/btnSignup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/checkBoxAgree"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_button"
-            android:enabled="false"
-            android:gravity="center"
-            android:padding="12dp"
-            android:text="SIGN UP"
-            android:textColor="#ffffff"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Designed and Developed by PD Team"
+        android:textColor="#ffffff" />
 
 </RelativeLayout>
