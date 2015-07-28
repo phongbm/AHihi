@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2196f3"
+    android:padding="32dp">
+
+    <TextView
+        android:id="@+id/txtStep1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STEP 1"
+        android:textColor="#ffffff"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtStep1"
+        android:text="Profile Infomation"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:id="@+id/layoutFullName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtDesc"
+        android:layout_marginTop="48dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_edittext"
+            android:hint="First Name"
+            android:inputType="textPersonName"
+            android:padding="16dp"
+            android:textColor="#ffeb3b"
+            android:textColorHint="#ffeb3b" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_edittext"
+            android:hint="Last Name"
+            android:inputType="textPersonName"
+            android:padding="16dp"
+            android:textColor="#ffeb3b"
+            android:textColorHint="#ffeb3b" />
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layoutFullName"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_edittext"
+        android:hint="Your Email"
+        android:inputType="textEmailAddress"
+        android:padding="16dp"
+        android:textColor="#ffeb3b"
+        android:textColorHint="#ffeb3b" />
+
+    <RelativeLayout
+        android:id="@+id/layoutBirthday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtEmail"
+        android:layout_marginTop="16dp"
+        android:background="#ffffff"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="4dp">
+
+        <TextView
+            android:id="@+id/txtBirthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:text="Birthday"
+            android:textColor="#2196f3" />
+
+        <EditText
+            android:id="@+id/edtBirthday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/txtBirthday"
+            android:layout_toRightOf="@+id/txtBirthday"
+            android:editable="false"
+            android:gravity="center"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="01 - 01 - 2000"
+            android:textColor="#2196f3" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layoutBirthday"
+        android:layout_marginTop="16dp"
+        android:background="#ffffff"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:text="Sex"
+            android:textColor="#2196f3" />
+
+        <RadioGroup
+            android:id="@+id/radioSex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Male"
+                android:textColor="#2196f3" />
+
+            <RadioButton
+                android:id="@+id/radioFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female"
+                android:textColor="#2196f3" />
+
+        </RadioGroup>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/btnOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/bg_btn_round"
+        android:enabled="false"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:text="SAVE AND CONTINUE"
+        android:textColor="#ffffff"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_toLeftOf="@+id/btnOK"
+        android:layout_toStartOf="@+id/btnOK"
+        android:text="SKIP"
+        android:textColor="#ffffff"
+        android:textStyle="bold" />
+
+</RelativeLayout>

@@ -40,7 +40,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="4dp"
-        android:textColor="#000000">
+        android:textColor="#ffeb3b">
 
         <requestFocus />
     </EditText>
@@ -70,7 +70,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="4dp"
-        android:textColor="#000000" />
+        android:textColor="#ffeb3b" />
 
     <TextView
         android:id="@+id/forgotPassword"
@@ -96,13 +96,5 @@
         android:text="LOG IN"
         android:textColor="#ffffff"
         android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="Designed and Developed by PD Team"
-        android:textColor="#ffffff" />
 
 </RelativeLayout>

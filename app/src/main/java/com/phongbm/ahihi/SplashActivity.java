@@ -9,7 +9,7 @@ import com.parse.ParseUser;
 import com.phongbm.loginsignup.MainFragment;
 
 public class SplashActivity extends Activity {
-    private final int SPLASH_DISPLAY_LENGHT = 1000;
+    private final int SPLASH_DISPLAY_LENGHT = 3000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

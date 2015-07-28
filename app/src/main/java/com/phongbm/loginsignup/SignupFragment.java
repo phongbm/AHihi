@@ -2,7 +2,6 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,11 +12,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
@@ -136,12 +131,13 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSignup:
-                final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
+                ((MainFragment) SignupFragment.this.getActivity())
+                        .showProfileInfomationFragment();
+                /*final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Signing up");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
-
                 String phoneNumber = edtPhoneNumber.getText().toString();
                 String password = edtPassword.getText().toString();
                 ParseUser parseUser = new ParseUser();
@@ -151,8 +147,8 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
-                            ParseUser.logOut();
-                            ((MainFragment) SignupFragment.this.getActivity()).showLoginSignupFragment();
+                            ((MainFragment) SignupFragment.this.getActivity())
+                                    .showProfileInfomationFragment();
                             progressDialog.dismiss();
                             Toast.makeText(SignupFragment.this.getActivity(),
                                     "Registered successfully", Toast.LENGTH_SHORT).show();
@@ -162,7 +158,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                                     "There was an error signing up", Toast.LENGTH_LONG).show();
                         }
                     }
-                });
+                });*/
                 break;
         }
     }

@@ -2,6 +2,7 @@ package com.phongbm.ahihi;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +37,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case CommonValue.START_ACCOUNT_MANAGEMENT:
+                    Intent intentAM = new Intent(MainActivity.this, AccountManagementActivity.class);
+                    MainActivity.this.startActivity(intentAM);
+                    break;
+            }
+            drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     };
 

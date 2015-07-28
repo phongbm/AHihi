@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.EditText;
 
 import com.phongbm.ahihi.R;
 
-public class LoginSignupFragment extends Fragment implements View.OnClickListener {
+public class ProfileInfomationFragment extends Fragment implements View.OnClickListener {
     private View view;
-    private TextView btnLogin, btnSignup;
+    private EditText edtBirthday;
 
     @Override
     public void onAttach(Activity activity) {
@@ -21,26 +21,20 @@ public class LoginSignupFragment extends Fragment implements View.OnClickListene
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_login_signup, null);
+        view = inflater.inflate(R.layout.fragment_profile_infomation, null);
         initializeComponent();
         return view;
     }
 
     private void initializeComponent() {
-        btnLogin = (TextView) view.findViewById(R.id.btnLogin);
-        btnLogin.setOnClickListener(this);
-        btnSignup = (TextView) view.findViewById(R.id.btnSignup);
-        btnSignup.setOnClickListener(this);
+        edtBirthday = (EditText) view.findViewById(R.id.edtBirthday);
+        edtBirthday.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnLogin:
-                ((MainFragment) this.getActivity()).showLoginFragment();
-                break;
-            case R.id.btnSignup:
-                ((MainFragment) this.getActivity()).showSigupFragment();
+            case R.id.edtBirthday:
                 break;
         }
     }

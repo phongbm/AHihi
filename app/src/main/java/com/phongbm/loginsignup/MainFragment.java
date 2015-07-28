@@ -33,6 +33,12 @@ public class MainFragment extends Activity {
                 .replace(android.R.id.content, new SignupFragment()).commit();
     }
 
+    public void showProfileInfomationFragment() {
+        this.getFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.anim_in_right, R.anim.anim_out_left)
+                .replace(android.R.id.content, new ProfileInfomationFragment()).commit();
+    }
+
     @Override
     public void onBackPressed() {
         if (!loginSignupFragment.isVisible()) {
