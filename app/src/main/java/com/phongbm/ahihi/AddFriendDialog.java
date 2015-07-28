@@ -3,15 +3,26 @@ package com.phongbm.ahihi;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class AddFriendDialog extends Dialog implements
         android.view.View.OnClickListener {
+    private static final String TAG = "AddFriendDialog";
     private Context context;
     private Handler handler;
     private EditText edtPhoneNumber;
@@ -56,6 +67,35 @@ public class AddFriendDialog extends Dialog implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnAddFriend:
+                String phoneNumber = edtPhoneNumber.getText().toString().trim();
+
+                final ParseUser currentUser = ParseUser.getCurrentUser();
+                ParseQuery<ParseUser> query = ParseUser.getQuery();
+                query.whereEqualTo("username", phoneNumber);
+                query.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> list, ParseException e) {
+                        if (e == null) {
+                            if (list.size() == 0) {
+                                return;
+                            }
+                            ArrayList<String> listFriend = (ArrayList<String>) currentUser.get("listFriend");
+                            if (listFriend == null)
+                                listFriend = new ArrayList<String>();
+                            listFriend.add(list.get(0).getObjectId());
+
+
+                            Message message = new Message();
+                            message.what = 100;
+                            message.obj = list.get(0).getUsername();
+                            message.setTarget(handler);
+                            message.sendToTarget();
+                        } else {
+                            Log.e(TAG, e.toString());
+                        }
+                    }
+                });
+
                 break;
         }
     }

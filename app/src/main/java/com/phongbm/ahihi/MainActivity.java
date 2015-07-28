@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import com.phongbm.slidingtab.SlidingTabLayout;
 
+import java.util.ArrayList;
+
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
     private RecyclerView recyclerViewVNavigation;
     private NavigationAdapter navigationAdapter;
@@ -33,6 +35,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private ImageView menu, addFriend;
     private TextView txtInternet;
     private InputMethodManager inputMethodManager;
+    private Friend friend;
 
     private Handler handler = new Handler() {
         @Override
@@ -41,6 +44,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 case CommonValue.START_ACCOUNT_MANAGEMENT:
                     Intent intentAM = new Intent(MainActivity.this, AccountManagementActivity.class);
                     MainActivity.this.startActivity(intentAM);
+                    break;
+                case 100:
+                    friend = new Friend((String) msg.obj);
+                    Intent i = new Intent();
+                    i.setAction("UPDATE_LIST_FRIEND");
+                    sendBroadcast(i);
                     break;
             }
             drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -64,6 +73,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
         initializeComponent();
+
     }
 
     private void initializeComponent() {
@@ -121,6 +131,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+    }
+
+    public Friend getFriend() {
+        return friend;
     }
 
 }

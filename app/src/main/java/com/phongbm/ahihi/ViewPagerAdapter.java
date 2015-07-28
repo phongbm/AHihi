@@ -1,5 +1,6 @@
 package com.phongbm.ahihi;
 
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -13,6 +14,8 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     private TabFourFragment tabFourFragment = new TabFourFragment();
     private int[] tabIconIds = new int[]{R.drawable.bg_tab_message, R.drawable.bg_tab_contact,
             R.drawable.bg_tab_friend, R.drawable.bg_tab_info};
+
+    private Handler handler;
 
     public ViewPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
