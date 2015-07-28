@@ -2,6 +2,7 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,7 +13,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
@@ -48,11 +53,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (checkBoxAgree.isChecked()) {
                     isCheckBoxChecked = true;
+                    enabledButtonSignup();
                 } else {
                     isCheckBoxChecked = false;
                     btnSignup.setEnabled(false);
                 }
-                enabledButtonSignup();
             }
         });
         textWatcherPhoneNumber = new TextWatcher() {
@@ -64,11 +69,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null && s.length() > 0) {
                     isFillPhoneNumber = true;
+                    enabledButtonSignup();
                 } else {
                     isFillPhoneNumber = false;
                     btnSignup.setEnabled(false);
                 }
-                enabledButtonSignup();
             }
 
             @Override
@@ -84,11 +89,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null && s.length() > 0) {
                     isFillPassword = true;
+                    enabledButtonSignup();
                 } else {
                     isFillPassword = false;
                     btnSignup.setEnabled(false);
                 }
-                enabledButtonSignup();
             }
 
             @Override
@@ -104,11 +109,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null && s.length() > 0) {
                     isFillConfirmPassword = true;
+                    enabledButtonSignup();
                 } else {
                     isFillConfirmPassword = false;
                     btnSignup.setEnabled(false);
                 }
-                enabledButtonSignup();
             }
 
             @Override
@@ -131,13 +136,12 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSignup:
-                ((MainFragment) SignupFragment.this.getActivity())
-                        .showProfileInfomationFragment();
                 /*final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Signing up");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
+
                 String phoneNumber = edtPhoneNumber.getText().toString();
                 String password = edtPassword.getText().toString();
                 ParseUser parseUser = new ParseUser();
@@ -159,6 +163,8 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                         }
                     }
                 });*/
+                ((MainFragment) SignupFragment.this.getActivity())
+                        .showProfileInfomationFragment();
                 break;
         }
     }

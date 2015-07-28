@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196f3"
+    android:background="@drawable/bg"
     android:padding="32dp">
 
     <TextView
@@ -32,6 +32,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/edtFistName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -42,9 +43,13 @@
             android:inputType="textPersonName"
             android:padding="16dp"
             android:textColor="#ffeb3b"
-            android:textColorHint="#ffeb3b" />
+            android:textColorHint="#ffeb3b">
+
+            <requestFocus />
+        </EditText>
 
         <EditText
+            android:id="@+id/edtLastName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
@@ -78,7 +83,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/edtEmail"
         android:layout_marginTop="16dp"
-        android:background="#ffffff"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
@@ -92,24 +96,26 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Birthday"
-            android:textColor="#2196f3" />
+            android:textColor="#ffffff" />
 
         <EditText
             android:id="@+id/edtBirthday"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:layout_toEndOf="@+id/txtBirthday"
-            android:layout_toRightOf="@+id/txtBirthday"
-            android:editable="false"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:gravity="center"
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingTop="8dp"
-            android:text="01 - 01 - 2000"
-            android:textColor="#2196f3" />
+            android:text="01/01/2000"
+            android:textColor="#ffffff" />
 
     </RelativeLayout>
 
@@ -117,9 +123,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layoutBirthday"
-        android:layout_marginTop="16dp"
-        android:background="#ffffff"
-        android:padding="8dp">
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="4dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -128,7 +135,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Sex"
-            android:textColor="#2196f3" />
+            android:textColor="#ffffff" />
 
         <RadioGroup
             android:id="@+id/radioSex"
@@ -143,14 +150,14 @@
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:text="Male"
-                android:textColor="#2196f3" />
+                android:textColor="#ffffff" />
 
             <RadioButton
                 android:id="@+id/radioFemale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Female"
-                android:textColor="#2196f3" />
+                android:textColor="#ffffff" />
 
         </RadioGroup>
 
@@ -171,19 +178,6 @@
         android:paddingRight="16dp"
         android:paddingTop="8dp"
         android:text="SAVE AND CONTINUE"
-        android:textColor="#ffffff"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_toLeftOf="@+id/btnOK"
-        android:layout_toStartOf="@+id/btnOK"
-        android:text="SKIP"
         android:textColor="#ffffff"
         android:textStyle="bold" />
 

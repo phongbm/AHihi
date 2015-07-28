@@ -53,11 +53,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null && s.length() > 0) {
                     isFillPhoneNumber = true;
+                    enabledButtonLogin();
                 } else {
                     isFillPhoneNumber = false;
                     btnLogin.setEnabled(false);
                 }
-                enabledButtonLogin();
             }
 
             @Override
@@ -73,11 +73,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s != null && s.length() > 0) {
                     isFillPassword = true;
+                    enabledButtonLogin();
                 } else {
                     isFillPassword = false;
                     btnLogin.setEnabled(false);
                 }
-                enabledButtonLogin();
             }
 
             @Override
