@@ -110,6 +110,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
+                            parseUser.put("isOnline", true);
+                            parseUser.saveInBackground();
                             Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
                             LoginFragment.this.getActivity().startActivity(intent);
                             LoginFragment.this.getActivity().finish();

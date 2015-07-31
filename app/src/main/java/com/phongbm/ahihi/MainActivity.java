@@ -1,6 +1,5 @@
 package com.phongbm.ahihi;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -22,8 +21,6 @@ import android.widget.TextView;
 
 import com.phongbm.slidingtab.SlidingTabLayout;
 
-import java.util.ArrayList;
-
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
     private RecyclerView recyclerViewVNavigation;
     private NavigationAdapter navigationAdapter;
@@ -33,9 +30,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private ViewPagerAdapter viewPagerAdapter;
     private SlidingTabLayout slidingTabs;
     private ImageView menu, addFriend;
-    private TextView txtInternet;
+    private TextView txtInternet, txtTitlePage;
     private InputMethodManager inputMethodManager;
-    private Friend friend;
+    private FriendItem friend;
 
     private Handler handler = new Handler() {
         @Override
@@ -45,26 +42,23 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     Intent intentAM = new Intent(MainActivity.this, AccountManagementActivity.class);
                     MainActivity.this.startActivity(intentAM);
                     break;
-                case 100:
-                    friend = new Friend((String) msg.obj);
+                case CommonValue.REQUEST_ADD_FRIEND:
+                    friend = new FriendItem("100", (String) msg.obj);
                     Intent i = new Intent();
                     i.setAction("UPDATE_LIST_FRIEND");
                     sendBroadcast(i);
                     break;
             }
-            drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            // drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            // drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     };
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) MainActivity.this.
-                getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static final boolean isNetworkConnected(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
+                Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo == null) {
-            return false;
-        } else
-            return true;
+        return networkInfo == null ? false : true;
     }
 
 
@@ -73,6 +67,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
         initializeComponent();
+        Intent i = new Intent();
+        i.setClassName("com.phongbm.ahihi", "com.phongbm.call.MyServiceCall");
+        startService(i);
 
     }
 
@@ -92,9 +89,23 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         recyclerViewVNavigation.setLayoutManager(linearLayoutManager);
 
         // Initialize view pager
-        viewPagerAdapter = new ViewPagerAdapter(MainActivity.this.getSupportFragmentManager());
+        viewPagerAdapter = new ViewPagerAdapter(this, this.getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(viewPagerAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                txtTitlePage.setText(viewPagerAdapter.getPageTitle(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
 
         // Initialize sliding tab
         slidingTabs = (SlidingTabLayout) findViewById(R.id.slidingTabs);
@@ -113,9 +124,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         addFriend = (ImageView) findViewById(R.id.addFriend);
         addFriend.setOnClickListener(this);
         txtInternet = (TextView) findViewById(R.id.txtInternet);
-        if (!isNetworkConnected()) {
+        if (!isNetworkConnected(this)) {
             txtInternet.setVisibility(LinearLayout.VISIBLE);
         }
+        txtTitlePage = (TextView) findViewById(R.id.txtTitlePage);
+        txtTitlePage.setText(viewPagerAdapter.getPageTitle(0));
     }
 
     @Override
@@ -135,11 +148,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
     }
 
-    public Friend getFriend() {
+    public FriendItem getFriend() {
         return friend;
     }
 

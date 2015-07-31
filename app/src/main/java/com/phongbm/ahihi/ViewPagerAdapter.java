@@ -1,49 +1,43 @@
 package com.phongbm.ahihi;
 
-import android.os.Handler;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
-public class ViewPagerAdapter extends FragmentStatePagerAdapter {
-    private static final int NUMBER_OF_FRAGMENT = 4;
+import java.util.ArrayList;
 
-    private TabOneFragment tabOneFragment = new TabOneFragment();
-    private TabContactFragment tabContactFragment = new TabContactFragment();
-    private TabThreeFragment tabThreeFragment = new TabThreeFragment();
-    private TabFourFragment tabFourFragment = new TabFourFragment();
+public class ViewPagerAdapter extends FragmentPagerAdapter {
+
     private int[] tabIconIds = new int[]{R.drawable.bg_tab_message, R.drawable.bg_tab_contact,
             R.drawable.bg_tab_friend, R.drawable.bg_tab_info};
 
-    private Handler handler;
+    private ArrayList<Fragment> fragments;
 
-    public ViewPagerAdapter(FragmentManager fragmentManager) {
+    public ViewPagerAdapter(Context context, FragmentManager fragmentManager) {
         super(fragmentManager);
+        fragments = new ArrayList<Fragment>();
+        fragments.add(new TabOneFragment(context));
+        fragments.add(new TabContactFragment(context));
+        fragments.add(new TabFriendFragment(context));
+        fragments.add(new TabFourFragment(context));
     }
 
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                return tabOneFragment;
-            case 1:
-                return tabContactFragment;
-            case 2:
-                return tabThreeFragment;
-            case 3:
-                return tabFourFragment;
-        }
-        return null;
+        return fragments.get(position);
     }
 
     @Override
     public int getCount() {
-        return NUMBER_OF_FRAGMENT;
+        return fragments.size();
     }
+
+    private String[] titles = new String[]{"Messages", "Contacts", "Friends", "Account"};
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return null;
+        return titles[position];
     }
 
     public int getPageIcon(int position) {

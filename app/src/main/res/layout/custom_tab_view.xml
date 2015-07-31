@@ -7,10 +7,10 @@
 
     <ImageView
         android:id="@+id/tabIcon"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="center"
-        android:padding="16dp"
+        android:padding="12dp"
         android:scaleType="centerCrop" />
 
 </LinearLayout>

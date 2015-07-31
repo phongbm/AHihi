@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -68,7 +69,6 @@ public class AddFriendDialog extends Dialog implements
         switch (view.getId()) {
             case R.id.btnAddFriend:
                 String phoneNumber = edtPhoneNumber.getText().toString().trim();
-
                 final ParseUser currentUser = ParseUser.getCurrentUser();
                 ParseQuery<ParseUser> query = ParseUser.getQuery();
                 query.whereEqualTo("username", phoneNumber);
@@ -77,25 +77,28 @@ public class AddFriendDialog extends Dialog implements
                     public void done(List<ParseUser> list, ParseException e) {
                         if (e == null) {
                             if (list.size() == 0) {
+                                Toast.makeText(context, "That account does not exist",
+                                        Toast.LENGTH_SHORT).show();
+                                AddFriendDialog.this.dismiss();
                                 return;
                             }
                             ArrayList<String> listFriend = (ArrayList<String>) currentUser.get("listFriend");
                             if (listFriend == null)
                                 listFriend = new ArrayList<String>();
                             listFriend.add(list.get(0).getObjectId());
-
+                            currentUser.put("listFriend", listFriend);
+                            currentUser.saveEventually();
 
                             Message message = new Message();
-                            message.what = 100;
-                            message.obj = list.get(0).getUsername();
+                            message.what = CommonValue.REQUEST_ADD_FRIEND;
+                            message.obj = list.get(0).get("fullName");
                             message.setTarget(handler);
                             message.sendToTarget();
+                            AddFriendDialog.this.dismiss();
                         } else {
-                            Log.e(TAG, e.toString());
                         }
                     }
                 });
-
                 break;
         }
     }
