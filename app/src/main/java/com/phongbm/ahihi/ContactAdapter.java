@@ -3,50 +3,41 @@ package com.phongbm.ahihi;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ContactAdapter extends BaseAdapter {
-    private Context context;
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
     private LayoutInflater layoutInflater;
     private ArrayList<ContactItem> contactItems;
-    // private HashMap<String, Integer> alphaIndexer;
-    // private ArrayList<String> sections;
+    private Context context;
 
     public ContactAdapter(Context context) {
         this.context = context;
-        layoutInflater = LayoutInflater.from(context);
-        initializeListContact();
-
-        /*alphaIndexer = new HashMap<String, Integer>();
-        for (int i = 0; i < contactItems.size(); i++) {
-            String firstLetter = contactItems.get(i).getName().substring(0, 1).toUpperCase();
-            if (!alphaIndexer.containsKey(firstLetter)) {
-                alphaIndexer.put(firstLetter, i);
-            }
-        }
-        Set<String> sectionLetters = alphaIndexer.keySet();
-        sections = new ArrayList<String>(sectionLetters);
-        Collections.sort(sections);*/
+        this.layoutInflater = LayoutInflater.from(context);
+        this.initializeArrayListContactItem();
     }
 
-    private void initializeListContact() {
+    private void initializeArrayListContactItem() {
         contactItems = new ArrayList<ContactItem>();
-        Cursor cursor = context.getContentResolver().query(Phone.CONTENT_URI, null, null, null,
-                Phone.DISPLAY_NAME + " ASC");
+        Cursor cursor = context.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null,
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            String phoneNumber = cursor.getString(cursor.getColumnIndex(Phone.NUMBER));
-            String name = cursor.getString(cursor.getColumnIndex(Phone.DISPLAY_NAME));
-            String photo = cursor.getString(cursor.getColumnIndex(Phone.PHOTO_THUMBNAIL_URI));
+            String phoneNumber = cursor.getString(cursor.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.NUMBER));
+            String name = cursor.getString(cursor.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String photo = cursor.getString(cursor.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI));
             contactItems.add(new ContactItem(phoneNumber, name, photo));
             cursor.moveToNext();
         }
@@ -54,59 +45,36 @@ public class ContactAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return contactItems.size();
     }
 
     @Override
-    public ContactItem getItem(int position) {
-        return contactItems.get(position);
+    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int position) {
+        View view = layoutInflater.inflate(R.layout.item_contact, parent, false);
+        return new ContactViewHolder(view);
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
-        // if (convertView == null) {
-        convertView = layoutInflater.inflate(R.layout.item_contact, parent, false);
-        viewHolder = new ViewHolder();
-        viewHolder.imgContactIcon = (CircleImageView) convertView.findViewById(R.id.imgContactIcon);
-        viewHolder.txtContactName = (TextView) convertView.findViewById(R.id.txtContactName);
-        viewHolder.txtContactDescription = (TextView) convertView.findViewById(R.id.txtContactDescription);
-        convertView.setTag(viewHolder);
-        // } else {
-        // viewHolder = (ViewHolder) convertView.getTag();
-        // }
+    public void onBindViewHolder(ContactViewHolder contactViewHolder, int position) {
         if (contactItems.get(position).getPhoto() != null) {
-            viewHolder.imgContactIcon.setImageURI(Uri.parse(contactItems.get(position).getPhoto()));
+            contactViewHolder.imgContactIcon.setImageURI(Uri.parse(contactItems.get(position).getPhoto()));
         }
-        viewHolder.txtContactName.setText(contactItems.get(position).getName());
-        viewHolder.txtContactDescription.setText(contactItems.get(position).getPhoneNumber());
-        return convertView;
+        contactViewHolder.txtContactName.setText(contactItems.get(position).getName());
+        contactViewHolder.txtContactDescription.setText(contactItems.get(position).getPhoneNumber());
+        return;
     }
 
-    /*@Override
-    public Object[] getSections() {
-        return sections.toArray();
-    }
+    public class ContactViewHolder extends RecyclerView.ViewHolder {
+        private CircleImageView imgContactIcon;
+        private TextView txtContactName, txtContactDescription;
 
-    @Override
-    public int getPositionForSection(int sectionIndex) {
-        return alphaIndexer.get(sections.get(sectionIndex));
-    }
-
-    @Override
-    public int getSectionForPosition(int position) {
-        return 0;
-    }*/
-
-    private class ViewHolder {
-        CircleImageView imgContactIcon;
-        TextView txtContactName, txtContactDescription;
+        public ContactViewHolder(View itemView) {
+            super(itemView);
+            imgContactIcon = (CircleImageView) itemView.findViewById(R.id.imgContactIcon);
+            txtContactName = (TextView) itemView.findViewById(R.id.txtContactName);
+            txtContactDescription = (TextView) itemView.findViewById(R.id.txtContactDescription);
+        }
     }
 
 }

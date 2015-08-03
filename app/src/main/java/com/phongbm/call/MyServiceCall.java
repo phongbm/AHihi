@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -24,9 +25,10 @@ import java.util.List;
 public class MyServiceCall extends Service {
     private static final String TAG = "MyServiceCall";
     private Context context;
-    private static String outGoingId = null, inComingId = null;
+    private String outGoingId = null;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
+    private BroadcastReceiverCall receiverCall = null;
 
     @Override
     public void onCreate() {
@@ -45,19 +47,16 @@ public class MyServiceCall extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
-        Log.i(TAG, "onStartCommand..."+outGoingId);
-
-        if ( intent == null ) {
-            if ( sinchClient == null )  Log.i(TAG, "null SInchCLient");
-            if ( outGoingId != null ) {
-                Log.i(TAG, "null outGoingId");
+        Log.i(TAG, "onStartCommand..." + outGoingId);
+        outGoingId = ParseUser.getCurrentUser().getObjectId();
+        if (intent == null) {
+            if (sinchClient == null)
+                Log.i(TAG, "null SInchCLient");
+            if (outGoingId != null) {
+                Log.i(TAG, "not null outGoingId");
                 startSinchService();
             }
             return START_STICKY;
-        }
-        if (intent != null) {
-            outGoingId = ParseUser.getCurrentUser().getObjectId();
-            // inComingId = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
         }
         startSinchService();
         return Service.START_STICKY;
@@ -65,10 +64,13 @@ public class MyServiceCall extends Service {
 
     private void startSinchService() {
         if (sinchClient == null) {
-            sinchClient = Sinch.getSinchClientBuilder().context(this)
+            sinchClient = Sinch.getSinchClientBuilder()
+                    .context(this)
+                    .userId(outGoingId)
                     .applicationKey(ServerInfo.SINCH_APPLICATION_KEY)
                     .applicationSecret(ServerInfo.SINCH_SECRET)
-                    .userId(outGoingId).environmentHost(ServerInfo.SINCH_ENVIROMENT).build();
+                    .environmentHost(ServerInfo.SINCH_ENVIROMENT)
+                    .build();
             sinchClient.setSupportCalling(true);
             sinchClient.startListeningOnActiveConnection();
             sinchClient.setSupportPushNotifications(true);
@@ -87,7 +89,6 @@ public class MyServiceCall extends Service {
 
         @Override
         public void onCallEstablished(Call call) {
-
         }
 
         @Override
@@ -114,14 +115,17 @@ public class MyServiceCall extends Service {
 
         @Override
         public void onCallProgressing(Call call) {
+            // do chuong
         }
 
         @Override
         public void onCallEstablished(Call call) {
+            // cuoc goi den duoc nhac len
         }
 
         @Override
         public void onCallEnded(Call call) {
+            // ket thuoc cuoc goi boi 1 trong 2 ben
         }
 
         @Override
@@ -139,8 +143,6 @@ public class MyServiceCall extends Service {
             context.registerReceiver(receiverCall, intentFilter);
         }
     }
-
-    private BroadcastReceiverCall receiverCall = null;
 
     private class BroadcastReceiverCall extends BroadcastReceiver {
         @Override

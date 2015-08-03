@@ -8,9 +8,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
-
     private int[] tabIconIds = new int[]{R.drawable.bg_tab_message, R.drawable.bg_tab_contact,
             R.drawable.bg_tab_friend, R.drawable.bg_tab_info};
+    private String[] titles = new String[]{"A", "B", "C", "D"};
 
     private ArrayList<Fragment> fragments;
 
@@ -32,8 +32,6 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return fragments.size();
     }
-
-    private String[] titles = new String[]{"Messages", "Contacts", "Friends", "Account"};
 
     @Override
     public CharSequence getPageTitle(int position) {

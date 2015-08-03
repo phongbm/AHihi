@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="@string/login"
+        android:text="@string/log_in"
         android:textColor="#ffffff"
         android:textSize="40sp"
         android:textStyle="bold" />
@@ -93,7 +93,7 @@
         android:enabled="false"
         android:gravity="center"
         android:padding="12dp"
-        android:text="@string/login"
+        android:text="@string/log_in"
         android:textColor="#ffffff"
         android:textStyle="bold" />
 

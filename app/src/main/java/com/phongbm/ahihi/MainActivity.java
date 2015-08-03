@@ -8,29 +8,35 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionButton;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
+import com.parse.ParseUser;
 import com.phongbm.slidingtab.SlidingTabLayout;
 
-public class MainActivity extends FragmentActivity implements View.OnClickListener {
-    private RecyclerView recyclerViewVNavigation;
-    private NavigationAdapter navigationAdapter;
-    private LinearLayoutManager linearLayoutManager;
-    private DrawerLayout drawerLayoutNavigation;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "MainActivity";
+
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
-    private SlidingTabLayout slidingTabs;
-    private ImageView menu, addFriend;
-    private TextView txtInternet, txtTitlePage;
+    private SlidingTabLayout slidingTab;
     private InputMethodManager inputMethodManager;
     private FriendItem friend;
 
@@ -38,10 +44,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case CommonValue.START_ACCOUNT_MANAGEMENT:
-                    Intent intentAM = new Intent(MainActivity.this, AccountManagementActivity.class);
-                    MainActivity.this.startActivity(intentAM);
-                    break;
                 case CommonValue.REQUEST_ADD_FRIEND:
                     friend = new FriendItem("100", (String) msg.obj);
                     Intent i = new Intent();
@@ -49,8 +51,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     sendBroadcast(i);
                     break;
             }
-            // drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            // drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     };
 
@@ -66,84 +66,118 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
+        initializeToolbar();
         initializeComponent();
-        Intent i = new Intent();
-        i.setClassName("com.phongbm.ahihi", "com.phongbm.call.MyServiceCall");
-        startService(i);
+        //startService();
+    }
 
+    private void initializeToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(toolbar);
+        this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void initializeComponent() {
         inputMethodManager = (InputMethodManager) MainActivity.this.
                 getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        // Initialize drawer layout
-        drawerLayoutNavigation = (DrawerLayout) findViewById(R.id.drawerLayoutNavigation);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
-        // Initialize navigation
-        linearLayoutManager = new LinearLayoutManager(MainActivity.this);
-        navigationAdapter = new NavigationAdapter(MainActivity.this, handler);
-        recyclerViewVNavigation = (RecyclerView) findViewById(R.id.recyclerViewNavigation);
-        recyclerViewVNavigation.setHasFixedSize(true);
-        recyclerViewVNavigation.setAdapter(navigationAdapter);
-        recyclerViewVNavigation.setLayoutManager(linearLayoutManager);
+        navigationView = (NavigationView) findViewById(R.id.navigation);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        // Initialize view pager
         viewPagerAdapter = new ViewPagerAdapter(this, this.getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(viewPagerAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
 
-            @Override
-            public void onPageSelected(int position) {
-                txtTitlePage.setText(viewPagerAdapter.getPageTitle(position));
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-
-        // Initialize sliding tab
-        slidingTabs = (SlidingTabLayout) findViewById(R.id.slidingTabs);
-        slidingTabs.setCustomTabView(R.layout.custom_tab_view, R.id.tabIcon);
-        slidingTabs.setDistributeEvenly(true);
-        slidingTabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+        slidingTab = (SlidingTabLayout) findViewById(R.id.slidingTab);
+        slidingTab.setCustomTabView(R.layout.custom_tab_view, R.id.tabIcon);
+        slidingTab.setDistributeEvenly(true);
+        slidingTab.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
                 return Color.WHITE;
             }
         });
-        slidingTabs.setViewPager(viewPager);
+        slidingTab.setViewPager(viewPager);
 
-        menu = (ImageView) findViewById(R.id.menu);
-        menu.setOnClickListener(this);
-        addFriend = (ImageView) findViewById(R.id.addFriend);
-        addFriend.setOnClickListener(this);
-        txtInternet = (TextView) findViewById(R.id.txtInternet);
-        if (!isNetworkConnected(this)) {
-            txtInternet.setVisibility(LinearLayout.VISIBLE);
-        }
-        txtTitlePage = (TextView) findViewById(R.id.txtTitlePage);
-        txtTitlePage.setText(viewPagerAdapter.getPageTitle(0));
+        initializeFloatingMenu();
+        initializeProfileInformation();
+    }
+
+    private void initializeProfileInformation() {
+        View header = navigationView.getChildAt(0);
+        TextView txtName = (TextView) header.findViewById(R.id.txtName);
+        txtName.setText((String) ParseUser.getCurrentUser().get("fullName"));
+        TextView txtEmail = (TextView) header.findViewById(R.id.txtEmail);
+        txtEmail.setText("phongbm.it@gmail.com");
+    }
+
+    /* private void startService() {
+        Intent intentStartService = new Intent();
+        intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.call.MyServiceCall");
+        startService(intentStartService);
+    }*/
+
+    private void initializeFloatingMenu() {
+        int padding = getResources().getDimensionPixelSize(R.dimen.red_button_content_padding);
+        int size = getResources().getDimensionPixelSize(R.dimen.blue_button_size);
+        int margin = getResources().getDimensionPixelSize(R.dimen.blue_button_content_margin);
+
+        ImageView imgMainMenu = new ImageView(this);
+        imgMainMenu.setImageResource(R.drawable.ic_plus);
+        imgMainMenu.setPadding(padding, padding, padding, padding);
+        FloatingActionButton btnMainMenu = new FloatingActionButton.Builder(this)
+                .setContentView(imgMainMenu)
+                .setBackgroundDrawable(R.drawable.button_action_red)
+                .build();
+
+        SubActionButton.Builder builder = new SubActionButton.Builder(this)
+                .setBackgroundDrawable(getResources().getDrawable(R.drawable.button_action_blue));
+        builder.setLayoutParams(new LayoutParams(size, size));
+        LayoutParams contentParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT);
+        contentParams.setMargins(margin, margin, margin, margin);
+
+        ImageView imgSubMenu1 = new ImageView(this);
+        ImageView imgSubMenu2 = new ImageView(this);
+        ImageView imgSubMenu3 = new ImageView(this);
+        imgSubMenu1.setImageResource(R.drawable.ic_search);
+        imgSubMenu2.setImageResource(R.drawable.ic_add_friend);
+        imgSubMenu3.setImageResource(R.drawable.ic_message);
+
+        SubActionButton subMenuSearch = builder.setContentView(imgSubMenu1, contentParams).build();
+        SubActionButton subMenuAddFried = builder.setContentView(imgSubMenu2, contentParams).build();
+        SubActionButton subMenuMessage = builder.setContentView(imgSubMenu3, contentParams).build();
+
+        (new FloatingActionMenu.Builder(this)).addSubActionView(subMenuSearch).addSubActionView(subMenuAddFried)
+                .addSubActionView(subMenuMessage).attachTo(btnMainMenu).build();
+
+        subMenuAddFried.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddFriendDialog addFriendDialog = new AddFriendDialog(MainActivity.this, handler);
+                addFriendDialog.show();
+                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.menu:
-                drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
-                drawerLayoutNavigation.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                break;
-            case R.id.addFriend:
-                AddFriendDialog addFriendDialog = new AddFriendDialog(MainActivity.this, handler);
-                addFriendDialog.show();
-                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-                break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -153,6 +187,17 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     public FriendItem getFriend() {
         return friend;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        menuItem.setChecked(true);
+        drawerLayout.closeDrawers();
+        switch (menuItem.getItemId()) {
+            case R.id.nav_notifications:
+                break;
+        }
+        return true;
     }
 
 }

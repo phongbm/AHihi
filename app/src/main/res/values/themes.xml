@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.AHihi" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
+    <style name="AppBaseTheme" parent="Base.Theme.AHihi" />
+    <style name="AppTheme" parent="AppBaseTheme" />
+</resources>

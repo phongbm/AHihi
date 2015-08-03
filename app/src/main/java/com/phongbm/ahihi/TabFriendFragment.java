@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -61,6 +62,9 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private void initializeComponent() {
         listViewFriend = (ListView) view.findViewById(R.id.listViewFriend);
         listViewFriend.setOnItemClickListener(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            listViewFriend.setNestedScrollingEnabled(true);
+        }
     }
 
     private UpdateListFriend updateListFriend = new UpdateListFriend();
