@@ -2,7 +2,7 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,21 +13,17 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "SignupFragment";
+
     private View view;
     private EditText edtPhoneNumber, edtPassword, edtConfirmPassword;
     private TextView btnSignup;
     private CheckBox checkBoxAgree;
-    private TextWatcher textWatcherPhoneNumber, textWatcherPassword, textWatcherConfirmPassword;
     private boolean isFillPhoneNumber, isFillPassword, isFillConfirmPassword, isCheckBoxChecked;
-
 
     @Override
     public void onAttach(Activity activity) {
@@ -60,7 +56,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-        textWatcherPhoneNumber = new TextWatcher() {
+        edtPhoneNumber.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -78,9 +74,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
+
             }
-        };
-        textWatcherPassword = new TextWatcher() {
+        });
+        edtPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -98,9 +95,22 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (edtPassword.getText().toString().length() > 0
+                        && edtConfirmPassword.getText().toString().length() > 0) {
+                    if (!edtPassword.getText().toString()
+                            .equals(edtConfirmPassword.getText().toString())) {
+                        edtPassword.setError("'Password' and 'Confirm Password' do not match");
+                    } else {
+                        edtPassword.setError(null);
+                        edtConfirmPassword.setError(null);
+                    }
+                } else {
+                    edtPassword.setError(null);
+                    edtConfirmPassword.setError(null);
+                }
             }
-        };
-        textWatcherConfirmPassword = new TextWatcher() {
+        });
+        edtConfirmPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -118,11 +128,21 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (edtPassword.getText().toString().length() > 0
+                        && edtConfirmPassword.getText().toString().length() > 0) {
+                    if (!edtConfirmPassword.getText().toString()
+                            .equals(edtPassword.getText().toString())) {
+                        edtConfirmPassword.setError("'Confirm Password' and 'Password' do not match");
+                    } else {
+                        edtConfirmPassword.setError(null);
+                        edtPassword.setError(null);
+                    }
+                } else {
+                    edtConfirmPassword.setError(null);
+                    edtPassword.setError(null);
+                }
             }
-        };
-        edtPhoneNumber.addTextChangedListener(textWatcherPhoneNumber);
-        edtPassword.addTextChangedListener(textWatcherPassword);
-        edtConfirmPassword.addTextChangedListener(textWatcherConfirmPassword);
+        });
     }
 
     private void enabledButtonSignup() {

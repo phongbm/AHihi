@@ -5,13 +5,13 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
@@ -23,7 +23,7 @@ import com.phongbm.ahihi.R;
 public class LoginFragment extends Fragment implements View.OnClickListener {
     private View view;
     private EditText edtPhoneNumber, edtPassword;
-    private TextView btnLogin;
+    private AppCompatButton btnLogin;
     private TextWatcher textWatcherPhoneNumber, textWatcherPassword;
     private boolean isFillPhoneNumber, isFillPassword;
 
@@ -40,7 +40,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initializeComponent() {
-        btnLogin = (TextView) view.findViewById(R.id.btnLogin);
+        btnLogin = (AppCompatButton) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
         edtPassword = (EditText) view.findViewById(R.id.edtPassword);

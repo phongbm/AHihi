@@ -7,4 +7,6 @@
     <string name="forgot_password"><u>Forgot password?</u></string>
     <string name="log_in">LOG IN</string>
     <string name="sign_up">SIGN UP</string>
+    <string name="open_navigation_drawer">OPEN</string>
+    <string name="close_navigation_drawer">CLOSE</string>
 </resources>

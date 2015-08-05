@@ -30,7 +30,7 @@
         android:layout_below="@+id/txtDesc"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:src="@drawable/avatar_default" />
+        android:src="@drawable/user_avatar_default" />
 
     <LinearLayout
         android:id="@+id/layoutUploadPhoto"

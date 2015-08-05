@@ -2,125 +2,109 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
-    android:padding="32sp">
+    android:background="@color/colorPrimary"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/txtSignup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
         android:text="@string/sign_up"
         android:textColor="#ffffff"
         android:textSize="40sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/txtUsername"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/txtSignup"
-        android:layout_marginTop="36dp"
-        android:text="Username (Phone Number)"
-        android:textColor="#ffffff"
-        android:textSize="15sp" />
+        android:layout_marginTop="32dp"
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:padding="20dp">
 
-    <EditText
-        android:id="@+id/edtPhoneNumber"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtUsername"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_edittext"
-        android:inputType="phone"
-        android:paddingBottom="4dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="4dp"
-        android:textColor="#ffeb3b">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tILPPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
 
-        <requestFocus />
-    </EditText>
+            <EditText
+                android:id="@+id/edtPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Phone Number"
+                android:inputType="phone"
+                android:textColor="#4caf50"
+                android:textColorHint="@color/colorPrimary"
+                android:textSize="20sp" />
+        </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/txtPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/edtPhoneNumber"
-        android:layout_marginTop="16dp"
-        android:text="Password"
-        android:textColor="#ffffff"
-        android:textSize="15sp" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tILPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tILPPhoneNumber"
+            android:layout_marginTop="8dp">
 
-    <EditText
-        android:id="@+id/edtPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtPassword"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_edittext"
-        android:inputType="textPassword"
-        android:paddingBottom="4dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="4dp"
-        android:textColor="#ffeb3b" />
+            <EditText
+                android:id="@+id/edtPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:textColor="#4caf50"
+                android:textColorHint="@color/colorPrimary"
+                android:textSize="20sp" />
+        </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/txtConfirmPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/edtPassword"
-        android:layout_marginTop="16dp"
-        android:text="Confirm password"
-        android:textColor="#ffffff"
-        android:textSize="15sp" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tILConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tILPassword"
+            android:layout_marginTop="8dp">
 
-    <EditText
-        android:id="@+id/edtConfirmPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtConfirmPassword"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/bg_edittext"
-        android:inputType="textPassword"
-        android:paddingBottom="4dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="4dp"
-        android:textColor="#ffeb3b" />
+            <EditText
+                android:id="@+id/edtConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Confirm Password"
+                android:inputType="textPassword"
+                android:textColor="#4caf50"
+                android:textColorHint="@color/colorPrimary"
+                android:textSize="20sp" />
+        </android.support.design.widget.TextInputLayout>
 
-    <CheckBox
-        android:id="@+id/checkBoxAgree"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edtConfirmPassword"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:text=" I agree to THE TERMS AND CONDITIONS"
-        android:textColor="#e0e0e0" />
+        <CheckBox
+            android:id="@+id/checkBoxAgree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tILConfirmPassword"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text=" I agree to THE TERMS AND CONDITIONS"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12sp" />
 
-    <TextView
-        android:id="@+id/btnSignup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/checkBoxAgree"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_btn_round"
-        android:enabled="false"
-        android:gravity="center"
-        android:padding="12dp"
-        android:text="@string/sign_up"
-        android:textColor="#ffffff"
-        android:textStyle="bold" />
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btnSignup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checkBoxAgree"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorPrimaryDark"
+            android:enabled="false"
+            android:gravity="center"
+            android:text="@string/sign_up"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

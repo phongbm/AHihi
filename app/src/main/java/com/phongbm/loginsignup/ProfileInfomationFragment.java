@@ -39,7 +39,7 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
         edtBirthday.setOnClickListener(this);
         btnOK = (TextView) view.findViewById(R.id.btnOK);
         btnOK.setOnClickListener(this);
-        edtFirstName = (EditText) view.findViewById(R.id.edtFistName);
+        edtFirstName = (EditText) view.findViewById(R.id.edtFirstName);
         edtLastName = (EditText) view.findViewById(R.id.edtLastName);
         edtEmail = (EditText) view.findViewById(R.id.edtEmail);
         textWatcherFirstName = new TextWatcher() {

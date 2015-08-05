@@ -10,7 +10,6 @@ import java.util.ArrayList;
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     private int[] tabIconIds = new int[]{R.drawable.bg_tab_message, R.drawable.bg_tab_contact,
             R.drawable.bg_tab_friend, R.drawable.bg_tab_info};
-    private String[] titles = new String[]{"A", "B", "C", "D"};
 
     private ArrayList<Fragment> fragments;
 
@@ -35,7 +34,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return titles[position];
+        return null;
     }
 
     public int getPageIcon(int position) {

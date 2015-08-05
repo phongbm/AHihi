@@ -2,13 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
-    android:padding="32dp">
+    android:background="@color/colorPrimary"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/txtStep1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="STEP 1"
         android:textColor="#ffffff"
         android:textSize="25sp"
@@ -19,166 +22,170 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtStep1"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:text="Profile Infomation"
         android:textColor="#ffffff"
         android:textSize="20sp" />
 
-    <LinearLayout
-        android:id="@+id/layoutFullName"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtDesc"
-        android:layout_marginTop="48dp"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/edtFistName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_edittext"
-            android:hint="First Name"
-            android:inputType="textPersonName"
-            android:padding="16dp"
-            android:textColor="#ffeb3b"
-            android:textColorHint="#ffeb3b">
-
-            <requestFocus />
-        </EditText>
-
-        <EditText
-            android:id="@+id/edtLastName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_edittext"
-            android:hint="Last Name"
-            android:inputType="textPersonName"
-            android:padding="16dp"
-            android:textColor="#ffeb3b"
-            android:textColorHint="#ffeb3b" />
-
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/edtEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layoutFullName"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_edittext"
-        android:hint="Your Email"
-        android:inputType="textEmailAddress"
-        android:padding="16dp"
-        android:textColor="#ffeb3b"
-        android:textColorHint="#ffeb3b" />
+        android:background="@android:drawable/dialog_holo_light_frame"
+        android:padding="20dp">
 
-    <RelativeLayout
-        android:id="@+id/layoutBirthday"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edtEmail"
-        android:layout_marginTop="16dp"
-        android:paddingBottom="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="4dp">
+        <LinearLayout
+            android:id="@+id/layoutFullName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/edtFirstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:hint="First Name"
+                    android:inputType="textPersonName"
+                    android:textColor="#4caf50"
+                    android:textColorHint="@color/colorPrimary"
+                    android:textSize="20sp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/edtLastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:hint="Last Name"
+                    android:inputType="textPersonName"
+                    android:textColor="#4caf50"
+                    android:textColorHint="@color/colorPrimary"
+                    android:textSize="20sp" />
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/tILEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layoutFullName"
+            android:layout_marginTop="8dp">
+
+            <EditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:textColor="#4caf50"
+                android:textColorHint="@color/colorPrimary"
+                android:textSize="20sp" />
+        </android.support.design.widget.TextInputLayout>
+
+        <RelativeLayout
+            android:id="@+id/layoutBirthday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tILEmail"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/txtBirthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Birthday"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtBirthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="01/01/2000"
+                android:textColor="#4caf50" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layoutSex"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layoutBirthday">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Sex"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp" />
+
+            <RadioGroup
+                android:id="@+id/radioSex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Male"
+                    android:textColor="@color/colorPrimary" />
+
+                <RadioButton
+                    android:id="@+id/radioFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female"
+                    android:textColor="@color/colorPrimary" />
+
+            </RadioGroup>
+
+        </RelativeLayout>
 
         <TextView
-            android:id="@+id/txtBirthday"
-            android:layout_width="wrap_content"
+            android:id="@+id/btnOK"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:text="Birthday"
-            android:textColor="#ffffff" />
-
-        <EditText
-            android:id="@+id/edtBirthday"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:clickable="false"
-            android:cursorVisible="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:gravity="center"
+            android:layout_below="@+id/layoutSex"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_btn_round"
+            android:enabled="false"
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingTop="8dp"
-            android:text="01/01/2000"
-            android:textColor="#ffffff" />
+            android:text="SAVE AND CONTINUE"
+            android:textColor="#ffffff"
+            android:textStyle="bold" />
 
     </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layoutBirthday"
-        android:paddingBottom="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="4dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:text="Sex"
-            android:textColor="#ffffff" />
-
-        <RadioGroup
-            android:id="@+id/radioSex"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radioMale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Male"
-                android:textColor="#ffffff" />
-
-            <RadioButton
-                android:id="@+id/radioFemale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Female"
-                android:textColor="#ffffff" />
-
-        </RadioGroup>
-
-    </RelativeLayout>
-
-
-    <TextView
-        android:id="@+id/btnOK"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/bg_btn_round"
-        android:enabled="false"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp"
-        android:text="SAVE AND CONTINUE"
-        android:textColor="#ffffff"
-        android:textStyle="bold" />
 
 </RelativeLayout>
