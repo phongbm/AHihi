@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -11,15 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.RadioButton;
 
 import com.phongbm.ahihi.R;
 
 public class ProfileInfomationFragment extends Fragment implements View.OnClickListener {
     private View view;
     private EditText edtBirthday, edtFirstName, edtLastName, edtEmail;
-    private TextView btnOK;
-    private TextWatcher textWatcherFirstName, textWatcherLastName, textWatcherEmail;
+    private AppCompatButton btnOK;
+    private RadioButton radioMale, radioFemale;
     private boolean isFillFirstName, isFillLastName, isFillEmail;
 
     @Override
@@ -35,14 +36,14 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
     }
 
     private void initializeComponent() {
+        btnOK = (AppCompatButton) view.findViewById(R.id.btnOK);
+        btnOK.setOnClickListener(this);
         edtBirthday = (EditText) view.findViewById(R.id.edtBirthday);
         edtBirthday.setOnClickListener(this);
-        btnOK = (TextView) view.findViewById(R.id.btnOK);
-        btnOK.setOnClickListener(this);
         edtFirstName = (EditText) view.findViewById(R.id.edtFirstName);
         edtLastName = (EditText) view.findViewById(R.id.edtLastName);
         edtEmail = (EditText) view.findViewById(R.id.edtEmail);
-        textWatcherFirstName = new TextWatcher() {
+        edtFirstName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -61,8 +62,8 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
             @Override
             public void afterTextChanged(Editable s) {
             }
-        };
-        textWatcherLastName = new TextWatcher() {
+        });
+        edtLastName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -81,8 +82,8 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
             @Override
             public void afterTextChanged(Editable s) {
             }
-        };
-        textWatcherEmail = new TextWatcher() {
+        });
+        edtEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -101,10 +102,9 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
             @Override
             public void afterTextChanged(Editable s) {
             }
-        };
-        edtFirstName.addTextChangedListener(textWatcherFirstName);
-        edtLastName.addTextChangedListener(textWatcherLastName);
-        edtEmail.addTextChangedListener(textWatcherEmail);
+        });
+        radioMale = (RadioButton) view.findViewById(R.id.radioMale);
+        radioFemale = (RadioButton) view.findViewById(R.id.radioFemale);
     }
 
     private void enabledButtonOK() {
@@ -142,6 +142,26 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
         DatePickerDialog datePickerDialog = new DatePickerDialog(this.getActivity(),
                 onDateSetListener, year, month, day);
         datePickerDialog.show();
+    }
+
+    public String getFullName() {
+        return edtFirstName.getText().toString().trim() + " "
+                + edtLastName.getText().toString().trim();
+    }
+
+    public String getEmail() {
+        return edtEmail.getText().toString();
+    }
+
+    public String getBirthday() {
+        return edtBirthday.getText().toString();
+    }
+
+    public boolean getSex() {
+        if (radioMale.isChecked())
+            return true;
+        else
+            return false;
     }
 
 }

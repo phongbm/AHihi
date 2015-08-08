@@ -13,7 +13,7 @@
         android:layout_height="48dp"
         android:layout_centerVertical="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_avatar_friend_default" />
+        android:src="@drawable/user_avatar_default" />
 
     <TextView
         android:id="@+id/txtName"

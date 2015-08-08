@@ -1,48 +1,83 @@
 package com.phongbm.image;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.Slide;
-import android.view.View;
+import android.util.DisplayMetrics;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.phongbm.ahihi.R;
 
 public class ImageControl extends AppCompatActivity {
     public static final String EXTRA_IMAGE = "ImageControl:image";
 
-    public static void launch(Activity activity, View transitionView, String url) {
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                activity, transitionView, EXTRA_IMAGE);
-        Intent intent = new Intent(activity, ImageControl.class);
-        intent.putExtra(EXTRA_IMAGE, url);
-        ActivityCompat.startActivity(activity, intent, options.toBundle());
-    }
+    public static int WIDTH_SCREEN, HEIGHT_SCREEN;
+
+    private RelativeLayout layoutCropImage;
+    private MySurfaceView mySurfaceView;
+    private String url;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Slide transition = new Slide();
-            transition.excludeTarget(android.R.id.statusBarBackground, true);
-            getWindow().setEnterTransition(transition);
-            getWindow().setReturnTransition(transition);
-        }
         setContentView(R.layout.activity_image_control);
+        getScreenSize();
+        initializeLayoutCropImage();
+        drawCircleFade();
 
-        ImageView image = (ImageView) findViewById(R.id.imgImage);
-        ViewCompat.setTransitionName(image, EXTRA_IMAGE);
-        supportPostponeEnterTransition();
+        url = getIntent().getStringExtra(EXTRA_IMAGE);
+        mySurfaceView = (MySurfaceView) findViewById(R.id.mySurfaceView);
+        mySurfaceView.startThread(url);
+    }
 
-        //ImageView imgImage = (ImageView) findViewById(R.id.imgImage);
-        //imgImage.setImageURI(Uri.parse(getIntent().getStringExtra(EXTRA_IMAGE)));
+    private void getScreenSize() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        WIDTH_SCREEN = metrics.widthPixels;
+        HEIGHT_SCREEN = metrics.heightPixels;
+    }
+
+    private void initializeLayoutCropImage() {
+        layoutCropImage = (RelativeLayout) findViewById(R.id.layoutCropImage);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(WIDTH_SCREEN, WIDTH_SCREEN);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        layoutCropImage.setLayoutParams(params);
+        imageView = (ImageView) findViewById(R.id.imageView);
+    }
+
+    private void drawCircleFade() {
+        Bitmap bm = Bitmap.createBitmap(WIDTH_SCREEN, WIDTH_SCREEN, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bm);
+        canvas.drawColor(Color.parseColor("#904caf50"));
+        Paint p = new Paint();
+        p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        p.setAntiAlias(true);
+        canvas.drawCircle(WIDTH_SCREEN / 2, WIDTH_SCREEN / 2, WIDTH_SCREEN / 2, p);
+        imageView.setImageBitmap(bm);
+    }
+
+    public static Bitmap getReziseBitmap(Bitmap bitmap, int newWidth, int newHeight) {
+        int width = bitmap.getWidth();
+        int heiht = bitmap.getHeight();
+        float scaleWidth = (float) newWidth / width;
+        float scaleHeight = (float) newHeight / heiht;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        return Bitmap.createBitmap(bitmap, 0, 0, width, heiht, matrix, false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mySurfaceView.setRunning(false);
+        super.onDestroy();
     }
 
 

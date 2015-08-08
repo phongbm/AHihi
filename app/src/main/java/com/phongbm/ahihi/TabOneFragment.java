@@ -47,6 +47,9 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLogout:
+                ParseUser parseUser = ParseUser.getCurrentUser();
+                parseUser.put("isOnline", false);
+                parseUser.saveInBackground();
                 ParseUser.logOut();
                 Intent intent = new Intent(TabOneFragment.this.getActivity(), MainFragment.class);
                 TabOneFragment.this.getActivity().startActivity(intent);

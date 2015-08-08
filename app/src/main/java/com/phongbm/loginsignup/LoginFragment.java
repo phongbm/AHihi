@@ -24,7 +24,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private View view;
     private EditText edtPhoneNumber, edtPassword;
     private AppCompatButton btnLogin;
-    private TextWatcher textWatcherPhoneNumber, textWatcherPassword;
     private boolean isFillPhoneNumber, isFillPassword;
 
     @Override
@@ -44,7 +43,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         btnLogin.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
         edtPassword = (EditText) view.findViewById(R.id.edtPassword);
-        textWatcherPhoneNumber = new TextWatcher() {
+        edtPhoneNumber.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -63,8 +62,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             @Override
             public void afterTextChanged(Editable s) {
             }
-        };
-        textWatcherPassword = new TextWatcher() {
+        });
+        edtPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -83,9 +82,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
             @Override
             public void afterTextChanged(Editable s) {
             }
-        };
-        edtPhoneNumber.addTextChangedListener(textWatcherPhoneNumber);
-        edtPassword.addTextChangedListener(textWatcherPassword);
+        });
     }
 
     private void enabledButtonLogin() {
@@ -104,8 +101,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
 
-                String phoneNumber = edtPhoneNumber.getText().toString();
-                String password = edtPassword.getText().toString();
+                String phoneNumber = edtPhoneNumber.getText().toString().trim();
+                String password = edtPassword.getText().toString().trim();
                 ParseUser.logInInBackground(phoneNumber, password, new LogInCallback() {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
@@ -114,8 +111,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                             parseUser.saveInBackground();
                             Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
                             LoginFragment.this.getActivity().startActivity(intent);
-                            LoginFragment.this.getActivity().finish();
                             progressDialog.dismiss();
+                            LoginFragment.this.getActivity().finish();
                         } else {
                             progressDialog.dismiss();
                             Toast.makeText(LoginFragment.this.getActivity(),

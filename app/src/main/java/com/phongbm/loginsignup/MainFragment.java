@@ -1,13 +1,12 @@
 package com.phongbm.loginsignup;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 
 import com.phongbm.ahihi.R;
 
 public class MainFragment extends Activity {
-    private LoginSignupFragment loginSignupFragment = new LoginSignupFragment();
+    private HomeFragment homeFragment = new HomeFragment();
     private LoginFragment loginFragment = new LoginFragment();
     private SignupFragment signupFragment = new SignupFragment();
     private ProfileInfomationFragment profileInfomationFragment = new ProfileInfomationFragment();
@@ -16,18 +15,18 @@ public class MainFragment extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.showLoginSignupFragmentNoAnimation();
+        this.showHomeFragmentNoAnimation();
     }
 
-    public void showLoginSignupFragment() {
+    public void showHomeFragment() {
         this.getFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.anim_in_left, R.anim.anim_out_right)
-                .replace(android.R.id.content, loginSignupFragment).commit();
+                .replace(android.R.id.content, homeFragment).commit();
     }
 
-    public void showLoginSignupFragmentNoAnimation() {
+    public void showHomeFragmentNoAnimation() {
         this.getFragmentManager().beginTransaction().replace(android.R.id.content,
-                loginSignupFragment).commit();
+                homeFragment).commit();
     }
 
     public void showLoginFragment() {
@@ -60,15 +59,19 @@ public class MainFragment extends Activity {
                 .replace(android.R.id.content, profilePictureFragment).commit();
     }
 
+    public ProfileInfomationFragment getProfileInfomationFragment() {
+        return profileInfomationFragment;
+    }
+
     @Override
     public void onBackPressed() {
         if (loginFragment.isVisible() || signupFragment.isVisible()) {
-            this.showLoginSignupFragment();
+            this.showHomeFragment();
         } else {
             if (profileInfomationFragment.isVisible()) {
             } else {
                 if (profilePictureFragment.isVisible()) {
-                    this.showProfileInfomationFragment();
+                    this.showProfileInfomationFragmentBack();
                 } else {
                     super.onBackPressed();
                 }

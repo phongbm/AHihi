@@ -69,6 +69,7 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = layoutInflater.inflate(R.layout.item_image, parent, false);
         ImageView imgImage = (ImageView) convertView.findViewById(R.id.imgImage);
+        convertView.setTag(imageURLs.get(position));
         if (imageStates.get(position).isFinish) {
             imgImage.setImageBitmap(imageStates.get(position).image);
         } else {

@@ -32,7 +32,7 @@
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
                     app:tabIndicatorColor="#ffffff" />
 
             </android.support.design.widget.AppBarLayout>
@@ -44,6 +44,20 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         </android.support.design.widget.CoordinatorLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btnNewMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_plus"
+            app:backgroundTint="#f44336"
+            app:elevation="8dp"
+            app:pressedTranslationZ="8dp"
+            app:rippleColor="@color/colorPrimaryDark" />
 
     </RelativeLayout>
 

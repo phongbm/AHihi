@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,17 +16,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.parse.ParseUser;
 import com.phongbm.call.OutgoingCallActivity;
 
 @SuppressLint("ValidFragment")
-public class TabFriendFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class TabFriendFragment extends Fragment implements AdapterView.OnItemClickListener,
+        View.OnClickListener {
     private static final String TAG = "TabFriendFragment";
 
     private View view;
     private ListView listViewFriend;
     private FriendAdapter friendAdapter;
+    private TextView btnTabActive, btnTabAllFriends;
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -62,9 +65,13 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private void initializeComponent() {
         listViewFriend = (ListView) view.findViewById(R.id.listViewFriend);
         listViewFriend.setOnItemClickListener(this);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             listViewFriend.setNestedScrollingEnabled(true);
-        }
+        }*/
+        btnTabActive = (TextView) view.findViewById(R.id.btnTabActive);
+        btnTabActive.setOnClickListener(this);
+        btnTabAllFriends = (TextView) view.findViewById(R.id.btnTabAllFriends);
+        btnTabAllFriends.setOnClickListener(this);
     }
 
     private UpdateListFriend updateListFriend = new UpdateListFriend();
@@ -84,6 +91,31 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getActivity().startActivity(intentCall);
     }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnTabActive:
+                changeStateShow(btnTabActive);
+                changeStateHide(btnTabAllFriends);
+                break;
+            case R.id.btnTabAllFriends:
+                changeStateShow(btnTabAllFriends);
+                changeStateHide(btnTabActive);
+                break;
+        }
+    }
+
+    private void changeStateShow(TextView txt) {
+        txt.setBackgroundResource(R.color.green_500);
+        txt.setTextColor(Color.WHITE);
+    }
+
+    private void changeStateHide(TextView txt) {
+        txt.setBackgroundResource(R.drawable.bg_rect_stroke_green);
+        txt.setTextColor(this.getActivity().getResources().getColor(R.color.green_500));
+    }
+
 
     private class UpdateListFriend extends BroadcastReceiver {
         @Override

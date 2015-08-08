@@ -4,13 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -24,11 +23,11 @@ import java.util.List;
 public class AddFriendDialog extends Dialog implements
         android.view.View.OnClickListener {
     private static final String TAG = "AddFriendDialog";
+
     private Context context;
     private Handler handler;
     private EditText edtPhoneNumber;
-    private TextView btnAddFriend;
-    private TextWatcher textWatcherPhoneNumber;
+    private AppCompatButton btnAddFriend;
 
     public AddFriendDialog(Context context, Handler handler) {
         super(context);
@@ -41,9 +40,9 @@ public class AddFriendDialog extends Dialog implements
 
     private void initializeComponent() {
         edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
-        btnAddFriend = (TextView) findViewById(R.id.btnAddFriend);
+        btnAddFriend = (AppCompatButton) findViewById(R.id.btnAddFriend);
         btnAddFriend.setOnClickListener(this);
-        textWatcherPhoneNumber = new TextWatcher() {
+        edtPhoneNumber.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -60,8 +59,7 @@ public class AddFriendDialog extends Dialog implements
             @Override
             public void afterTextChanged(Editable s) {
             }
-        };
-        edtPhoneNumber.addTextChangedListener(textWatcherPhoneNumber);
+        });
     }
 
     @Override

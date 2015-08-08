@@ -2,10 +2,11 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.drawable.Drawable;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
@@ -74,7 +79,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
         edtPassword.addTextChangedListener(new TextWatcher() {
@@ -156,14 +160,14 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSignup:
-                /*final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
+                final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
                 progressDialog.setTitle("Signing up");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
 
-                String phoneNumber = edtPhoneNumber.getText().toString();
-                String password = edtPassword.getText().toString();
+                String phoneNumber = edtPhoneNumber.getText().toString().trim();
+                String password = edtPassword.getText().toString().trim();
                 ParseUser parseUser = new ParseUser();
                 parseUser.setUsername(phoneNumber);
                 parseUser.setPassword(password);
@@ -171,6 +175,12 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
+                            ParseUser user = ParseUser.getCurrentUser();
+                            if (user != null) {
+                                Log.i(TAG, "Sign up successfully user not null");
+                            }
+                            // user.put("isOnline", true);
+                            // user.saveInBackground();
                             ((MainFragment) SignupFragment.this.getActivity())
                                     .showProfileInfomationFragment();
                             progressDialog.dismiss();
@@ -182,9 +192,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                                     "There was an error signing up", Toast.LENGTH_LONG).show();
                         }
                     }
-                });*/
-                ((MainFragment) SignupFragment.this.getActivity())
-                        .showProfileInfomationFragment();
+                });
                 break;
         }
     }

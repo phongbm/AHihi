@@ -5,4 +5,5 @@
     <color name="textColorPrimary">#ffffff</color>
     <color name="textColorSecondary">#ffffff</color>
     <color name="window_background">#ffffff</color>
+    <color name="green_500">#4caf50</color>
 </resources>

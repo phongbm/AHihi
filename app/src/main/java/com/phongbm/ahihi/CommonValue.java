@@ -11,4 +11,9 @@ public class CommonValue {
     public static final String ACTION_OUTGOING_CALL = "ACTION_OUTGOING_CALL";
     public static final String END_CALL = "END_CALL";
 
+    public static final String URL_IAMGE = "URL_IAMGE";
+    public static final String X_IMAGE = "X_IMAGE";
+    public static final String Y_IMAGE = "Y_IMAGE";
+    public static final String CROP_PICTURE = "CROP_PICTURE";
+
 }

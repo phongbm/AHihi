@@ -3,7 +3,6 @@ package com.phongbm.ahihi;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +10,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FriendAdapter extends BaseAdapter {
     private static final String TAG = "FriendAdapter";
@@ -77,7 +74,7 @@ public class FriendAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.item_list_friend, parent, false);
+            convertView = layoutInflater.inflate(R.layout.item_friend, parent, false);
         }
         TextView nameFriend = (TextView) convertView.findViewById(R.id.txtName);
         ImageView imgAvatar = (ImageView) convertView.findViewById(R.id.imgAvatar);
