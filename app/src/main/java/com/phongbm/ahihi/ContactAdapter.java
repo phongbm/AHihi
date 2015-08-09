@@ -27,16 +27,23 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
 
     private void initializeArrayListContactItem() {
         contactItems = new ArrayList<ContactItem>();
-        Cursor cursor = context.getContentResolver().query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+        Cursor cursor = context.getContentResolver().query
+                (ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER,
+                                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                                ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI}, null,
+                        null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
+        if (cursor == null) {
+            return;
+        }
+        String phoneNumber, name, photo;
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            String phoneNumber = cursor.getString(cursor.getColumnIndex(
+            phoneNumber = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.CommonDataKinds.Phone.NUMBER));
-            String name = cursor.getString(cursor.getColumnIndex(
+            name = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String photo = cursor.getString(cursor.getColumnIndex(
+            photo = cursor.getString(cursor.getColumnIndex(
                     ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI));
             contactItems.add(new ContactItem(phoneNumber, name, photo));
             cursor.moveToNext();
@@ -58,7 +65,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     @Override
     public void onBindViewHolder(ContactViewHolder contactViewHolder, int position) {
         if (contactItems.get(position).getPhoto() != null) {
-            contactViewHolder.imgContactIcon.setImageURI(Uri.parse(contactItems.get(position).getPhoto()));
+            contactViewHolder.imgContactIcon.setImageURI(
+                    Uri.parse(contactItems.get(position).getPhoto()));
         }
         contactViewHolder.txtContactName.setText(contactItems.get(position).getName());
         contactViewHolder.txtContactDescription.setText(contactItems.get(position).getPhoneNumber());

@@ -2,6 +2,7 @@ package com.phongbm.loginsignup;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Window;
 
 import com.phongbm.ahihi.R;
 
@@ -15,6 +16,7 @@ public class MainFragment extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         this.showHomeFragmentNoAnimation();
     }
 
@@ -61,6 +63,10 @@ public class MainFragment extends Activity {
 
     public ProfileInfomationFragment getProfileInfomationFragment() {
         return profileInfomationFragment;
+    }
+
+    public SignupFragment getSignupFragment() {
+        return signupFragment;
     }
 
     @Override

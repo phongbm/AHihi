@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +22,7 @@ import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SignupFragment";
+    // private MainFragment mainFragment;
 
     private View view;
     private EditText edtPhoneNumber, edtPassword, edtConfirmPassword;
@@ -32,6 +32,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onAttach(Activity activity) {
+        // mainFragment = (MainFragment) activity;
         super.onAttach(activity);
     }
 
@@ -168,19 +169,18 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
                 String phoneNumber = edtPhoneNumber.getText().toString().trim();
                 String password = edtPassword.getText().toString().trim();
-                ParseUser parseUser = new ParseUser();
+
+                // mainFragment.setProgressBarIndeterminateVisibility(true);
+
+                final ParseUser parseUser = new ParseUser();
                 parseUser.setUsername(phoneNumber);
                 parseUser.setPassword(password);
                 parseUser.signUpInBackground(new SignUpCallback() {
                     @Override
                     public void done(ParseException e) {
+                        // mainFragment.setProgressBarIndeterminateVisibility(false);
+
                         if (e == null) {
-                            ParseUser user = ParseUser.getCurrentUser();
-                            if (user != null) {
-                                Log.i(TAG, "Sign up successfully user not null");
-                            }
-                            // user.put("isOnline", true);
-                            // user.saveInBackground();
                             ((MainFragment) SignupFragment.this.getActivity())
                                     .showProfileInfomationFragment();
                             progressDialog.dismiss();
@@ -195,6 +195,14 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 });
                 break;
         }
+    }
+
+    public String getPhoneNumber() {
+        return edtPhoneNumber.getText().toString().trim();
+    }
+
+    public String getPassword() {
+        return edtPassword.getText().toString().trim();
     }
 
 }

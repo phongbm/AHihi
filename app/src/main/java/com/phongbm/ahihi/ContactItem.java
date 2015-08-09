@@ -1,5 +1,7 @@
 package com.phongbm.ahihi;
 
+import android.net.Uri;
+
 public class ContactItem {
     private String phoneNumber, name, photo;
 

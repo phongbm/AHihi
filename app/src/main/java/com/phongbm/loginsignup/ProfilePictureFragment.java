@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,10 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
 import com.phongbm.image.SquareImageView;
@@ -29,6 +30,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfilePictureFragment extends Fragment implements View.OnClickListener,
         AdapterView.OnItemClickListener {
     private static final String TAG = "ProfilePictureFragment";
+    // private MainFragment mainFragment;
 
     private View view;
     private GridView gridViewAvatarDefault;
@@ -42,8 +44,11 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
 
     @Override
     public void onAttach(Activity activity) {
+        //if (activity instanceof MainFragment) {
         super.onAttach(activity);
+        // mainFragment = (MainFragment) activity;
         layoutInflater = LayoutInflater.from(activity);
+        //}
     }
 
     @Override
@@ -66,31 +71,36 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnOK:
-                String fullName = ((MainFragment) getActivity()).getProfileInfomationFragment().getFullName();
-                String email = ((MainFragment) getActivity()).getProfileInfomationFragment().getEmail();
-                String birthday = ((MainFragment) getActivity()).getProfileInfomationFragment().getBirthday();
-                boolean sex = ((MainFragment) getActivity()).getProfileInfomationFragment().getSex();
+                final String fullName = ((MainFragment) getActivity()).getProfileInfomationFragment().getFullName();
+                final String email = ((MainFragment) getActivity()).getProfileInfomationFragment().getEmail();
+                final String birthday = ((MainFragment) getActivity()).getProfileInfomationFragment().getBirthday();
+                final boolean sex = ((MainFragment) getActivity()).getProfileInfomationFragment().getSex();
 
-                ParseUser parseUser = ParseUser.getCurrentUser();
-                if (parseUser == null) {
-                    return;
-                }
-                Log.i(TAG, "Update information...");
+                ParseUser newUser = ParseUser.getCurrentUser();
 
-                parseUser.put("fullName", fullName);
-                parseUser.setEmail(email);
-                parseUser.put("birthday", birthday);
-                parseUser.put("sex", sex);
-                parseUser.saveInBackground();
+                // mainFragment.setProgressBarIndeterminateVisibility(true);
+
+                newUser.put("fullName", fullName);
+                newUser.setEmail(email);
+                newUser.put("birthday", birthday);
+                newUser.put("sex", sex);
+                newUser.put("isOnline", true);
+                newUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        // mainFragment.setProgressBarIndeterminateVisibility(false);
+                    }
+                });
 
                 imgAvatar.buildDrawingCache();
                 Bitmap avatar = imgAvatar.getDrawingCache();
-                uploadAvatar(parseUser, avatar);
+                uploadAvatar(newUser, avatar);
 
                 Intent intent = new Intent(this.getActivity(), MainActivity.class);
                 this.getActivity().startActivity(intent);
                 this.getActivity().finish();
                 break;
+
         }
     }
 
@@ -100,8 +110,14 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
         byte[] bytes = byteArrayOutputStream.toByteArray();
         if (bytes != null) {
             ParseFile parseFile = new ParseFile(bytes);
+            // mainFragment.setProgressBarIndeterminateVisibility(true);
             parseUser.put("avatar", parseFile);
-            parseUser.saveInBackground();
+            parseUser.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    // mainFragment.setProgressBarIndeterminateVisibility(false);
+                }
+            });
         }
         try {
             byteArrayOutputStream.close();
