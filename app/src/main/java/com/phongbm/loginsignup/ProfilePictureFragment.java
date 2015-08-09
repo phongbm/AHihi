@@ -30,7 +30,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ProfilePictureFragment extends Fragment implements View.OnClickListener,
         AdapterView.OnItemClickListener {
     private static final String TAG = "ProfilePictureFragment";
-    // private MainFragment mainFragment;
 
     private View view;
     private GridView gridViewAvatarDefault;
@@ -44,11 +43,8 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
 
     @Override
     public void onAttach(Activity activity) {
-        //if (activity instanceof MainFragment) {
         super.onAttach(activity);
-        // mainFragment = (MainFragment) activity;
         layoutInflater = LayoutInflater.from(activity);
-        //}
     }
 
     @Override
@@ -78,8 +74,6 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
 
                 ParseUser newUser = ParseUser.getCurrentUser();
 
-                // mainFragment.setProgressBarIndeterminateVisibility(true);
-
                 newUser.put("fullName", fullName);
                 newUser.setEmail(email);
                 newUser.put("birthday", birthday);
@@ -88,7 +82,6 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
                 newUser.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
-                        // mainFragment.setProgressBarIndeterminateVisibility(false);
                     }
                 });
 
@@ -100,7 +93,6 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
                 this.getActivity().startActivity(intent);
                 this.getActivity().finish();
                 break;
-
         }
     }
 
@@ -110,14 +102,8 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
         byte[] bytes = byteArrayOutputStream.toByteArray();
         if (bytes != null) {
             ParseFile parseFile = new ParseFile(bytes);
-            // mainFragment.setProgressBarIndeterminateVisibility(true);
             parseUser.put("avatar", parseFile);
-            parseUser.saveInBackground(new SaveCallback() {
-                @Override
-                public void done(ParseException e) {
-                    // mainFragment.setProgressBarIndeterminateVisibility(false);
-                }
-            });
+            parseUser.saveInBackground();
         }
         try {
             byteArrayOutputStream.close();

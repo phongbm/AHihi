@@ -2,10 +2,10 @@ package com.phongbm.call;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.phongbm.ahihi.CommonValue;
 import com.phongbm.ahihi.R;
@@ -21,13 +21,14 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         btnEnCall = (ImageView) findViewById(R.id.btnEndCall);
         btnEnCall.setOnClickListener(this);
 
+        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        ;
+
         // thiet lap cuoc goi di
         String id = getIntent().getStringExtra(CommonValue.INCOMING_CALL_ID);
         Intent intent = new Intent(CommonValue.ACTION_OUTGOING_CALL);
         intent.putExtra(CommonValue.INCOMING_CALL_ID, id);
         sendBroadcast(intent);
-
-
     }
 
     @Override

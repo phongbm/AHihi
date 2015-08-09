@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements
         this.initializeToolbar();
         this.initializeComponent();
         this.initializeProfileInformation();
-        //startService();
+        this.startService();
     }
 
     private void initializeToolbar() {
@@ -138,11 +138,11 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    /*private void startService() {
+    private void startService() {
         Intent intentStartService = new Intent();
         intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.call.MyServiceCall");
         startService(intentStartService);
-    }*/
+    }
 
     public FriendItem getFriend() {
         return friend;

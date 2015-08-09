@@ -22,7 +22,6 @@ import com.phongbm.ahihi.R;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SignupFragment";
-    // private MainFragment mainFragment;
 
     private View view;
     private EditText edtPhoneNumber, edtPassword, edtConfirmPassword;
@@ -32,7 +31,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onAttach(Activity activity) {
-        // mainFragment = (MainFragment) activity;
         super.onAttach(activity);
     }
 
@@ -170,16 +168,12 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 String phoneNumber = edtPhoneNumber.getText().toString().trim();
                 String password = edtPassword.getText().toString().trim();
 
-                // mainFragment.setProgressBarIndeterminateVisibility(true);
-
                 final ParseUser parseUser = new ParseUser();
                 parseUser.setUsername(phoneNumber);
                 parseUser.setPassword(password);
                 parseUser.signUpInBackground(new SignUpCallback() {
                     @Override
                     public void done(ParseException e) {
-                        // mainFragment.setProgressBarIndeterminateVisibility(false);
-
                         if (e == null) {
                             ((MainFragment) SignupFragment.this.getActivity())
                                     .showProfileInfomationFragment();
