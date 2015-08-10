@@ -15,7 +15,7 @@
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/user_avatar_default" />
+        android:src="@drawable/ic_avatar_default" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -43,6 +43,7 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/invite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -50,12 +51,13 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:background="#ff9800"
+        android:background="@color/green_500"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingTop="4dp"
         android:text="INVITE"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:textSize="12sp" />
 
 </RelativeLayout>

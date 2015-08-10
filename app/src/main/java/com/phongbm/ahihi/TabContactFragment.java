@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 @SuppressLint("ValidFragment")
 public class TabContactFragment extends Fragment {
@@ -16,19 +17,19 @@ public class TabContactFragment extends Fragment {
 
     private Context context;
     private View view;
-    private RecyclerView recyclerViewContact;
+    private ListView listViewContact;
 
     public TabContactFragment(Context context) {
         this.context = context;
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         view = layoutInflater.inflate(R.layout.tab_contact, null);
-        initializeComponent();
+        this.initializeComponent();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recyclerViewContact.setAdapter(new ContactAdapter(context));
+        listViewContact.setAdapter(new ContactAdapter(context));
     }
 
     @Override
@@ -37,9 +38,7 @@ public class TabContactFragment extends Fragment {
     }
 
     private void initializeComponent() {
-        recyclerViewContact = (RecyclerView) view.findViewById(R.id.recyclerViewContact);
-        recyclerViewContact.setLayoutManager(new LinearLayoutManager(context));
-        recyclerViewContact.setHasFixedSize(true);
+        listViewContact = (ListView) view.findViewById(R.id.listViewContact);
     }
 
 }

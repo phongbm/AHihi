@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.phongbm.ahihi.CommonValue;
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonValue;
 
 public class OutgoingCallActivity extends Activity implements View.OnClickListener {
     private ImageView btnEnCall;
@@ -22,8 +22,6 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         btnEnCall.setOnClickListener(this);
 
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        ;
-
         // thiet lap cuoc goi di
         String id = getIntent().getStringExtra(CommonValue.INCOMING_CALL_ID);
         Intent intent = new Intent(CommonValue.ACTION_OUTGOING_CALL);

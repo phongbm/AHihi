@@ -5,13 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.parse.ParseUser;
-import com.phongbm.ahihi.CommonValue;
-import com.phongbm.ahihi.ServerInfo;
+import com.phongbm.common.CommonValue;
+import com.phongbm.common.ServerInfo;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
@@ -24,8 +23,8 @@ import java.util.List;
 
 public class MyServiceCall extends Service {
     private static final String TAG = "MyServiceCall";
+    private static String outGoingId = null;
     private Context context;
-    private String outGoingId = null;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
     private BroadcastReceiverCall receiverCall = null;
@@ -172,6 +171,12 @@ public class MyServiceCall extends Service {
                     break;
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        this.unregisterReceiver(receiverCall);
+        super.onDestroy();
     }
 
 }

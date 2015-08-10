@@ -30,7 +30,7 @@
                 android:shadowColor="#000000"
                 android:shadowDx="0"
                 android:shadowDy="0"
-                android:shadowRadius="50"
+                android:shadowRadius="25"
                 android:text="Welcome!"
                 android:textColor="#ffffff"
                 android:textSize="36sp"
@@ -59,28 +59,45 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btnSignup"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_rect_stroke_white"
-                android:text="@string/sign_up"
-                android:textColor="#ffffff" />
+                android:background="#ffffff"
+                android:padding="1dp">
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/btnLogin"
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnSignup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:text="@string/sign_up"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_rect_stroke_white"
-                android:text="@string/log_in"
-                android:textColor="#ffffff"
-                android:textStyle="bold" />
+                android:background="#ffffff"
+                android:padding="1dp">
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimaryDark"
+                    android:text="@string/log_in"
+                    android:textColor="#ffffff"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

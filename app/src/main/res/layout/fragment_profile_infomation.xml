@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtDesc"
         android:layout_marginTop="32dp"
-        android:background="@drawable/bg_round_fill_white"
+        android:background="@drawable/bg_layout_white"
         android:padding="16dp">
 
         <LinearLayout

@@ -1,4 +1,4 @@
-package com.phongbm.image;
+package com.phongbm.libs;
 
 import android.content.Context;
 import android.util.AttributeSet;

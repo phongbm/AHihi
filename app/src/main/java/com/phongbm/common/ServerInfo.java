@@ -1,4 +1,4 @@
-package com.phongbm.ahihi;
+package com.phongbm.common;
 
 public class ServerInfo {
     public static final String PARSE_APPLICATION_ID = "L3tNbRlz4GUUy7UXE65tiEQwVNYcHDX5GBXa2bBG";

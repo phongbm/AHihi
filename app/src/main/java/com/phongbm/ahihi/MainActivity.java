@@ -1,5 +1,6 @@
 package com.phongbm.ahihi;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,17 +17,29 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.phongbm.common.CommonValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -41,19 +54,13 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private InputMethodManager inputMethodManager;
-    private FriendItem friend;
+    private FriendItem newFriend;
     private Bitmap userAvatar;
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case CommonValue.REQUEST_ADD_FRIEND:
-                    friend = new FriendItem("100", (String) msg.obj);
-                    Intent i = new Intent();
-                    i.setAction("UPDATE_LIST_FRIEND");
-                    sendBroadcast(i);
-                    break;
             }
         }
     };
@@ -123,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements
         TextView txtEmail = (TextView) header.findViewById(R.id.txtEmail);
         txtEmail.setText((String) currentUser.getEmail());
         final CircleImageView imgAvatar = (CircleImageView) header.findViewById(R.id.imgAvatar);
-
         ParseFile parseFile = (ParseFile) currentUser.get("avatar");
         if (parseFile != null) {
             parseFile.getDataInBackground(new GetDataCallback() {
@@ -142,10 +148,6 @@ public class MainActivity extends AppCompatActivity implements
         Intent intentStartService = new Intent();
         intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.call.MyServiceCall");
         startService(intentStartService);
-    }
-
-    public FriendItem getFriend() {
-        return friend;
     }
 
     @Override
@@ -172,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_add_user:
-                AddFriendDialog addFriendDialog = new AddFriendDialog(MainActivity.this, handler);
+                AddFriendDialog addFriendDialog = new AddFriendDialog();
                 addFriendDialog.show();
                 break;
         }
@@ -192,6 +194,106 @@ public class MainActivity extends AppCompatActivity implements
             parseUser.saveInBackground();
         }
         super.onDestroy();
+    }
+
+    public FriendItem getNewFriend() {
+        return newFriend;
+    }
+
+    private void createNewFriend(final ParseUser parseUser) {
+        final ParseFile parseFile = (ParseFile) parseUser.get("avatar");
+        if (parseFile != null) {
+            parseFile.getDataInBackground(new GetDataCallback() {
+                @Override
+                public void done(byte[] bytes, ParseException e) {
+                    if (e == null) {
+                        Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        newFriend = new FriendItem(parseUser.getObjectId(),
+                                (String) parseUser.get("fullName"), avatar);
+                        Intent intentAddFriend = new Intent();
+                        intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
+                        sendBroadcast(intentAddFriend);
+                    }
+                }
+            });
+        }
+        return;
+    }
+
+    private class AddFriendDialog extends Dialog implements
+            android.view.View.OnClickListener {
+        private static final String TAG = "AddFriendDialog";
+
+        private EditText edtPhoneNumber;
+        private AppCompatButton btnAddFriend;
+
+        public AddFriendDialog() {
+            super(MainActivity.this);
+            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            this.setContentView(R.layout.dialog_addfriend);
+            this.initializeComponent();
+        }
+
+        private void initializeComponent() {
+            edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
+            btnAddFriend = (AppCompatButton) findViewById(R.id.btnAddFriend);
+            btnAddFriend.setOnClickListener(this);
+            edtPhoneNumber.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s != null && s.length() > 0) {
+                        btnAddFriend.setEnabled(true);
+                    } else {
+                        btnAddFriend.setEnabled(false);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.btnAddFriend:
+                    String phoneNumber = edtPhoneNumber.getText().toString().trim();
+                    final ParseUser currentUser = ParseUser.getCurrentUser();
+                    ParseQuery<ParseUser> query = ParseUser.getQuery();
+                    query.whereEqualTo("username", phoneNumber);
+                    query.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> list, ParseException e) {
+                            if (e == null) {
+                                if (list.size() == 0) {
+                                    Toast.makeText(MainActivity.this, "That account does not exist",
+                                            Toast.LENGTH_SHORT).show();
+                                    AddFriendDialog.this.dismiss();
+                                    return;
+                                }
+                                ArrayList<String> listFriend = (ArrayList<String>)
+                                        currentUser.get("listFriend");
+                                if (listFriend == null)
+                                    listFriend = new ArrayList<String>();
+                                listFriend.add(list.get(0).getObjectId());
+                                currentUser.put("listFriend", listFriend);
+                                currentUser.saveInBackground();
+
+                                createNewFriend(list.get(0));
+
+                                AddFriendDialog.this.dismiss();
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
+
     }
 
 }

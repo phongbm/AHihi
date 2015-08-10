@@ -3,16 +3,16 @@ package com.phongbm.loginsignup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private View view;
-    private TextView btnLogin, btnSignup;
+    private AppCompatButton btnLogin, btnSignup;
 
     @Override
     public void onAttach(Activity activity) {
@@ -22,14 +22,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_home, null);
-        initializeComponent();
+        this.initializeComponent();
         return view;
     }
 
     private void initializeComponent() {
-        btnLogin = (TextView) view.findViewById(R.id.btnLogin);
+        btnLogin = (AppCompatButton) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
-        btnSignup = (TextView) view.findViewById(R.id.btnSignup);
+        btnSignup = (AppCompatButton) view.findViewById(R.id.btnSignup);
         btnSignup.setOnClickListener(this);
     }
 

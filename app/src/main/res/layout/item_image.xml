@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.phongbm.image.SquareImageView
+    <com.phongbm.libs.SquareImageView
         android:id="@+id/imgImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

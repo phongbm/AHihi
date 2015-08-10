@@ -14,7 +14,7 @@
         android:shadowColor="#000000"
         android:shadowDx="0"
         android:shadowDy="0"
-        android:shadowRadius="50"
+        android:shadowRadius="25"
         android:text="@string/log_in"
         android:textColor="#ffffff"
         android:textSize="40sp"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtLogin"
         android:layout_marginTop="32dp"
-        android:background="@drawable/bg_round_fill_white"
+        android:background="@drawable/bg_layout_white"
         android:padding="16dp">
 
         <android.support.design.widget.TextInputLayout
@@ -89,11 +89,12 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/btnLogin"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="@string/new_user"
             android:textColor="@color/green_500" />
 

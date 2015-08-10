@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.phongbm.call.OutgoingCallActivity;
+import com.phongbm.common.CommonValue;
+
+import java.util.Collections;
 
 @SuppressLint("ValidFragment")
 public class TabFriendFragment extends Fragment implements AdapterView.OnItemClickListener,
@@ -29,12 +31,13 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private ListView listViewFriend;
     private FriendAdapter friendAdapter;
     private TextView btnTabActive, btnTabAllFriends;
+    private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case CommonValue.UPDATE_LIST_FRIEND:
+                case CommonValue.ACTION_UPDATE_LIST_FRIEND:
                     friendAdapter.notifyDataSetChanged();
                     break;
             }
@@ -44,42 +47,35 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     public TabFriendFragment(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         view = layoutInflater.inflate(R.layout.tab_friend, null);
-        initializeComponent();
+        this.initializeComponent();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate()...");
-        registerUpdateListFriend();
+        this.registerUpdateListFriend();
         friendAdapter = new FriendAdapter(getActivity(), handler);
         listViewFriend.setAdapter(friendAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView...");
         return view;
     }
 
     private void initializeComponent() {
         listViewFriend = (ListView) view.findViewById(R.id.listViewFriend);
         listViewFriend.setOnItemClickListener(this);
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            listViewFriend.setNestedScrollingEnabled(true);
-        }*/
         btnTabActive = (TextView) view.findViewById(R.id.btnTabActive);
         btnTabActive.setOnClickListener(this);
         btnTabAllFriends = (TextView) view.findViewById(R.id.btnTabAllFriends);
         btnTabAllFriends.setOnClickListener(this);
     }
 
-    private UpdateListFriend updateListFriend = new UpdateListFriend();
-
     public void registerUpdateListFriend() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction("UPDATE_LIST_FRIEND");
-        getActivity().registerReceiver(updateListFriend, filter);
+        filter.addAction(CommonValue.ACTION_ADD_FRIEND);
+        this.getActivity().registerReceiver(broadcastUpdateListFriend, filter);
     }
 
 
@@ -117,14 +113,21 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     }
 
 
-    private class UpdateListFriend extends BroadcastReceiver {
+    private class BroadcastUpdateListFriend extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("UPDATE_LIST_FRIEND")) {
-                friendAdapter.getFriends().add(((MainActivity) getActivity()).getFriend());
+            if (intent.getAction().equals(CommonValue.ACTION_ADD_FRIEND)) {
+                friendAdapter.getFriends().add(((MainActivity) getActivity()).getNewFriend());
+                Collections.sort(friendAdapter.getFriends());
                 friendAdapter.notifyDataSetChanged();
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        this.getActivity().unregisterReceiver(broadcastUpdateListFriend);
+        super.onDestroy();
     }
 
 }

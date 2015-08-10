@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
@@ -24,6 +25,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private View view;
     private EditText edtPhoneNumber, edtPassword;
     private AppCompatButton btnLogin;
+    private TextView forgotPassword, register;
     private boolean isFillPhoneNumber, isFillPassword;
 
     @Override
@@ -34,13 +36,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_login, null);
-        initializeComponent();
+        this.initializeComponent();
         return view;
     }
 
     private void initializeComponent() {
         btnLogin = (AppCompatButton) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
+        forgotPassword = (TextView) view.findViewById(R.id.forgotPassword);
+        forgotPassword.setOnClickListener(this);
+        register = (TextView) view.findViewById(R.id.register);
+        register.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
         edtPassword = (EditText) view.findViewById(R.id.edtPassword);
         edtPhoneNumber.addTextChangedListener(new TextWatcher() {
@@ -109,8 +115,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         if (parseUser != null) {
                             parseUser.put("isOnline", true);
                             parseUser.saveInBackground();
+
                             Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
                             LoginFragment.this.getActivity().startActivity(intent);
+
                             progressDialog.dismiss();
                             LoginFragment.this.getActivity().finish();
                         } else {
@@ -120,6 +128,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         }
                     }
                 });
+                break;
+            case R.id.forgotPassword:
+                break;
+            case R.id.register:
+                ((MainFragment) this.getActivity()).showSigupFragment();
                 break;
         }
     }

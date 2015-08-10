@@ -20,7 +20,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
-import com.phongbm.image.SquareImageView;
+import com.phongbm.libs.SquareImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,10 +34,10 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
     private View view;
     private GridView gridViewAvatarDefault;
     private CircleImageView imgAvatar;
-    private int[] avatarDefaultIDs = new int[]{R.drawable.ava_1, R.drawable.ava_2,
-            R.drawable.ava_3, R.drawable.ava_4, R.drawable.ava_5, R.drawable.ava_6,
-            R.drawable.ava_7, R.drawable.ava_8, R.drawable.ava_9, R.drawable.ava_10,
-            R.drawable.ava_11, R.drawable.ava_12, R.drawable.user_avatar_default};
+    private int[] avatarDefaultIDs = new int[]{R.drawable.ic_ava_1, R.drawable.ic_ava_2,
+            R.drawable.ic_ava_3, R.drawable.ic_ava_4, R.drawable.ic_ava_5, R.drawable.ic_ava_6,
+            R.drawable.ic_ava_7, R.drawable.ic_ava_8, R.drawable.ic_ava_9, R.drawable.ic_ava_10,
+            R.drawable.ic_ava_11, R.drawable.ic_ava_12, R.drawable.ic_avatar_default};
     private LayoutInflater layoutInflater;
     private AppCompatButton btnOK;
 
@@ -78,12 +78,7 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
                 newUser.setEmail(email);
                 newUser.put("birthday", birthday);
                 newUser.put("sex", sex);
-                newUser.put("isOnline", true);
-                newUser.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                    }
-                });
+                newUser.saveInBackground();
 
                 imgAvatar.buildDrawingCache();
                 Bitmap avatar = imgAvatar.getDrawingCache();

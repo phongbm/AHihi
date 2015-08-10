@@ -5,10 +5,10 @@
     android:background="#ffffff"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerViewContact"
+    <ListView
+        android:id="@+id/listViewContact"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:background="#ffffff" />
 
 </RelativeLayout>

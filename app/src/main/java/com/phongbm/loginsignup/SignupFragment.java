@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -25,8 +26,9 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
     private View view;
     private EditText edtPhoneNumber, edtPassword, edtConfirmPassword;
-    private TextView btnSignup;
+    private AppCompatButton btnSignup;
     private CheckBox checkBoxAgree;
+    private TextView login;
     private boolean isFillPhoneNumber, isFillPassword, isFillConfirmPassword, isCheckBoxChecked;
 
     @Override
@@ -37,13 +39,15 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_signup, null);
-        initializeComponent();
+        this.initializeComponent();
         return view;
     }
 
     private void initializeComponent() {
-        btnSignup = (TextView) view.findViewById(R.id.btnSignup);
+        btnSignup = (AppCompatButton) view.findViewById(R.id.btnSignup);
         btnSignup.setOnClickListener(this);
+        login = (TextView) view.findViewById(R.id.login);
+        login.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
         edtPassword = (EditText) view.findViewById(R.id.edtPassword);
         edtConfirmPassword = (EditText) view.findViewById(R.id.edtConfirmPassword);
@@ -165,16 +169,16 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
 
-                String phoneNumber = edtPhoneNumber.getText().toString().trim();
-                String password = edtPassword.getText().toString().trim();
-
-                final ParseUser parseUser = new ParseUser();
-                parseUser.setUsername(phoneNumber);
-                parseUser.setPassword(password);
-                parseUser.signUpInBackground(new SignUpCallback() {
+                final ParseUser newUser = new ParseUser();
+                newUser.setUsername(edtPhoneNumber.getText().toString().trim());
+                newUser.setPassword(edtPassword.getText().toString().trim());
+                newUser.signUpInBackground(new SignUpCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
+                            newUser.put("isOnline", true);
+                            newUser.saveInBackground();
+
                             ((MainFragment) SignupFragment.this.getActivity())
                                     .showProfileInfomationFragment();
                             progressDialog.dismiss();
@@ -188,15 +192,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                     }
                 });
                 break;
+            case R.id.login:
+                ((MainFragment) this.getActivity()).showLoginFragment();
+                break;
         }
-    }
-
-    public String getPhoneNumber() {
-        return edtPhoneNumber.getText().toString().trim();
-    }
-
-    public String getPassword() {
-        return edtPassword.getText().toString().trim();
     }
 
 }

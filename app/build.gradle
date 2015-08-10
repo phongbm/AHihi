@@ -38,5 +38,4 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.parse.bolts:bolts-android:+'
     compile 'de.hdodenhof:circleimageview:+'
-    compile 'com.github.ShogoMizumoto:ZDepthShadowLayout:+'
 }

@@ -31,7 +31,7 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_profile_infomation, null);
-        initializeComponent();
+        this.initializeComponent();
         return view;
     }
 
@@ -101,6 +101,11 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (!edtEmail.getText().toString().contains("@")) {
+                    edtEmail.setError("Email is not valid");
+                } else {
+                    edtEmail.setError(null);
+                }
             }
         });
         radioMale = (RadioButton) view.findViewById(R.id.radioMale);
@@ -117,7 +122,7 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.edtBirthday:
-                showDatePickerDialog();
+                this.showDatePickerDialog();
                 break;
             case R.id.btnOK:
                 ((MainFragment) this.getActivity()).showProfilePictureFragment();
@@ -158,10 +163,14 @@ public class ProfileInfomationFragment extends Fragment implements View.OnClickL
     }
 
     public boolean getSex() {
-        if (radioMale.isChecked())
+        if (radioMale.isChecked()) {
             return true;
-        else
-            return false;
+        } else {
+            if (radioFemale.isChecked()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

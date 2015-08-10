@@ -3,6 +3,7 @@ package com.phongbm.ahihi;
 import android.app.Application;
 
 import com.parse.Parse;
+import com.phongbm.common.ServerInfo;
 
 public class MyApplication extends Application {
     @Override

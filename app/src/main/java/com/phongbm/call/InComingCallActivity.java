@@ -2,13 +2,12 @@ package com.phongbm.call;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.phongbm.ahihi.CommonValue;
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonValue;
 
 public class InComingCallActivity extends Activity implements View.OnClickListener {
     private TextView btnAnswer, btnHangup;
@@ -35,7 +34,7 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
 
             // nghe cuoc goi
             case R.id.btnAnswer:
-                setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+                // setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
                 Intent answer = new Intent(CommonValue.ACTION_ANSWER);
                 this.sendBroadcast(answer);
                 break;
