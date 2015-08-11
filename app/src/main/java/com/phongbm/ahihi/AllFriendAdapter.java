@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
@@ -23,17 +22,21 @@ import com.phongbm.common.CommonValue;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class FriendAdapter extends BaseAdapter {
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class AllFriendAdapter extends BaseAdapter {
     private static final String TAG = "FriendAdapter";
 
     private Handler handler;
-    private ArrayList<FriendItem> friendItems;
+    private ArrayList<AllFriendItem> allFriendItems;
+    private ArrayList<ActiveFriendItem> activeFriendItems;
     private LayoutInflater layoutInflater;
 
-    public FriendAdapter(Context context, Handler handler) {
+    public AllFriendAdapter(Context context, Handler handler) {
         layoutInflater = LayoutInflater.from(context);
         this.handler = handler;
-        friendItems = new ArrayList<FriendItem>();
+        allFriendItems = new ArrayList<AllFriendItem>();
+        activeFriendItems = new ArrayList<ActiveFriendItem>();
         if (MainActivity.isNetworkConnected(context))
             this.initializeListFriend();
     }
@@ -58,9 +61,14 @@ public class FriendAdapter extends BaseAdapter {
                                 if (e == null) {
                                     Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0,
                                             bytes.length);
-                                    friendItems.add(new FriendItem(parseUser.getObjectId(),
+                                    allFriendItems.add(new AllFriendItem(parseUser.getObjectId(),
                                             (String) parseUser.get("fullName"), avatar));
-                                    Collections.sort(friendItems);
+                                    Collections.sort(allFriendItems);
+                                    if ((boolean) parseUser.get("isOnline")) {
+                                        activeFriendItems.add(new ActiveFriendItem(
+                                                parseUser.getObjectId(),
+                                                (String) parseUser.get("fullName"), avatar));
+                                    }
                                 }
                             }
                         });
@@ -76,12 +84,12 @@ public class FriendAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return friendItems.size();
+        return allFriendItems.size();
     }
 
     @Override
-    public FriendItem getItem(int position) {
-        return friendItems.get(position);
+    public AllFriendItem getItem(int position) {
+        return allFriendItems.get(position);
     }
 
     @Override
@@ -91,18 +99,31 @@ public class FriendAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.item_friend, parent, false);
+            convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
+            viewHolder.txtName = (TextView) convertView.findViewById(R.id.txtName);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
-        TextView txtName = (TextView) convertView.findViewById(R.id.txtName);
-        ImageView imgAvatar = (ImageView) convertView.findViewById(R.id.imgAvatar);
-        txtName.setText(friendItems.get(position).getName());
-        imgAvatar.setImageBitmap(friendItems.get(position).getAvatar());
+        viewHolder.imgAvatar.setImageBitmap(allFriendItems.get(position).getAvatar());
+        viewHolder.txtName.setText(allFriendItems.get(position).getName());
         return convertView;
     }
 
-    public ArrayList<FriendItem> getFriends() {
-        return friendItems;
+    private class ViewHolder {
+        CircleImageView imgAvatar;
+        TextView txtName;
     }
 
+    public ArrayList<AllFriendItem> getFriends() {
+        return allFriendItems;
+    }
+
+    public ArrayList<ActiveFriendItem> getActiveFriendItems() {
+        return activeFriendItems;
+    }
 }

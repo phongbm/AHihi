@@ -29,7 +29,8 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     private View view;
     private ListView listViewFriend;
-    private FriendAdapter friendAdapter;
+    private AllFriendAdapter allFriendAdapter;
+    private ActiveFriendAdapter activeFriendAdapter;
     private TextView btnTabActive, btnTabAllFriends;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
 
@@ -38,7 +39,10 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case CommonValue.ACTION_UPDATE_LIST_FRIEND:
-                    friendAdapter.notifyDataSetChanged();
+                    allFriendAdapter.notifyDataSetChanged();
+                    activeFriendAdapter.setActiveFriendItems(
+                            allFriendAdapter.getActiveFriendItems());
+                    activeFriendAdapter.notifyDataSetChanged();
                     break;
             }
         }
@@ -54,8 +58,9 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
-        friendAdapter = new FriendAdapter(getActivity(), handler);
-        listViewFriend.setAdapter(friendAdapter);
+        allFriendAdapter = new AllFriendAdapter(this.getActivity(), handler);
+        activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
+        listViewFriend.setAdapter(activeFriendAdapter);
     }
 
     @Override
@@ -82,7 +87,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
-        String inComingId = friendAdapter.getItem(position).getId();
+        String inComingId = allFriendAdapter.getItem(position).getId();
         intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
         intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getActivity().startActivity(intentCall);
@@ -94,10 +99,12 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
             case R.id.btnTabActive:
                 changeStateShow(btnTabActive);
                 changeStateHide(btnTabAllFriends);
+                listViewFriend.setAdapter(activeFriendAdapter);
                 break;
             case R.id.btnTabAllFriends:
                 changeStateShow(btnTabAllFriends);
                 changeStateHide(btnTabActive);
+                listViewFriend.setAdapter(allFriendAdapter);
                 break;
         }
     }
@@ -117,9 +124,13 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(CommonValue.ACTION_ADD_FRIEND)) {
-                friendAdapter.getFriends().add(((MainActivity) getActivity()).getNewFriend());
-                Collections.sort(friendAdapter.getFriends());
-                friendAdapter.notifyDataSetChanged();
+                ActiveFriendItem newFriend = ((MainActivity) getActivity()).getNewFriend();
+                allFriendAdapter.getFriends().add(newFriend);
+                Collections.sort(allFriendAdapter.getFriends());
+                allFriendAdapter.notifyDataSetChanged();
+
+                activeFriendAdapter.getActiveFriendItems().add(newFriend);
+                activeFriendAdapter.notifyDataSetChanged();
             }
         }
     }

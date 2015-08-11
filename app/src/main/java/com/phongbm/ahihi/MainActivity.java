@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private InputMethodManager inputMethodManager;
-    private FriendItem newFriend;
+    private ActiveFriendItem newFriend;
     private Bitmap userAvatar;
 
     private Handler handler = new Handler() {
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onDestroy();
     }
 
-    public FriendItem getNewFriend() {
+    public ActiveFriendItem getNewFriend() {
         return newFriend;
     }
 
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements
                 public void done(byte[] bytes, ParseException e) {
                     if (e == null) {
                         Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        newFriend = new FriendItem(parseUser.getObjectId(),
+                        newFriend = new ActiveFriendItem(parseUser.getObjectId(),
                                 (String) parseUser.get("fullName"), avatar);
                         Intent intentAddFriend = new Intent();
                         intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);

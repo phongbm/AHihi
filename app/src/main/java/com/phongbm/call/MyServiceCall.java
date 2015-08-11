@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MyServiceCall extends Service {
     private static final String TAG = "MyServiceCall";
-    private static String outGoingId = null;
+    private String outGoingId = null;
     private Context context;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
@@ -35,7 +35,7 @@ public class MyServiceCall extends Service {
         if (context == null) {
             context = this;
         }
-        registerBroadcast();
+        this.registerBroadcast();
     }
 
     @Override
@@ -47,7 +47,11 @@ public class MyServiceCall extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand...");
         Log.i(TAG, "onStartCommand..." + outGoingId);
-        outGoingId = ParseUser.getCurrentUser().getObjectId();
+        if (ParseUser.getCurrentUser() != null) {
+            outGoingId = ParseUser.getCurrentUser().getObjectId();
+        } else {
+            outGoingId = null;
+        }
         if (intent == null) {
             if (sinchClient == null)
                 Log.i(TAG, "null SInchCLient");
@@ -156,6 +160,7 @@ public class MyServiceCall extends Service {
                 case CommonValue.ACTION_HANGUP:
                     if (inComingCall != null) {
                         inComingCall.hangup();
+                        inComingCall = null;
                     }
                     break;
                 // thiet lap cuoc goi di
@@ -167,6 +172,7 @@ public class MyServiceCall extends Service {
                 case CommonValue.END_CALL:
                     if (outGoingCall != null) {
                         outGoingCall.hangup();
+                        outGoingCall = null;
                     }
                     break;
             }

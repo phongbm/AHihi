@@ -21,7 +21,7 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         btnEnCall = (ImageView) findViewById(R.id.btnEndCall);
         btnEnCall.setOnClickListener(this);
 
-        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         // thiet lap cuoc goi di
         String id = getIntent().getStringExtra(CommonValue.INCOMING_CALL_ID);
         Intent intent = new Intent(CommonValue.ACTION_OUTGOING_CALL);

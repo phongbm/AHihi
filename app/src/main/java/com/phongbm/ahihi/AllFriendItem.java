@@ -2,11 +2,11 @@ package com.phongbm.ahihi;
 
 import android.graphics.Bitmap;
 
-public class FriendItem implements Comparable {
+public class AllFriendItem implements Comparable {
     private String id, fullName;
     private Bitmap avatar;
 
-    public FriendItem(String id, String fullName, Bitmap avatar) {
+    public AllFriendItem(String id, String fullName, Bitmap avatar) {
         this.id = id;
         this.fullName = fullName;
         this.avatar = avatar;
@@ -26,6 +26,7 @@ public class FriendItem implements Comparable {
 
     @Override
     public int compareTo(Object another) {
-        return fullName.toLowerCase().compareTo(((FriendItem) another).getName().toLowerCase());
+        return fullName.toLowerCase().compareTo(((AllFriendItem) another).getName().toLowerCase());
     }
+
 }

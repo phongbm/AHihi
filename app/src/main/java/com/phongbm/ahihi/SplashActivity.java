@@ -20,6 +20,9 @@ public class SplashActivity extends Activity {
             public void run() {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 if (currentUser != null) {
+                    currentUser.put("isOnline", true);
+                    currentUser.saveInBackground();
+
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     SplashActivity.this.startActivity(intent);
                 } else {
