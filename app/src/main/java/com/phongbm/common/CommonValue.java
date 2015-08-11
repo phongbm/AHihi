@@ -5,7 +5,11 @@ public class CommonValue {
     public static final int REQUEST_ADD_FRIEND = 5;
     public static final int ACTION_UPDATE_LIST_FRIEND = 6;
     public static final String ACTION_ADD_FRIEND = "ACTION_ADD_FRIEND";
+
     public static final String INCOMING_CALL_ID = "INCOMING_CALL_ID";
+    public static final String INCOMING_CALL_NAME = "INCOMING_CALL_NAME";
+    public static final String INCOMING_CALL_AVATAR = "INCOMING_CALL_AVATAR";
+
     public static final String OUTGOING_CALL_ID = "OUTGOING_CALL_ID";
     public static final String ACTION_ANSWER = "ACTION_ANSWER";
     public static final String ACTION_HANGUP = "ACTION_HANGUP";

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
 @SuppressLint("ValidFragment")
@@ -33,6 +35,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private ActiveFriendAdapter activeFriendAdapter;
     private TextView btnTabActive, btnTabAllFriends;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
+    private boolean activeFriendAdapterVisible;
 
     private Handler handler = new Handler() {
         @Override
@@ -86,11 +89,27 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String inComingId, inComingName;
+        ByteArrayOutputStream avatar = new ByteArrayOutputStream();
+        if (activeFriendAdapterVisible) {
+            inComingId = activeFriendAdapter.getItem(position).getId();
+            inComingName = activeFriendAdapter.getItem(position).getName();
+            activeFriendAdapter.getItem(position).getAvatar()
+                    .compress(Bitmap.CompressFormat.PNG, 80, avatar);
+        } else {
+            inComingId = allFriendAdapter.getItem(position).getId();
+            inComingName = allFriendAdapter.getItem(position).getName();
+            allFriendAdapter.getItem(position).getAvatar()
+                    .compress(Bitmap.CompressFormat.PNG, 80, avatar);
+        }
+
         Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
-        String inComingId = allFriendAdapter.getItem(position).getId();
         intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+        intentCall.putExtra(CommonValue.INCOMING_CALL_NAME, inComingName);
+        intentCall.putExtra(CommonValue.INCOMING_CALL_AVATAR, avatar.toByteArray());
+
         intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getActivity().startActivity(intentCall);
+        this.getActivity().startActivity(intentCall);
     }
 
     @Override
@@ -100,11 +119,13 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                 changeStateShow(btnTabActive);
                 changeStateHide(btnTabAllFriends);
                 listViewFriend.setAdapter(activeFriendAdapter);
+                activeFriendAdapterVisible = true;
                 break;
             case R.id.btnTabAllFriends:
                 changeStateShow(btnTabAllFriends);
                 changeStateHide(btnTabActive);
                 listViewFriend.setAdapter(allFriendAdapter);
+                activeFriendAdapterVisible = false;
                 break;
         }
     }
@@ -129,8 +150,10 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                 Collections.sort(allFriendAdapter.getFriends());
                 allFriendAdapter.notifyDataSetChanged();
 
-                activeFriendAdapter.getActiveFriendItems().add(newFriend);
-                activeFriendAdapter.notifyDataSetChanged();
+                if (intent.getBooleanExtra("isOnline", true)) {
+                    activeFriendAdapter.getActiveFriendItems().add(newFriend);
+                    activeFriendAdapter.notifyDataSetChanged();
+                }
             }
         }
     }
@@ -139,6 +162,14 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     public void onDestroy() {
         this.getActivity().unregisterReceiver(broadcastUpdateListFriend);
         super.onDestroy();
+    }
+
+    public AllFriendAdapter getAllFriendAdapter() {
+        return allFriendAdapter;
+    }
+
+    public ActiveFriendAdapter getActiveFriendAdapter() {
+        return activeFriendAdapter;
     }
 
 }

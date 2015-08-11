@@ -212,6 +212,8 @@ public class MainActivity extends AppCompatActivity implements
                                 (String) parseUser.get("fullName"), avatar);
                         Intent intentAddFriend = new Intent();
                         intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
+                        boolean isOnline = (boolean) parseUser.get("isOnline");
+                        intentAddFriend.putExtra("isOnline", isOnline);
                         sendBroadcast(intentAddFriend);
                     }
                 }
