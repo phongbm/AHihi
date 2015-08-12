@@ -129,6 +129,7 @@ public class MyServiceCall extends Service {
         @Override
         public void onCallEnded(Call call) {
             // ket thuoc cuoc goi boi 1 trong 2 ben
+            Log.i(TAG, "onCallEnded...");
         }
 
         @Override
@@ -143,6 +144,8 @@ public class MyServiceCall extends Service {
             intentFilter.addAction(CommonValue.ACTION_ANSWER);
             intentFilter.addAction(CommonValue.ACTION_HANGUP);
             intentFilter.addAction(CommonValue.ACTION_OUTGOING_CALL);
+            intentFilter.addAction(CommonValue.ACTION_LOGOUT);
+            intentFilter.addAction(CommonValue.END_CALL);
             context.registerReceiver(receiverCall, intentFilter);
         }
     }
@@ -171,10 +174,20 @@ public class MyServiceCall extends Service {
                     break;
                 case CommonValue.END_CALL:
                     if (outGoingCall != null) {
+                        Log.i(TAG, "END_CALL ... outGoingCall");
                         outGoingCall.hangup();
                         outGoingCall = null;
                     }
+                    if (inComingCall != null) {
+                        Log.i(TAG, "END_CALL ... inComingCall");
+                        inComingCall.hangup();
+                        inComingCall = null;
+                    }
                     break;
+                case CommonValue.ACTION_LOGOUT:
+                    sinchClient.stopListeningOnActiveConnection();
+                    sinchClient.terminate();
+                    sinchClient = null;
             }
         }
     }
@@ -184,5 +197,6 @@ public class MyServiceCall extends Service {
         this.unregisterReceiver(receiverCall);
         super.onDestroy();
     }
+
 
 }

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.parse.ParseUser;
+import com.phongbm.common.CommonValue;
 import com.phongbm.loginsignup.MainFragment;
 
 @SuppressLint("ValidFragment")
@@ -51,6 +52,10 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
                 parseUser.put("isOnline", false);
                 parseUser.saveInBackground();
                 ParseUser.logOut();
+
+                Intent intentLogout = new Intent(CommonValue.ACTION_LOGOUT);
+                TabOneFragment.this.getActivity().sendBroadcast(intentLogout);
+
                 Intent intent = new Intent(TabOneFragment.this.getActivity(), MainFragment.class);
                 TabOneFragment.this.getActivity().startActivity(intent);
                 TabOneFragment.this.getActivity().finish();

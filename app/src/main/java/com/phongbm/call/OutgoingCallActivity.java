@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
@@ -30,6 +32,7 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         this.initializeComponent();
 
         this.setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+
         Intent intent = new Intent(CommonValue.ACTION_OUTGOING_CALL);
         intent.putExtra(CommonValue.INCOMING_CALL_ID, id);
         sendBroadcast(intent);
@@ -38,11 +41,10 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
     private void initializeComponent() {
         id = getIntent().getStringExtra(CommonValue.INCOMING_CALL_ID);
         name = getIntent().getStringExtra(CommonValue.INCOMING_CALL_NAME);
-
         avatar = BitmapFactory.decodeByteArray(getIntent().
                 getByteArrayExtra(CommonValue.INCOMING_CALL_AVATAR), 0, getIntent()
                 .getByteArrayExtra(CommonValue.INCOMING_CALL_AVATAR).length);
-
+        
         btnEnCall = (ImageView) findViewById(R.id.btnEndCall);
         btnEnCall.setOnClickListener(this);
 
