@@ -81,6 +81,7 @@
                     android:src="@drawable/ic_call_ringtone" />
 
                 <ImageView
+                    android:id="@+id/btnCallSpeaker"
                     android:layout_width="54dp"
                     android:layout_height="54dp"
                     android:layout_marginLeft="16dp"
