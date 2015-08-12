@@ -20,30 +20,28 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/txtTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dialing..."
+                android:text="Calling..."
                 android:textColor="#ffffff"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="normal" />
 
             <TextView
-                android:id="@+id/txtFullName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Phong Bui Minh"
                 android:textColor="#ffffff"
-                android:textSize="36sp"
+                android:textSize="32sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtPhoneNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Mobile (+84) 989192072"
                 android:textColor="#ffffff"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="normal" />
-
         </LinearLayout>
 
     </RelativeLayout>
@@ -60,13 +58,11 @@
             android:layout_weight="6">
 
             <com.phongbm.libs.CallingRippleView
-                android:id="@+id/callingRipple"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"
                 android:layout_centerInParent="true" />
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imgAvatar"
                 android:layout_width="128dp"
                 android:layout_height="128dp"
                 android:layout_centerInParent="true"
@@ -93,11 +89,9 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/btnRingtone"
                         android:layout_width="42dp"
                         android:layout_height="42dp"
                         android:background="@drawable/bg_call_circle"
-                        android:contentDescription="@null"
                         android:padding="8dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_call_ringtone" />
@@ -108,7 +102,6 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:background="@drawable/bg_call_circle"
-                        android:contentDescription="@null"
                         android:padding="8dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_call_speaker" />
@@ -119,7 +112,6 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
                         android:background="@drawable/bg_call_circle"
-                        android:contentDescription="@null"
                         android:padding="8dp"
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_call_map" />
@@ -133,13 +125,20 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/btnHangup"
-                        android:layout_width="256dp"
+                        android:layout_width="128dp"
                         android:layout_height="48dp"
                         android:background="@drawable/bg_rounded_hangup"
-                        android:contentDescription="@null"
                         android:padding="12dp"
                         android:src="@drawable/ic_call_hangup" />
+
+                    <ImageView
+                        android:layout_width="128dp"
+                        android:layout_height="48dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
+                        android:background="@drawable/bg_rounded_answer"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_call_answer" />
 
                 </LinearLayout>
 

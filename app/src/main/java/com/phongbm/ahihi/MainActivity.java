@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void startService() {
         Intent intentStartService = new Intent();
-        intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.call.MyServiceCall");
+        intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.call.AHihiServiceCall");
         startService(intentStartService);
     }
 
@@ -209,7 +209,8 @@ public class MainActivity extends AppCompatActivity implements
                     if (e == null) {
                         Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         newFriend = new ActiveFriendItem(parseUser.getObjectId(),
-                                (String) parseUser.get("fullName"), avatar);
+                                (String) parseUser.get("fullName"),
+                                parseUser.getUsername(), avatar);
                         Intent intentAddFriend = new Intent();
                         intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
                         boolean isOnline = (boolean) parseUser.get("isOnline");

@@ -11,18 +11,18 @@ public class RingtoneManager {
 
     public RingtoneManager(Context context) {
         this.context = context;
-        mediaPlayer = new MediaPlayer();
+        mediaPlayer = MediaPlayer.create(context, R.raw.ringtone);
     }
 
     public void playRingtone() {
         if (!mediaPlayer.isPlaying()) {
-            mediaPlayer = MediaPlayer.create(context, R.raw.ringtone);
+            mediaPlayer.setLooping(true);
             mediaPlayer.start();
         }
     }
 
     public void stopRingtone() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+        if (mediaPlayer != null && mediaPlayer.isPlaying() && mediaPlayer.isLooping()) {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = null;

@@ -35,7 +35,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private ActiveFriendAdapter activeFriendAdapter;
     private TextView btnTabActive, btnTabAllFriends;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
-    private boolean activeFriendAdapterVisible;
+    private boolean activeFriendAdapterVisible = true;
 
     private Handler handler = new Handler() {
         @Override
@@ -89,23 +89,26 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String inComingId, inComingName;
+        String ID, fullName, phoneNumber;
         ByteArrayOutputStream avatar = new ByteArrayOutputStream();
         if (activeFriendAdapterVisible) {
-            inComingId = activeFriendAdapter.getItem(position).getId();
-            inComingName = activeFriendAdapter.getItem(position).getName();
+            ID = activeFriendAdapter.getItem(position).getId();
+            fullName = activeFriendAdapter.getItem(position).getName();
+            phoneNumber = activeFriendAdapter.getItem(position).getPhoneNumber();
             activeFriendAdapter.getItem(position).getAvatar()
                     .compress(Bitmap.CompressFormat.PNG, 80, avatar);
         } else {
-            inComingId = allFriendAdapter.getItem(position).getId();
-            inComingName = allFriendAdapter.getItem(position).getName();
+            ID = allFriendAdapter.getItem(position).getId();
+            fullName = allFriendAdapter.getItem(position).getName();
+            phoneNumber = allFriendAdapter.getItem(position).getPhoneNumber();
             allFriendAdapter.getItem(position).getAvatar()
                     .compress(Bitmap.CompressFormat.PNG, 80, avatar);
         }
 
         Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
-        intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
-        intentCall.putExtra(CommonValue.INCOMING_CALL_NAME, inComingName);
+        intentCall.putExtra(CommonValue.INCOMING_CALL_ID, ID);
+        intentCall.putExtra(CommonValue.INCOMING_CALL_FULL_NAME, fullName);
+        intentCall.putExtra(CommonValue.INCOMING_CALL_PHONE_NUMBER, phoneNumber);
         intentCall.putExtra(CommonValue.INCOMING_CALL_AVATAR, avatar.toByteArray());
 
         intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -136,7 +139,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     private void changeStateHide(TextView txt) {
-        txt.setBackgroundResource(R.drawable.bg_rect_stroke_green);
+        txt.setBackgroundResource(R.drawable.bg_button_friend_green);
         txt.setTextColor(this.getActivity().getResources().getColor(R.color.green_500));
     }
 

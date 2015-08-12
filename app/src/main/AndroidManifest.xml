@@ -44,7 +44,7 @@
         </activity>
 
         <service
-            android:name="com.phongbm.call.MyServiceCall"
+            android:name="com.phongbm.call.AHihiServiceCall"
             android:exported="false" />
     </application>
 

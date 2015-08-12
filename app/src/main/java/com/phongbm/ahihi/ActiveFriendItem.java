@@ -4,8 +4,8 @@ import android.graphics.Bitmap;
 
 public class ActiveFriendItem extends AllFriendItem {
 
-    public ActiveFriendItem(String id, String fullName, Bitmap avatar) {
-        super(id, fullName, avatar);
+    public ActiveFriendItem(String id, String fullName, String phoneNumber, Bitmap avatar) {
+        super(id, fullName, phoneNumber, avatar);
     }
 
     @Override

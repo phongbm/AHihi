@@ -62,12 +62,14 @@ public class AllFriendAdapter extends BaseAdapter {
                                     Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0,
                                             bytes.length);
                                     allFriendItems.add(new AllFriendItem(parseUser.getObjectId(),
-                                            (String) parseUser.get("fullName"), avatar));
+                                            (String) parseUser.get("fullName"),
+                                            parseUser.getUsername(), avatar));
                                     Collections.sort(allFriendItems);
                                     if ((boolean) parseUser.get("isOnline")) {
                                         activeFriendItems.add(new ActiveFriendItem(
                                                 parseUser.getObjectId(),
-                                                (String) parseUser.get("fullName"), avatar));
+                                                (String) parseUser.get("fullName"),
+                                                parseUser.getUsername(), avatar));
                                     }
                                 }
                             }

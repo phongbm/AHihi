@@ -45,7 +45,6 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
                 this.finish();
                 break;
 
-            // nghe cuoc goi
             case R.id.btnAnswer:
                 ringtoneManager.stopRingtone();
 

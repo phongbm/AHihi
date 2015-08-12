@@ -21,13 +21,14 @@ import com.sinch.android.rtc.calling.CallListener;
 
 import java.util.List;
 
-public class MyServiceCall extends Service {
+public class AHihiServiceCall extends Service {
     private static final String TAG = "MyServiceCall";
-    private String outGoingId = null;
+
     private Context context;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
-    private BroadcastReceiverCall receiverCall = null;
+    private BroadcastCall broadcastCall = null;
+    private String outGoingId = null;
 
     @Override
     public void onCreate() {
@@ -35,7 +36,7 @@ public class MyServiceCall extends Service {
         if (context == null) {
             context = this;
         }
-        this.registerBroadcast();
+        this.registerBroadcastCall();
     }
 
     @Override
@@ -45,23 +46,15 @@ public class MyServiceCall extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand...");
-        Log.i(TAG, "onStartCommand..." + outGoingId);
-        if (ParseUser.getCurrentUser() != null) {
-            outGoingId = ParseUser.getCurrentUser().getObjectId();
-        } else {
-            outGoingId = null;
-        }
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        outGoingId = currentUser != null ? currentUser.getObjectId() : null;
         if (intent == null) {
-            if (sinchClient == null)
-                Log.i(TAG, "null SInchCLient");
             if (outGoingId != null) {
-                Log.i(TAG, "not null outGoingId");
-                startSinchService();
+                this.startSinchService();
             }
             return START_STICKY;
         }
-        startSinchService();
+        this.startSinchService();
         return Service.START_STICKY;
     }
 
@@ -87,15 +80,20 @@ public class MyServiceCall extends Service {
     private class OutGoingCallListener implements CallListener {
         @Override
         public void onCallProgressing(Call call) {
-            Log.i(TAG, "onCallProgressing...");
         }
 
         @Override
         public void onCallEstablished(Call call) {
+            Intent intentPickUp = new Intent();
+            intentPickUp.setAction(CommonValue.STATE_PICK_UP);
+            AHihiServiceCall.this.sendBroadcast(intentPickUp);
         }
 
         @Override
         public void onCallEnded(Call call) {
+            Intent intentEndCall = new Intent();
+            intentEndCall.setAction(CommonValue.STATE_END_CALL);
+            AHihiServiceCall.this.sendBroadcast(intentEndCall);
         }
 
         @Override
@@ -106,7 +104,6 @@ public class MyServiceCall extends Service {
     private class InComingCallListener implements CallClientListener, CallListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call call) {
-            // bat cuoc goi den
             inComingCall = call;
             inComingCall.addCallListener(this);
             Intent intentInComingCall = new Intent();
@@ -118,18 +115,15 @@ public class MyServiceCall extends Service {
 
         @Override
         public void onCallProgressing(Call call) {
-            // do chuong
         }
 
         @Override
         public void onCallEstablished(Call call) {
-            // cuoc goi den duoc nhac len
         }
 
         @Override
         public void onCallEnded(Call call) {
-            // ket thuoc cuoc goi boi 1 trong 2 ben
-            Log.i(TAG, "onCallEnded...");
+            Log.i(TAG, "InComingCallListener... onCallEnded...");
         }
 
         @Override
@@ -137,24 +131,28 @@ public class MyServiceCall extends Service {
         }
     }
 
-    private void registerBroadcast() {
-        if (receiverCall == null) {
-            receiverCall = new BroadcastReceiverCall();
+    private void registerBroadcastCall() {
+        if (broadcastCall == null) {
+            broadcastCall = new BroadcastCall();
             IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(CommonValue.ACTION_OUTGOING_CALL);
+            intentFilter.addAction(CommonValue.ACTION_END_CALL);
             intentFilter.addAction(CommonValue.ACTION_ANSWER);
             intentFilter.addAction(CommonValue.ACTION_HANGUP);
-            intentFilter.addAction(CommonValue.ACTION_OUTGOING_CALL);
             intentFilter.addAction(CommonValue.ACTION_LOGOUT);
-            intentFilter.addAction(CommonValue.END_CALL);
-            context.registerReceiver(receiverCall, intentFilter);
+            context.registerReceiver(broadcastCall, intentFilter);
         }
     }
 
-    private class BroadcastReceiverCall extends BroadcastReceiver {
+    private class BroadcastCall extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                // dong y nghe cuoc goi
+                case CommonValue.ACTION_OUTGOING_CALL:
+                    outGoingCall = sinchClient.getCallClient()
+                            .callUser(intent.getStringExtra(CommonValue.INCOMING_CALL_ID));
+                    outGoingCall.addCallListener(new OutGoingCallListener());
+                    break;
                 case CommonValue.ACTION_ANSWER:
                     if (inComingCall != null) {
                         inComingCall.answer();
@@ -166,20 +164,12 @@ public class MyServiceCall extends Service {
                         inComingCall = null;
                     }
                     break;
-                // thiet lap cuoc goi di
-                case CommonValue.ACTION_OUTGOING_CALL:
-                    outGoingCall = sinchClient.getCallClient()
-                            .callUser(intent.getStringExtra(CommonValue.INCOMING_CALL_ID));
-                    outGoingCall.addCallListener(new OutGoingCallListener());
-                    break;
-                case CommonValue.END_CALL:
+                case CommonValue.ACTION_END_CALL:
                     if (outGoingCall != null) {
-                        Log.i(TAG, "END_CALL ... outGoingCall");
                         outGoingCall.hangup();
                         outGoingCall = null;
                     }
                     if (inComingCall != null) {
-                        Log.i(TAG, "END_CALL ... inComingCall");
                         inComingCall.hangup();
                         inComingCall = null;
                     }
@@ -194,9 +184,8 @@ public class MyServiceCall extends Service {
 
     @Override
     public void onDestroy() {
-        this.unregisterReceiver(receiverCall);
+        this.unregisterReceiver(broadcastCall);
         super.onDestroy();
     }
-
 
 }
