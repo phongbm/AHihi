@@ -104,11 +104,15 @@ public class AHihiServiceCall extends Service {
     private class InComingCallListener implements CallClientListener, CallListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call call) {
+            Log.i(TAG, "getCallId... " + call.getCallId());
+            Log.i(TAG, "getRemoteUserId... " + call.getRemoteUserId());
+
             inComingCall = call;
             inComingCall.addCallListener(this);
             Intent intentInComingCall = new Intent();
-            intentInComingCall.setClassName("com.phongbm.ahihi",
-                    "com.phongbm.call.InComingCallActivity");
+            intentInComingCall.setClassName(CommonValue.PACKAGE_NAME_MAIN,
+                    CommonValue.PACKAGE_NAME_CALL + ".InComingCallActivity");
+            intentInComingCall.putExtra(CommonValue.OUTGOING_CALL_ID, call.getRemoteUserId());
             intentInComingCall.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intentInComingCall);
         }
@@ -119,11 +123,16 @@ public class AHihiServiceCall extends Service {
 
         @Override
         public void onCallEstablished(Call call) {
+            Intent intentAnswer = new Intent();
+            intentAnswer.setAction(CommonValue.STATE_ANSWER);
+            AHihiServiceCall.this.sendBroadcast(intentAnswer);
         }
 
         @Override
         public void onCallEnded(Call call) {
-            Log.i(TAG, "InComingCallListener... onCallEnded...");
+            Intent intentEndCall = new Intent();
+            intentEndCall.setAction(CommonValue.STATE_END_CALL);
+            AHihiServiceCall.this.sendBroadcast(intentEndCall);
         }
 
         @Override
@@ -153,22 +162,22 @@ public class AHihiServiceCall extends Service {
                             .callUser(intent.getStringExtra(CommonValue.INCOMING_CALL_ID));
                     outGoingCall.addCallListener(new OutGoingCallListener());
                     break;
+                case CommonValue.ACTION_END_CALL:
+                    if (outGoingCall != null) {
+                        outGoingCall.hangup();
+                        outGoingCall = null;
+                    }
+                    if (inComingCall != null) {
+                        inComingCall.hangup();
+                        inComingCall = null;
+                    }
+                    break;
                 case CommonValue.ACTION_ANSWER:
                     if (inComingCall != null) {
                         inComingCall.answer();
                     }
                     break;
                 case CommonValue.ACTION_HANGUP:
-                    if (inComingCall != null) {
-                        inComingCall.hangup();
-                        inComingCall = null;
-                    }
-                    break;
-                case CommonValue.ACTION_END_CALL:
-                    if (outGoingCall != null) {
-                        outGoingCall.hangup();
-                        outGoingCall = null;
-                    }
                     if (inComingCall != null) {
                         inComingCall.hangup();
                         inComingCall = null;

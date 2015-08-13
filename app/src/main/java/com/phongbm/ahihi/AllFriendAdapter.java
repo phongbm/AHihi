@@ -65,6 +65,7 @@ public class AllFriendAdapter extends BaseAdapter {
                                             (String) parseUser.get("fullName"),
                                             parseUser.getUsername(), avatar));
                                     Collections.sort(allFriendItems);
+
                                     if ((boolean) parseUser.get("isOnline")) {
                                         activeFriendItems.add(new ActiveFriendItem(
                                                 parseUser.getObjectId(),
@@ -121,11 +122,12 @@ public class AllFriendAdapter extends BaseAdapter {
         TextView txtName;
     }
 
-    public ArrayList<AllFriendItem> getFriends() {
+    public ArrayList<AllFriendItem> getAllFriendItems() {
         return allFriendItems;
     }
 
     public ArrayList<ActiveFriendItem> getActiveFriendItems() {
         return activeFriendItems;
     }
+
 }

@@ -149,8 +149,8 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(CommonValue.ACTION_ADD_FRIEND)) {
                 ActiveFriendItem newFriend = ((MainActivity) getActivity()).getNewFriend();
-                allFriendAdapter.getFriends().add(newFriend);
-                Collections.sort(allFriendAdapter.getFriends());
+                allFriendAdapter.getAllFriendItems().add(newFriend);
+                Collections.sort(allFriendAdapter.getAllFriendItems());
                 allFriendAdapter.notifyDataSetChanged();
 
                 if (intent.getBooleanExtra("isOnline", true)) {

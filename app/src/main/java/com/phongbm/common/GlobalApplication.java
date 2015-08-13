@@ -1,11 +1,10 @@
-package com.phongbm.ahihi;
+package com.phongbm.common;
 
 import android.app.Application;
 
 import com.parse.Parse;
-import com.phongbm.common.ServerInfo;
 
-public class MyApplication extends Application {
+public class GlobalApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
