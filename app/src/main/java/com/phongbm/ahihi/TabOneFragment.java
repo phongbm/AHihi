@@ -3,6 +3,7 @@ package com.phongbm.ahihi;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,7 +20,7 @@ import com.phongbm.loginsignup.MainFragment;
 public class TabOneFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "TabOneFragment";
     private View view;
-    private Button btnLoguout;
+    private Button btnLoguout, btnGoogleMap;
 
     public TabOneFragment(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -42,6 +43,9 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
     private void initializeComponent() {
         btnLoguout = (Button) view.findViewById(R.id.btnLogout);
         btnLoguout.setOnClickListener(this);
+
+        btnGoogleMap = (Button) view.findViewById(R.id.btnGoogleMap);
+        btnGoogleMap.setOnClickListener(this);
     }
 
     @Override
@@ -59,6 +63,17 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
                 Intent intent = new Intent(TabOneFragment.this.getActivity(), MainFragment.class);
                 TabOneFragment.this.getActivity().startActivity(intent);
                 TabOneFragment.this.getActivity().finish();
+                break;
+
+            case R.id.btnGoogleMap:
+                String latitude = "21.038342";
+                String longitude = "105.782418";
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
                 break;
         }
     }
