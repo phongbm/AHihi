@@ -10,4 +10,5 @@
     <color name="window_background">#ffffff</color>
     <color name="navigationBarColor">#2196F3</color>
     <color name="green_500">#4caf50</color>
+    <color name="red_500">#f44336</color>
 </resources>

@@ -24,8 +24,8 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image);
-        initializeToolbar();
-        initializeComponent();
+        this.initializeToolbar();
+        this.initializeComponent();
 
         imageAdapter = new ImageAdapter(this);
         gridViewImage.setAdapter(imageAdapter);

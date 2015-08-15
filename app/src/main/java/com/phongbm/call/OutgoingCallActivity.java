@@ -2,48 +2,46 @@ package com.phongbm.call;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.phongbm.ahihi.CallLogsDBManager;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.libs.CallingRippleView;
-
-import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class OutgoingCallActivity extends Activity implements View.OnClickListener {
-    public static final int UPDATE_TIME_CALL = 0;
+    private static final int UPDATE_TIME_CALL = 1000;
+    private static final int NOTIFICATION_CALLING = 0;
 
     private ImageView btnEndCall, btnRingtone;
-    private TextView txtTime, txtFullName, txtPhoneNumber;
-    private CircleImageView imgAvatar;
-    private String id, fullName, phoneNumber;
-    private Bitmap avatar;
+    private TextView txtTime;
     private CallingRippleView callingRipple;
     private BroadcastOutgoingCall broadcastOutgoingCall;
     private int timeCall = 0;
-    private String time;
-    private boolean isCalling = false;
+    private String id, time, fullName, phoneNumber, date = null;
+    private boolean isCalling = false, isPressBtnEndCall = false;
     private Thread threadTimeCall;
+    private CommonMethod commonMethod;
+    private CallLogsDBManager callLogsDBManager;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -65,21 +63,10 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         Intent intent = new Intent(CommonValue.ACTION_OUTGOING_CALL);
         intent.putExtra(CommonValue.INCOMING_CALL_ID, id);
         this.sendBroadcast(intent);
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(OutgoingCallActivity.this)
-                        .setSmallIcon(R.drawable.ic_notification_calling)
-                        .setContentTitle("AHihi").setContentText("Calling...");
-        Intent i = new Intent(OutgoingCallActivity.this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                OutgoingCallActivity.this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
-        NotificationManager notificationManager = (NotificationManager)
-                OutgoingCallActivity.this.getSystemService(
-                        Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, builder.build());
-
-        return;
+        callLogsDBManager = new CallLogsDBManager(this);
+        commonMethod = CommonMethod.getInstance();
+        commonMethod.pushNotification(this, MainActivity.class, "Calling...",
+                NOTIFICATION_CALLING, R.drawable.ic_notification_calling, true);
     }
 
     private void initializeComponent() {
@@ -87,25 +74,23 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         btnEndCall.setOnClickListener(this);
         btnRingtone = (ImageView) findViewById(R.id.btnRingtone);
         btnRingtone.setOnClickListener(this);
+        txtTime = (TextView) findViewById(R.id.txtTime);
+        TextView txtFullName = (TextView) findViewById(R.id.txtFullName);
+        TextView txtPhoneNumber = (TextView) findViewById(R.id.txtPhoneNumber);
+        CircleImageView imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
         callingRipple = (CallingRippleView) findViewById(R.id.callingRipple);
 
         Intent intent = this.getIntent();
         id = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
         fullName = intent.getStringExtra(CommonValue.INCOMING_CALL_FULL_NAME);
         phoneNumber = intent.getStringExtra(CommonValue.INCOMING_CALL_PHONE_NUMBER);
-        avatar = BitmapFactory.decodeByteArray(intent.getByteArrayExtra(
+        Bitmap avatar = BitmapFactory.decodeByteArray(intent.getByteArrayExtra(
                 CommonValue.INCOMING_CALL_AVATAR), 0, intent.getByteArrayExtra(
                 CommonValue.INCOMING_CALL_AVATAR).length);
-
-        txtTime = (TextView) findViewById(R.id.txtTime);
-        txtFullName = (TextView) findViewById(R.id.txtFullName);
-        txtPhoneNumber = (TextView) findViewById(R.id.txtPhoneNumber);
-        imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
 
         txtFullName.setText(fullName);
         txtPhoneNumber.setText("Mobile " + phoneNumber);
         imgAvatar.setImageBitmap(avatar);
-        return;
     }
 
     @Override
@@ -113,29 +98,29 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         switch (view.getId()) {
             case R.id.btnEndCall:
                 isCalling = false;
+                date = commonMethod.getCurrentDateTime();
+                isPressBtnEndCall = true;
+                btnEndCall.setEnabled(false);
                 Intent intentEndCall = new Intent(CommonValue.ACTION_END_CALL);
-                OutgoingCallActivity.this.sendBroadcast(intentEndCall);
-                OutgoingCallActivity.this.finish();
+                this.sendBroadcast(intentEndCall);
                 break;
             case R.id.btnRingtone:
-                AudioManager audioManager = (AudioManager) OutgoingCallActivity.this
+                AudioManager audioManager = (AudioManager) this
                         .getSystemService(Context.AUDIO_SERVICE);
                 audioManager.adjustStreamVolume(AudioManager.STREAM_RING,
                         AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
                 break;
         }
-        return;
     }
 
     private void registerBroadcastOutgoingCall() {
         if (broadcastOutgoingCall == null) {
             broadcastOutgoingCall = new BroadcastOutgoingCall();
             IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(CommonValue.STATE_PICK_UP);
             intentFilter.addAction(CommonValue.STATE_END_CALL);
+            intentFilter.addAction(CommonValue.STATE_PICK_UP);
             this.registerReceiver(broadcastOutgoingCall, intentFilter);
         }
-        return;
     }
 
     private class BroadcastOutgoingCall extends BroadcastReceiver {
@@ -150,14 +135,25 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
                             AudioManager.STREAM_VOICE_CALL);
                     break;
                 case CommonValue.STATE_END_CALL:
-                    if (isCalling) {
+                    if (timeCall != 0) {
                         isCalling = false;
                         txtTime.setText("End Call: " + time);
                     } else {
-                        txtTime.setText("Missed Call");
+                        if (isPressBtnEndCall) {
+                            txtTime.setText("Call Ended");
+                        } else {
+                            txtTime.setText("Missed Call");
+                        }
                     }
-                    txtTime.setTextColor(Color.parseColor("#f44336"));
+                    if (date == null) {
+                        date = commonMethod.getCurrentDateTime();
+                    }
+                    btnEndCall.setEnabled(false);
+                    txtTime.setBackgroundColor(OutgoingCallActivity.this.getResources()
+                            .getColor(R.color.red_500));
                     callingRipple.setVisibility(RelativeLayout.GONE);
+                    OutgoingCallActivity.this.setVolumeControlStream(
+                            AudioManager.USE_DEFAULT_STREAM_TYPE);
                     (new Handler()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -166,7 +162,6 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
                     }, 3000);
                     break;
             }
-            return;
         }
     }
 
@@ -175,25 +170,28 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         public void run() {
             while (isCalling) {
                 timeCall += 1000;
-                convertTimeToString();
+                time = commonMethod.convertTimeToString(timeCall);
                 handler.sendEmptyMessage(UPDATE_TIME_CALL);
                 SystemClock.sleep(1000);
             }
         }
     };
 
-    private void convertTimeToString() {
-        int minutes = (int) TimeUnit.MILLISECONDS.toMinutes(timeCall);
-        int seconds = (int) TimeUnit.MILLISECONDS.toSeconds(timeCall) - minutes * 60;
-        time = (minutes < 10 ? "0" + minutes : "" + minutes)
-                + ":" + (seconds < 10 ? "0" + seconds : "" + seconds);
-    }
-
     @Override
     protected void onDestroy() {
         this.unregisterReceiver(broadcastOutgoingCall);
-        ((NotificationManager) OutgoingCallActivity.this.
-                getSystemService(Context.NOTIFICATION_SERVICE)).cancel(0);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("id", id);
+        contentValues.put("fullName", fullName);
+        contentValues.put("phoneNumber", phoneNumber);
+        contentValues.put("date", date);
+        contentValues.put("state", "outGoingCall");
+        callLogsDBManager.insertData(contentValues);
+        callLogsDBManager.closeDatabase();
+
+        ((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE))
+                .cancel(NOTIFICATION_CALLING);
         super.onDestroy();
     }
 

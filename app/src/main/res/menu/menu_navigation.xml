@@ -6,6 +6,10 @@
             android:icon="@drawable/ic_nav_notifications"
             android:title="Notifications" />
         <item
+            android:id="@+id/nav_call_logs"
+            android:icon="@drawable/ic_nav_call_logs"
+            android:title="Call Logs" />
+        <item
             android:id="@+id/nav_privacy_settings"
             android:icon="@drawable/ic_nav_privacy_settings"
             android:title="Privacy Settings" />
@@ -25,11 +29,8 @@
     <item android:title="Sub items">
         <menu>
             <item
-                android:icon="@drawable/ic_nav_notifications"
-                android:title="Sub item 1" />
-            <item
-                android:icon="@drawable/ic_nav_notifications"
-                android:title="Sub item 2" />
+                android:icon="@drawable/ic_nav_log_out"
+                android:title="Log out" />
         </menu>
     </item>
 </menu>

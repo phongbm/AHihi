@@ -2,21 +2,18 @@ package com.phongbm.call;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -28,30 +25,33 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.phongbm.ahihi.CallLogsDBManager;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.libs.CallingRippleView;
 import com.phongbm.music.RingtoneManager;
 
-import java.util.concurrent.TimeUnit;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class InComingCallActivity extends Activity implements View.OnClickListener {
-    private static final String TAG = "InComingCallActivity";
-    public static final int UPDATE_TIME_CALL = 0;
+    private static final int UPDATE_TIME_CALL = 1000;
+    private static final int NOTIFICATION_CALLING = 0;
+    private static final int NOTIFICATION_MISSED_CALL = 1;
 
-    private ImageView btnAnswer, btnHangup;
+    private ImageView btnAnswer, btnEndCall;
     private TextView txtTime, txtFullName, txtPhoneNumber;
     private CircleImageView imgAvatar;
     private CallingRippleView callingRipple;
     private RingtoneManager ringtoneManager;
     private BroadcastInComingCall broadcastInComingCall;
     private int timeCall = 0;
-    private String time;
     private boolean isCalling = false;
     private Thread threadTimeCall;
+    private CommonMethod commonMethod;
+    private String state, id, fullName, phoneNumber, time, date = null;
+    private CallLogsDBManager callLogsDBManager;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -73,46 +73,36 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
         this.setVolumeControlStream(AudioManager.STREAM_RING);
         ringtoneManager = new RingtoneManager(this);
         ringtoneManager.playRingtone();
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(InComingCallActivity.this)
-                        .setSmallIcon(R.drawable.ic_notification_calling)
-                        .setContentTitle("AHihi").setContentText("Calling...");
-        Intent i = new Intent(InComingCallActivity.this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                InComingCallActivity.this, 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
-        NotificationManager notificationManager = (NotificationManager)
-                InComingCallActivity.this.getSystemService(
-                        Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(1, builder.build());
-
-        return;
+        callLogsDBManager = new CallLogsDBManager(this);
+        commonMethod = CommonMethod.getInstance();
+        commonMethod.pushNotification(this, MainActivity.class, "Calling...",
+                NOTIFICATION_CALLING, R.drawable.ic_notification_calling, true);
     }
 
     private void initializeComponent() {
         btnAnswer = (ImageView) findViewById(R.id.btnAnswer);
         btnAnswer.setOnClickListener(this);
-        btnHangup = (ImageView) findViewById(R.id.btnHangup);
-        btnHangup.setOnClickListener(this);
+        btnEndCall = (ImageView) findViewById(R.id.btnEndCall);
+        btnEndCall.setOnClickListener(this);
         txtTime = (TextView) findViewById(R.id.txtTime);
         txtFullName = (TextView) findViewById(R.id.txtFullName);
         txtPhoneNumber = (TextView) findViewById(R.id.txtPhoneNumber);
         imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
         callingRipple = (CallingRippleView) findViewById(R.id.callingRipple);
 
+        id = this.getIntent().getStringExtra(CommonValue.OUTGOING_CALL_ID);
         ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
-        parseQuery.whereEqualTo("objectId", this.getIntent().getStringExtra
-                (CommonValue.OUTGOING_CALL_ID));
+        parseQuery.whereEqualTo("objectId", id);
         parseQuery.getFirstInBackground(new GetCallback<ParseUser>() {
             @Override
             public void done(ParseUser parseUser, ParseException e) {
                 if (parseUser == null) {
-                    Log.i(TAG, "parseUser NULL");
                     return;
                 }
-                txtFullName.setText((String) parseUser.get("fullName"));
-                txtPhoneNumber.setText("Mobile " + parseUser.getUsername());
+                fullName = (String) parseUser.get("fullName");
+                txtFullName.setText(fullName);
+                phoneNumber = parseUser.getUsername();
+                txtPhoneNumber.setText("Mobile " + phoneNumber);
                 ParseFile parseFile = (ParseFile) parseUser.get("avatar");
                 if (parseFile == null) {
                     return;
@@ -129,7 +119,6 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
                 });
             }
         });
-        return;
     }
 
     @Override
@@ -143,16 +132,16 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
                 Intent intentAnswer = new Intent(CommonValue.ACTION_ANSWER);
                 this.sendBroadcast(intentAnswer);
                 break;
-            case R.id.btnHangup:
+            case R.id.btnEndCall:
                 isCalling = false;
+                date = commonMethod.getCurrentDateTime();
+                btnAnswer.setEnabled(false);
                 ringtoneManager.stopRingtone();
                 this.setVolumeControlStream(AudioManager.USE_DEFAULT_STREAM_TYPE);
-                Intent intentHangup = new Intent(CommonValue.ACTION_HANGUP);
+                Intent intentHangup = new Intent(CommonValue.ACTION_END_CALL);
                 this.sendBroadcast(intentHangup);
-                this.finish();
                 break;
         }
-        return;
     }
 
     private void registerBroadcastInComingCall() {
@@ -163,7 +152,6 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
             intentFilter.addAction(CommonValue.STATE_END_CALL);
             this.registerReceiver(broadcastInComingCall, intentFilter);
         }
-        return;
     }
 
     private class BroadcastInComingCall extends BroadcastReceiver {
@@ -173,66 +161,68 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
                 case CommonValue.STATE_ANSWER:
                     threadTimeCall = new Thread(runnableTimeCall);
                     threadTimeCall.start();
+                    InComingCallActivity.this.setVolumeControlStream(
+                            AudioManager.STREAM_VOICE_CALL);
                     break;
                 case CommonValue.STATE_END_CALL:
                     if (timeCall != 0) {
                         isCalling = false;
                         txtTime.setText("End Call: " + time);
-                        txtTime.setTextColor(Color.parseColor("#f44336"));
-                        callingRipple.setVisibility(RelativeLayout.GONE);
-                        (new Handler()).postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                InComingCallActivity.this.finish();
-                            }
-                        }, 3000);
+                        state = "inComingCall";
                     } else {
                         ringtoneManager.stopRingtone();
-                        NotificationCompat.Builder builder =
-                                new NotificationCompat.Builder(InComingCallActivity.this)
-                                        .setSmallIcon(R.drawable.ic_notification_missed_call)
-                                        .setContentTitle("AHihi").setContentText("Missed Call");
-                        Intent i = new Intent(InComingCallActivity.this, MainActivity.class);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(
-                                InComingCallActivity.this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-                        builder.setContentIntent(pendingIntent);
-                        NotificationManager notificationManager = (NotificationManager)
-                                InComingCallActivity.this.getSystemService(
-                                        Context.NOTIFICATION_SERVICE);
-                        notificationManager.notify(0, builder.build());
-                        InComingCallActivity.this.finish();
+                        commonMethod.pushNotification(InComingCallActivity.this, MainActivity.class,
+                                "Missed Call", NOTIFICATION_MISSED_CALL,
+                                R.drawable.ic_notification_missed_call, false);
+                        txtTime.setText("Missed Call");
+                        state = "missedCall";
                     }
+                    if (date == null) {
+                        date = commonMethod.getCurrentDateTime();
+                    }
+                    txtTime.setBackgroundColor(InComingCallActivity.this.getResources()
+                            .getColor(R.color.red_500));
+                    callingRipple.setVisibility(RelativeLayout.GONE);
+                    InComingCallActivity.this.setVolumeControlStream(
+                            AudioManager.USE_DEFAULT_STREAM_TYPE);
+                    (new Handler()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            InComingCallActivity.this.finish();
+                        }
+                    }, 3000);
                     break;
             }
-            return;
         }
     }
-
 
     private Runnable runnableTimeCall = new Runnable() {
         @Override
         public void run() {
             while (isCalling) {
                 timeCall += 1000;
-                convertTimeToString();
+                time = commonMethod.convertTimeToString(timeCall);
                 handler.sendEmptyMessage(UPDATE_TIME_CALL);
                 SystemClock.sleep(1000);
             }
         }
     };
 
-    private void convertTimeToString() {
-        int minutes = (int) TimeUnit.MILLISECONDS.toMinutes(timeCall);
-        int seconds = (int) TimeUnit.MILLISECONDS.toSeconds(timeCall) - minutes * 60;
-        time = (minutes < 10 ? "0" + minutes : "" + minutes)
-                + ":" + (seconds < 10 ? "0" + seconds : "" + seconds);
-    }
-
     @Override
     protected void onDestroy() {
         this.unregisterReceiver(broadcastInComingCall);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("id", id);
+        contentValues.put("fullName", fullName);
+        contentValues.put("phoneNumber", phoneNumber);
+        contentValues.put("date", date);
+        contentValues.put("state", state);
+        callLogsDBManager.insertData(contentValues);
+        callLogsDBManager.closeDatabase();
+
         ((NotificationManager) InComingCallActivity.this.
-                getSystemService(Context.NOTIFICATION_SERVICE)).cancel(1);
+                getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIFICATION_CALLING);
         super.onDestroy();
     }
 

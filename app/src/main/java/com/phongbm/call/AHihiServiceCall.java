@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.parse.ParseUser;
 import com.phongbm.common.CommonValue;
@@ -104,9 +103,6 @@ public class AHihiServiceCall extends Service {
     private class InComingCallListener implements CallClientListener, CallListener {
         @Override
         public void onIncomingCall(CallClient callClient, Call call) {
-            Log.i(TAG, "getCallId... " + call.getCallId());
-            Log.i(TAG, "getRemoteUserId... " + call.getRemoteUserId());
-
             inComingCall = call;
             inComingCall.addCallListener(this);
             Intent intentInComingCall = new Intent();
@@ -147,7 +143,6 @@ public class AHihiServiceCall extends Service {
             intentFilter.addAction(CommonValue.ACTION_OUTGOING_CALL);
             intentFilter.addAction(CommonValue.ACTION_END_CALL);
             intentFilter.addAction(CommonValue.ACTION_ANSWER);
-            intentFilter.addAction(CommonValue.ACTION_HANGUP);
             intentFilter.addAction(CommonValue.ACTION_LOGOUT);
             context.registerReceiver(broadcastCall, intentFilter);
         }
@@ -158,8 +153,8 @@ public class AHihiServiceCall extends Service {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case CommonValue.ACTION_OUTGOING_CALL:
-                    outGoingCall = sinchClient.getCallClient()
-                            .callUser(intent.getStringExtra(CommonValue.INCOMING_CALL_ID));
+                    String inComingCallId = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
+                    outGoingCall = sinchClient.getCallClient().callUser(inComingCallId);
                     outGoingCall.addCallListener(new OutGoingCallListener());
                     break;
                 case CommonValue.ACTION_END_CALL:
@@ -177,16 +172,11 @@ public class AHihiServiceCall extends Service {
                         inComingCall.answer();
                     }
                     break;
-                case CommonValue.ACTION_HANGUP:
-                    if (inComingCall != null) {
-                        inComingCall.hangup();
-                        inComingCall = null;
-                    }
-                    break;
                 case CommonValue.ACTION_LOGOUT:
                     sinchClient.stopListeningOnActiveConnection();
                     sinchClient.terminate();
                     sinchClient = null;
+                    break;
             }
         }
     }

@@ -20,6 +20,7 @@ public class FriendsDBManager {
 
     public FriendsDBManager(Context context) {
         this.context = context;
+        copyDatabaseFile();
     }
 
     private void copyDatabaseFile() {

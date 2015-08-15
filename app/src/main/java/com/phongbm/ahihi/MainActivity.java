@@ -155,7 +155,9 @@ public class MainActivity extends AppCompatActivity implements
         menuItem.setChecked(true);
         drawerLayout.closeDrawers();
         switch (menuItem.getItemId()) {
-            case R.id.nav_notifications:
+            case R.id.nav_call_logs:
+                Intent intentCallLogs = new Intent(MainActivity.this, CallLogActivity.class);
+                MainActivity.this.startActivity(intentCallLogs);
                 break;
         }
         return true;
@@ -163,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        this.getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
