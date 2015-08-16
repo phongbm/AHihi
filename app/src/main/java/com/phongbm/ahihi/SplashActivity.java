@@ -18,12 +18,6 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_splash);
-
-        TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        String phoneNumber = tMgr.getLine1Number();
-
-        Toast.makeText(this, phoneNumber, Toast.LENGTH_SHORT).show();
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
