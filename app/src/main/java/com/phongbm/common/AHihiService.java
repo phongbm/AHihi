@@ -1,4 +1,4 @@
-package com.phongbm.call;
+package com.phongbm.common;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -6,28 +6,42 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.phongbm.common.CommonValue;
-import com.phongbm.common.ServerInfo;
+import com.parse.SaveCallback;
+import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
+import com.sinch.android.rtc.SinchClientListener;
+import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
 import com.sinch.android.rtc.calling.CallListener;
+import com.sinch.android.rtc.messaging.Message;
+import com.sinch.android.rtc.messaging.MessageClient;
+import com.sinch.android.rtc.messaging.MessageClientListener;
+import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
+import com.sinch.android.rtc.messaging.MessageFailureInfo;
+import com.sinch.android.rtc.messaging.WritableMessage;
 
 import java.util.List;
 
-public class AHihiServiceCall extends Service {
+public class AHihiService extends Service implements SinchClientListener {
     private static final String TAG = "MyServiceCall";
 
     private Context context;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
-    private BroadcastCall broadcastCall = null;
+    private AHihiBroadcast aHihiBroadcast = null;
     private String outGoingId = null;
+
+    private MessageListener messageListener;
+    private MessageClient messageClient;
 
     @Override
     public void onCreate() {
@@ -35,7 +49,7 @@ public class AHihiServiceCall extends Service {
         if (context == null) {
             context = this;
         }
-        this.registerBroadcastCall();
+        this.registerBroadcast();
     }
 
     @Override
@@ -67,13 +81,40 @@ public class AHihiServiceCall extends Service {
                     .environmentHost(ServerInfo.SINCH_ENVIROMENT)
                     .build();
             sinchClient.setSupportCalling(true);
+            sinchClient.setSupportMessaging(true);
             sinchClient.startListeningOnActiveConnection();
-            sinchClient.setSupportPushNotifications(true);
             sinchClient.checkManifest();
             sinchClient.setSupportActiveConnectionInBackground(true);
+            sinchClient.addSinchClientListener(this);
             sinchClient.getCallClient().addCallClientListener(new InComingCallListener());
             sinchClient.start();
         }
+    }
+
+    @Override
+    public void onClientStarted(SinchClient sinchClient) {
+        if (messageClient == null) {
+            messageListener = new MessageListener();
+            sinchClient.startListeningOnActiveConnection();
+            messageClient = sinchClient.getMessageClient();
+            messageClient.addMessageClientListener(messageListener);
+        }
+    }
+
+    @Override
+    public void onClientStopped(SinchClient sinchClient) {
+    }
+
+    @Override
+    public void onClientFailed(SinchClient sinchClient, SinchError sinchError) {
+    }
+
+    @Override
+    public void onRegistrationCredentialsRequired(SinchClient sinchClient, ClientRegistration clientRegistration) {
+    }
+
+    @Override
+    public void onLogMessage(int i, String s, String s1) {
     }
 
     private class OutGoingCallListener implements CallListener {
@@ -85,14 +126,14 @@ public class AHihiServiceCall extends Service {
         public void onCallEstablished(Call call) {
             Intent intentPickUp = new Intent();
             intentPickUp.setAction(CommonValue.STATE_PICK_UP);
-            AHihiServiceCall.this.sendBroadcast(intentPickUp);
+            AHihiService.this.sendBroadcast(intentPickUp);
         }
 
         @Override
         public void onCallEnded(Call call) {
             Intent intentEndCall = new Intent();
             intentEndCall.setAction(CommonValue.STATE_END_CALL);
-            AHihiServiceCall.this.sendBroadcast(intentEndCall);
+            AHihiService.this.sendBroadcast(intentEndCall);
         }
 
         @Override
@@ -121,14 +162,14 @@ public class AHihiServiceCall extends Service {
         public void onCallEstablished(Call call) {
             Intent intentAnswer = new Intent();
             intentAnswer.setAction(CommonValue.STATE_ANSWER);
-            AHihiServiceCall.this.sendBroadcast(intentAnswer);
+            AHihiService.this.sendBroadcast(intentAnswer);
         }
 
         @Override
         public void onCallEnded(Call call) {
             Intent intentEndCall = new Intent();
             intentEndCall.setAction(CommonValue.STATE_END_CALL);
-            AHihiServiceCall.this.sendBroadcast(intentEndCall);
+            AHihiService.this.sendBroadcast(intentEndCall);
         }
 
         @Override
@@ -136,22 +177,54 @@ public class AHihiServiceCall extends Service {
         }
     }
 
-    private void registerBroadcastCall() {
-        if (broadcastCall == null) {
-            broadcastCall = new BroadcastCall();
+    private class MessageListener implements MessageClientListener {
+        @Override
+        public void onIncomingMessage(MessageClient messageClient, Message message) {
+        }
+
+        @Override
+        public void onMessageSent(MessageClient messageClient, Message message, String s) {
+            Toast.makeText(AHihiService.this, "onMessageSent...", Toast.LENGTH_SHORT).show();
+            Intent intentSent = new Intent();
+            intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
+            AHihiService.this.sendBroadcast(intentSent);
+        }
+
+        @Override
+        public void onMessageFailed(MessageClient messageClient, Message message,
+                                    MessageFailureInfo messageFailureInfo) {
+        }
+
+        @Override
+        public void onMessageDelivered(MessageClient messageClient, MessageDeliveryInfo messageDeliveryInfo) {
+        }
+
+        @Override
+        public void onShouldSendPushData(MessageClient messageClient, Message message, List<PushPair> list) {
+        }
+
+    }
+
+    private void registerBroadcast() {
+        if (aHihiBroadcast == null) {
+            aHihiBroadcast = new AHihiBroadcast();
             IntentFilter intentFilter = new IntentFilter();
+            // Call
             intentFilter.addAction(CommonValue.ACTION_OUTGOING_CALL);
             intentFilter.addAction(CommonValue.ACTION_END_CALL);
             intentFilter.addAction(CommonValue.ACTION_ANSWER);
             intentFilter.addAction(CommonValue.ACTION_LOGOUT);
-            context.registerReceiver(broadcastCall, intentFilter);
+            // Message
+            intentFilter.addAction(CommonValue.ACTION_SEND_MESSAGE);
+            context.registerReceiver(aHihiBroadcast, intentFilter);
         }
     }
 
-    private class BroadcastCall extends BroadcastReceiver {
+    private class AHihiBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
+                // Call
                 case CommonValue.ACTION_OUTGOING_CALL:
                     String inComingCallId = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
                     outGoingCall = sinchClient.getCallClient().callUser(inComingCallId);
@@ -173,17 +246,46 @@ public class AHihiServiceCall extends Service {
                     }
                     break;
                 case CommonValue.ACTION_LOGOUT:
+                    messageClient.removeMessageClientListener(messageListener);
+                    messageClient = null;
+
                     sinchClient.stopListeningOnActiveConnection();
                     sinchClient.terminate();
                     sinchClient = null;
+                    break;
+
+                // Message
+                case CommonValue.ACTION_SEND_MESSAGE:
+                    Toast.makeText(AHihiService.this, "ACTION_SEND_MESSAGE", Toast.LENGTH_SHORT).show();
+                    String id = intent.getStringExtra(CommonValue.INCOMING_MESSAGE_ID);
+                    String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
+                    sendMessage(id, content);
                     break;
             }
         }
     }
 
+    private synchronized void sendMessage(final String id, final String content) {
+        ParseObject message = new ParseObject("Message");
+        message.put("senderId", outGoingId);
+        message.put("receiverId", id);
+        message.put("content", content);
+        message.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+                WritableMessage message = new WritableMessage(id, content);
+                messageClient.send(message);
+            }
+        });
+    }
+
     @Override
     public void onDestroy() {
-        this.unregisterReceiver(broadcastCall);
+        this.unregisterReceiver(aHihiBroadcast);
         super.onDestroy();
     }
 

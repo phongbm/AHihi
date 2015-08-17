@@ -1,6 +1,6 @@
 package com.phongbm.call;
 
-import android.app.Activity;
+import android.app.KeyguardManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -14,7 +14,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,6 +27,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.phongbm.ahihi.CallLogActivity;
 import com.phongbm.ahihi.CallLogsDBManager;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
@@ -35,7 +38,7 @@ import com.phongbm.music.RingtoneManager;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class InComingCallActivity extends Activity implements View.OnClickListener {
+public class InComingCallActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int UPDATE_TIME_CALL = 1000;
     private static final int NOTIFICATION_CALLING = 0;
     private static final int NOTIFICATION_MISSED_CALL = 1;
@@ -47,10 +50,10 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
     private RingtoneManager ringtoneManager;
     private BroadcastInComingCall broadcastInComingCall;
     private int timeCall = 0;
+    private String state, id, fullName, phoneNumber, time, date = null;
     private boolean isCalling = false;
     private Thread threadTimeCall;
     private CommonMethod commonMethod;
-    private String state, id, fullName, phoneNumber, time, date = null;
     private CallLogsDBManager callLogsDBManager;
     private Handler handler = new Handler() {
         @Override
@@ -67,6 +70,10 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         this.setContentView(R.layout.activity_incoming_call);
         this.initializeComponent();
         this.registerBroadcastInComingCall();
@@ -171,7 +178,7 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
                         state = "inComingCall";
                     } else {
                         ringtoneManager.stopRingtone();
-                        commonMethod.pushNotification(InComingCallActivity.this, MainActivity.class,
+                        commonMethod.pushNotification(InComingCallActivity.this, CallLogActivity.class,
                                 "Missed Call", NOTIFICATION_MISSED_CALL,
                                 R.drawable.ic_notification_missed_call, false);
                         txtTime.setText("Missed Call");
@@ -185,6 +192,15 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
                     callingRipple.setVisibility(RelativeLayout.GONE);
                     InComingCallActivity.this.setVolumeControlStream(
                             AudioManager.USE_DEFAULT_STREAM_TYPE);
+
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("id", id);
+                    contentValues.put("fullName", fullName);
+                    contentValues.put("phoneNumber", phoneNumber);
+                    contentValues.put("date", date);
+                    contentValues.put("state", state);
+                    callLogsDBManager.insertData(contentValues);
+
                     (new Handler()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -211,16 +227,7 @@ public class InComingCallActivity extends Activity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         this.unregisterReceiver(broadcastInComingCall);
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("id", id);
-        contentValues.put("fullName", fullName);
-        contentValues.put("phoneNumber", phoneNumber);
-        contentValues.put("date", date);
-        contentValues.put("state", state);
-        callLogsDBManager.insertData(contentValues);
         callLogsDBManager.closeDatabase();
-
         ((NotificationManager) InComingCallActivity.this.
                 getSystemService(Context.NOTIFICATION_SERVICE)).cancel(NOTIFICATION_CALLING);
         super.onDestroy();

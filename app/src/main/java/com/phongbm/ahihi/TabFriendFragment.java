@@ -5,23 +5,24 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
 @SuppressLint("ValidFragment")
@@ -47,6 +48,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                             allFriendAdapter.getActiveFriendItems());
                     activeFriendAdapter.notifyDataSetChanged();
                     break;
+
             }
         }
     };
@@ -89,30 +91,48 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String ID, fullName, phoneNumber;
-        ByteArrayOutputStream avatar = new ByteArrayOutputStream();
+        /*String ID;
         if (activeFriendAdapterVisible) {
             ID = activeFriendAdapter.getItem(position).getId();
-            fullName = activeFriendAdapter.getItem(position).getName();
-            phoneNumber = activeFriendAdapter.getItem(position).getPhoneNumber();
-            activeFriendAdapter.getItem(position).getAvatar()
-                    .compress(Bitmap.CompressFormat.PNG, 80, avatar);
         } else {
             ID = allFriendAdapter.getItem(position).getId();
-            fullName = allFriendAdapter.getItem(position).getName();
-            phoneNumber = allFriendAdapter.getItem(position).getPhoneNumber();
-            allFriendAdapter.getItem(position).getAvatar()
-                    .compress(Bitmap.CompressFormat.PNG, 80, avatar);
         }
-
-        Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
+        Intent intentCall = new Intent(getActivity(), MessageActivity.class);
         intentCall.putExtra(CommonValue.INCOMING_CALL_ID, ID);
-        intentCall.putExtra(CommonValue.INCOMING_CALL_FULL_NAME, fullName);
-        intentCall.putExtra(CommonValue.INCOMING_CALL_PHONE_NUMBER, phoneNumber);
-        intentCall.putExtra(CommonValue.INCOMING_CALL_AVATAR, avatar.toByteArray());
+        // intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.getActivity().startActivity(intentCall);*/
 
-        intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.getActivity().startActivity(intentCall);
+        final String inComingId;
+        if (activeFriendAdapterVisible) {
+            inComingId = activeFriendAdapter.getItem(position).getId();
+        } else {
+            inComingId = allFriendAdapter.getItem(position).getId();
+        }
+        final ImageView menu = (ImageView) view.findViewById(R.id.menu);
+        menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(TabFriendFragment.this.getActivity(), menu);
+                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_open_chat:
+                                break;
+                            case R.id.action_voice_call:
+                                Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
+                                intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                                TabFriendFragment.this.getActivity().startActivity(intentCall);
+                                break;
+                            case R.id.action_view_profile:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
+            }
+        });
     }
 
     @Override

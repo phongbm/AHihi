@@ -2,6 +2,8 @@ package com.phongbm.ahihi;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,19 +11,24 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.phongbm.common.CommonValue;
 import com.phongbm.libs.CircleTextView;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class CallLogAdapter extends BaseAdapter {
+    private Context context;
     private LayoutInflater layoutInflater;
     private ArrayList<CallLogItem> callLogItems;
+    private Handler handler;
     private Random random = new Random();
 
-    public CallLogAdapter(Context context, ArrayList<CallLogItem> callLogItems) {
+    public CallLogAdapter(Context context, ArrayList<CallLogItem> callLogItems, Handler handler) {
+        this.context = context;
         layoutInflater = LayoutInflater.from(context);
         this.callLogItems = callLogItems;
+        this.handler = handler;
     }
 
     @Override
@@ -40,7 +47,7 @@ public class CallLogAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_call_log, parent, false);
@@ -50,6 +57,7 @@ public class CallLogAdapter extends BaseAdapter {
             viewHolder.txtPhoneNumber = (TextView) convertView.findViewById(R.id.txtPhoneNumber);
             viewHolder.txtDate = (TextView) convertView.findViewById(R.id.txtDate);
             viewHolder.imgState = (ImageView) convertView.findViewById(R.id.imgState);
+            viewHolder.btnCallBack = (ImageView) convertView.findViewById(R.id.btnCallBack);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -73,13 +81,27 @@ public class CallLogAdapter extends BaseAdapter {
                 viewHolder.imgState.setImageResource(R.drawable.ic_call_log_missed_call);
                 break;
         }
+        viewHolder.btnCallBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Message message = new Message();
+                message.what = CommonValue.WHAT_CALL_BACK;
+                message.obj = callLogItems.get(position).getId();
+                message.setTarget(handler);
+                message.sendToTarget();
+            }
+        });
         return convertView;
     }
 
     private class ViewHolder {
         CircleTextView imgAvatar;
         TextView txtFullName, txtPhoneNumber, txtDate;
-        ImageView imgState;
+        ImageView imgState, btnCallBack;
+    }
+
+    public void setCallLogItems(ArrayList<CallLogItem> callLogItems) {
+        this.callLogItems = callLogItems;
     }
 
 }

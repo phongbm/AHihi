@@ -1,23 +1,48 @@
 package com.phongbm.ahihi;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.phongbm.call.OutgoingCallActivity;
+import com.phongbm.common.CommonValue;
 
 import java.util.ArrayList;
 
 public class CallLogActivity extends AppCompatActivity {
+    private static final int REQUEST_CALL_LOGS = 0;
+
     private CallLogsDBManager callLogsDBManager;
     private ListView listViewCallLog;
     private CallLogAdapter callLogAdapter;
     private ArrayList<CallLogItem> callLogItems;
     private RelativeLayout layoutNoCallLogs;
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case CommonValue.WHAT_CALL_BACK:
+                    Intent intentOutGoingCall = new Intent(CallLogActivity.this,
+                            OutgoingCallActivity.class);
+                    intentOutGoingCall.putExtra(CommonValue.INCOMING_CALL_ID, (String) msg.obj);
+                    // intentOutGoingCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    CallLogActivity.this.startActivityForResult(intentOutGoingCall,
+                            REQUEST_CALL_LOGS);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +56,7 @@ public class CallLogActivity extends AppCompatActivity {
             listViewCallLog.setVisibility(RelativeLayout.GONE);
             layoutNoCallLogs.setVisibility(RelativeLayout.VISIBLE);
         } else {
-            callLogAdapter = new CallLogAdapter(this, callLogItems);
+            callLogAdapter = new CallLogAdapter(this, callLogItems, handler);
             listViewCallLog.setAdapter(callLogAdapter);
         }
     }
@@ -97,6 +122,17 @@ public class CallLogActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
+        if (requestCode == REQUEST_CALL_LOGS) {
+            if (resultCode == Activity.RESULT_OK) {
+                callLogAdapter.setCallLogItems(callLogsDBManager.getData());
+                callLogAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
 }

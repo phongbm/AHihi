@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -25,7 +28,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private View view;
     private EditText edtPhoneNumber, edtPassword;
     private AppCompatButton btnLogin;
-    private TextView forgotPassword, register;
+    private TextView txtLogo, forgotPassword, register;
     private boolean isFillPhoneNumber, isFillPassword;
 
     @Override
@@ -35,12 +38,22 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_login, null);
+        view = inflater.inflate(R.layout.test, null);
+        this.initializeToolbar();
         this.initializeComponent();
         return view;
     }
 
+    private void initializeToolbar() {
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) this.getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) this.getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActivity().setTitle("LOG IN");
+    }
+
     private void initializeComponent() {
+        txtLogo = (TextView) view.findViewById(R.id.txtLogo);
+        txtLogo.setTypeface(Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/AIRSTREA.TTF"));
         btnLogin = (AppCompatButton) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
         forgotPassword = (TextView) view.findViewById(R.id.forgotPassword);

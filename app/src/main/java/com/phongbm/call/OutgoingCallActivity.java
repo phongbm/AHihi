@@ -14,11 +14,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.GetCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 import com.phongbm.ahihi.CallLogsDBManager;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
@@ -28,12 +37,13 @@ import com.phongbm.libs.CallingRippleView;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class OutgoingCallActivity extends Activity implements View.OnClickListener {
+public class OutgoingCallActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int UPDATE_TIME_CALL = 1000;
     private static final int NOTIFICATION_CALLING = 0;
 
     private ImageView btnEndCall, btnRingtone;
-    private TextView txtTime;
+    private TextView txtTime, txtFullName, txtPhoneNumber;
+    private CircleImageView imgAvatar;
     private CallingRippleView callingRipple;
     private BroadcastOutgoingCall broadcastOutgoingCall;
     private int timeCall = 0;
@@ -75,22 +85,41 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
         btnRingtone = (ImageView) findViewById(R.id.btnRingtone);
         btnRingtone.setOnClickListener(this);
         txtTime = (TextView) findViewById(R.id.txtTime);
-        TextView txtFullName = (TextView) findViewById(R.id.txtFullName);
-        TextView txtPhoneNumber = (TextView) findViewById(R.id.txtPhoneNumber);
-        CircleImageView imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
+        txtFullName = (TextView) findViewById(R.id.txtFullName);
+        txtPhoneNumber = (TextView) findViewById(R.id.txtPhoneNumber);
+        imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
         callingRipple = (CallingRippleView) findViewById(R.id.callingRipple);
 
         Intent intent = this.getIntent();
         id = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
-        fullName = intent.getStringExtra(CommonValue.INCOMING_CALL_FULL_NAME);
-        phoneNumber = intent.getStringExtra(CommonValue.INCOMING_CALL_PHONE_NUMBER);
-        Bitmap avatar = BitmapFactory.decodeByteArray(intent.getByteArrayExtra(
-                CommonValue.INCOMING_CALL_AVATAR), 0, intent.getByteArrayExtra(
-                CommonValue.INCOMING_CALL_AVATAR).length);
-
-        txtFullName.setText(fullName);
-        txtPhoneNumber.setText("Mobile " + phoneNumber);
-        imgAvatar.setImageBitmap(avatar);
+        ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+        parseQuery.whereEqualTo("objectId", id);
+        parseQuery.getFirstInBackground(new GetCallback<ParseUser>() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
+                if (parseUser == null) {
+                    return;
+                }
+                fullName = (String) parseUser.get("fullName");
+                txtFullName.setText(fullName);
+                phoneNumber = parseUser.getUsername();
+                txtPhoneNumber.setText("Mobile " + phoneNumber);
+                ParseFile parseFile = (ParseFile) parseUser.get("avatar");
+                if (parseFile == null) {
+                    return;
+                }
+                parseFile.getDataInBackground(new GetDataCallback() {
+                    @Override
+                    public void done(byte[] bytes, ParseException e) {
+                        if (e != null) {
+                            return;
+                        }
+                        Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        imgAvatar.setImageBitmap(avatar);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -154,6 +183,15 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
                     callingRipple.setVisibility(RelativeLayout.GONE);
                     OutgoingCallActivity.this.setVolumeControlStream(
                             AudioManager.USE_DEFAULT_STREAM_TYPE);
+
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("id", id);
+                    contentValues.put("fullName", fullName);
+                    contentValues.put("phoneNumber", phoneNumber);
+                    contentValues.put("date", date);
+                    contentValues.put("state", "outGoingCall");
+                    callLogsDBManager.insertData(contentValues);
+
                     (new Handler()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -180,19 +218,17 @@ public class OutgoingCallActivity extends Activity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         this.unregisterReceiver(broadcastOutgoingCall);
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("id", id);
-        contentValues.put("fullName", fullName);
-        contentValues.put("phoneNumber", phoneNumber);
-        contentValues.put("date", date);
-        contentValues.put("state", "outGoingCall");
-        callLogsDBManager.insertData(contentValues);
         callLogsDBManager.closeDatabase();
-
         ((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE))
                 .cancel(NOTIFICATION_CALLING);
         super.onDestroy();
+    }
+
+    @Override
+    public void finish() {
+        this.setResult(Activity.RESULT_OK);
+        Toast.makeText(this, "OK CMNL", Toast.LENGTH_SHORT).show();
+        super.finish();
     }
 
 }

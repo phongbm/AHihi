@@ -2,7 +2,10 @@ package com.phongbm.common;
 
 public class CommonValue {
     public static final String PACKAGE_NAME_MAIN = "com.phongbm.ahihi";
+    public static final String PACKAGE_NAME_COMMON = "com.phongbm.common";
     public static final String PACKAGE_NAME_CALL = "com.phongbm.call";
+
+    public static final int WHAT_CALL_BACK = 2;
 
     public static final int REQUEST_ADD_FRIEND = 5;
     public static final int ACTION_UPDATE_LIST_FRIEND = 6;
@@ -10,9 +13,6 @@ public class CommonValue {
 
     public static final String OUTGOING_CALL_ID = "OUTGOING_CALL_ID";
     public static final String INCOMING_CALL_ID = "INCOMING_CALL_ID";
-    public static final String INCOMING_CALL_FULL_NAME = "INCOMING_CALL_FULL_NAME";
-    public static final String INCOMING_CALL_PHONE_NUMBER = "INCOMING_CALL_PHONE_NUMBER";
-    public static final String INCOMING_CALL_AVATAR = "INCOMING_CALL_AVATAR";
     public static final String ACTION_OUTGOING_CALL = "ACTION_OUTGOING_CALL";
     public static final String ACTION_END_CALL = "ACTION_END_CALL";
     public static final String ACTION_ANSWER = "ACTION_ANSWER";
@@ -20,6 +20,11 @@ public class CommonValue {
     public static final String STATE_END_CALL = "STATE_END_CALL";
     public static final String STATE_PICK_UP = "STATE_PICK_UP";
     public static final String STATE_ANSWER = "STATE_ANSWER";
+
+    public static final String INCOMING_MESSAGE_ID = "INCOMING_MESSAGE_ID";
+    public static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
+    public static final String MESSAGE_CONTENT = "MESSAGE_CONTENT";
+    public static final String STATE_MESSAGE_SENT = "STATE_MESSAGE_SENT";
 
     public static final String URL_IMAGE = "URL_IMAGE";
     public static final String X_IMAGE = "X_IMAGE";

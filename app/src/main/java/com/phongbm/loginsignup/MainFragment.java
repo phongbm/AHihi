@@ -1,12 +1,11 @@
 package com.phongbm.loginsignup;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.Window;
+import android.support.v7.app.AppCompatActivity;
 
 import com.phongbm.ahihi.R;
 
-public class MainFragment extends Activity {
+public class MainFragment extends AppCompatActivity {
     private HomeFragment homeFragment = new HomeFragment();
     private LoginFragment loginFragment = new LoginFragment();
     private SignupFragment signupFragment = new SignupFragment();

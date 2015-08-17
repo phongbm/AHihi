@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void startService() {
         Intent intentStartService = new Intent();
-        intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.call.AHihiServiceCall");
+        intentStartService.setClassName("com.phongbm.ahihi", "com.phongbm.common.AHihiService");
         startService(intentStartService);
     }
 
