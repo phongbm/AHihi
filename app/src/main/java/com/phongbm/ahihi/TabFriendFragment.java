@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
+import com.phongbm.message.MessageActivity;
 
 import java.util.Collections;
 
@@ -118,6 +119,9 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.action_open_chat:
+                                Intent intentChat = new Intent(getActivity(), MessageActivity.class);
+                                intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                                TabFriendFragment.this.getActivity().startActivity(intentChat);
                                 break;
                             case R.id.action_voice_call:
                                 Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);

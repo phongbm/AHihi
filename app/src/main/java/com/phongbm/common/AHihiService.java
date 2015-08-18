@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -83,10 +84,9 @@ public class AHihiService extends Service implements SinchClientListener {
             sinchClient.setSupportCalling(true);
             sinchClient.setSupportMessaging(true);
             sinchClient.startListeningOnActiveConnection();
-            sinchClient.checkManifest();
             sinchClient.setSupportActiveConnectionInBackground(true);
             sinchClient.addSinchClientListener(this);
-            sinchClient.getCallClient().addCallClientListener(new InComingCallListener());
+            sinchClient.checkManifest();
             sinchClient.start();
         }
     }
@@ -95,9 +95,9 @@ public class AHihiService extends Service implements SinchClientListener {
     public void onClientStarted(SinchClient sinchClient) {
         if (messageClient == null) {
             messageListener = new MessageListener();
-            sinchClient.startListeningOnActiveConnection();
-            messageClient = sinchClient.getMessageClient();
+            messageClient = this.sinchClient.getMessageClient();
             messageClient.addMessageClientListener(messageListener);
+            this.sinchClient.getCallClient().addCallClientListener(new InComingCallListener());
         }
     }
 
@@ -193,10 +193,13 @@ public class AHihiService extends Service implements SinchClientListener {
         @Override
         public void onMessageFailed(MessageClient messageClient, Message message,
                                     MessageFailureInfo messageFailureInfo) {
+            Log.i(TAG, "onMessageFailed...");
+            Log.i(TAG, messageFailureInfo.getSinchError().toString());
         }
 
         @Override
         public void onMessageDelivered(MessageClient messageClient, MessageDeliveryInfo messageDeliveryInfo) {
+            Log.i(TAG, "onMessageDelivered...");
         }
 
         @Override
@@ -259,6 +262,7 @@ public class AHihiService extends Service implements SinchClientListener {
                     Toast.makeText(AHihiService.this, "ACTION_SEND_MESSAGE", Toast.LENGTH_SHORT).show();
                     String id = intent.getStringExtra(CommonValue.INCOMING_MESSAGE_ID);
                     String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
+                    Log.i(TAG, content);
                     sendMessage(id, content);
                     break;
             }
