@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,63 +30,78 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final String TAG = "MessageActivity";
+
     private ListView listViewMessage;
     private MessageAdapter messageAdapter;
     private String outGoingMessageId, inComingMessageId;
     private ReentrantLock reentrantLock = new ReentrantLock();
-    private EditText editText;
+    private EditText edtContent;
     private ImageView btnSend;
     private BroadcastMessage broadcastMessage;
-    private String content;
+    private String content, inComingFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_message);
-        this.initializeComponent();
-        this.registerBroadcastMessage();
 
         Intent intent = this.getIntent();
         outGoingMessageId = ParseUser.getCurrentUser().getObjectId();
         inComingMessageId = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
+        inComingFullName = intent.getStringExtra("NAME");
+
+        this.initializeToolbar();
+        this.initializeComponent();
+        this.registerBroadcastMessage();
 
         messageAdapter = new MessageAdapter(this);
         listViewMessage.setAdapter(messageAdapter);
         this.getData();
     }
 
+    private void initializeToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        this.setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.setTitle(inComingFullName);
+    }
+
     private void initializeComponent() {
         listViewMessage = (ListView) findViewById(R.id.listViewMessage);
-        editText = (EditText) findViewById(R.id.edtContent);
-        editText.addTextChangedListener(new TextWatcher() {
+        listViewMessage.setSelected(false);
+        btnSend = (ImageView) findViewById(R.id.btnSend);
+        btnSend.setEnabled(false);
+        btnSend.setOnClickListener(this);
+        edtContent = (EditText) findViewById(R.id.edtContent);
+        edtContent.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s == null || s.length() == 0) {
+                    btnSend.setEnabled(false);
+                    btnSend.setImageResource(R.drawable.ic_sent_negative);
+                } else {
+                    btnSend.setEnabled(true);
+                    btnSend.setImageResource(R.drawable.ic_sent_active);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s == null || s.length() == 0) {
-                    btnSend.setEnabled(false);
-                } else {
-                    btnSend.setEnabled(true);
-                }
             }
         });
-        btnSend = (ImageView) findViewById(R.id.btnSend);
-        btnSend.setOnClickListener(this);
     }
 
     private void getData() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
-        query.whereContainedIn("senderId",
-                Arrays.asList(new String[]{outGoingMessageId, inComingMessageId}));
-        query.whereContainedIn("receiverId",
-                Arrays.asList(new String[]{outGoingMessageId, inComingMessageId}));
-        query.orderByDescending("createAt");
+        String[] ids = new String[]{outGoingMessageId, inComingMessageId};
+        query.whereContainedIn("senderId", Arrays.asList(ids));
+        query.whereContainedIn("receiverId", Arrays.asList(ids));
+        query.orderByDescending("createdAt");
         query.setLimit(100);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -92,11 +111,12 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 for (ParseObject message : list) {
                     reentrantLock.lock();
-                    boolean check = false;
+                    int type = MessageAdapter.TYPE_INCOMING;
                     if (outGoingMessageId.equals(message.getString("senderId"))) {
-                        check = true;
+                        type = MessageAdapter.TYPE_OUTGOING;
                     }
-                    messageAdapter.addMessage(new MessageItem(check, message.getString("content")));
+                    messageAdapter.addMessage(0, new MessageItem(type, message.getString("content")));
+                    Log.i(TAG, message.getString("content"));
                     reentrantLock.unlock();
                 }
             }
@@ -107,8 +127,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSend:
-                content = editText.getText().toString();
-                editText.setText("");
+                content = edtContent.getText().toString();
+                edtContent.setText("");
                 Intent intentSend = new Intent();
                 intentSend.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentSend.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
@@ -123,6 +143,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             broadcastMessage = new BroadcastMessage();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(CommonValue.STATE_MESSAGE_SENT);
+            intentFilter.addAction(CommonValue.STATE_MESSAGE_INCOMING);
             MessageActivity.this.registerReceiver(broadcastMessage, intentFilter);
         }
     }
@@ -132,11 +153,28 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case CommonValue.STATE_MESSAGE_SENT:
-                    messageAdapter.addMessage(new MessageItem(true, content));
-                    messageAdapter.notifyDataSetChanged();
+                    messageAdapter.addMessage(messageAdapter.getCount(),
+                            new MessageItem(MessageAdapter.TYPE_OUTGOING, content));
+                    break;
+                case CommonValue.STATE_MESSAGE_INCOMING:
+                    messageAdapter.addMessage(messageAdapter.getCount(),
+                            new MessageItem(MessageAdapter.TYPE_INCOMING,
+                                    intent.getStringExtra(CommonValue.MESSAGE_CONTENT)));
                     break;
             }
+            listViewMessage.setSelection(messageAdapter.getCount());
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.getMenuInflater().inflate(R.menu.menu_message, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

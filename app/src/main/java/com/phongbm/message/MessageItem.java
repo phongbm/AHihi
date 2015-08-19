@@ -1,16 +1,16 @@
 package com.phongbm.message;
 
 public class MessageItem {
-    private boolean check;
+    private int type;
     private String content;
 
-    public MessageItem(boolean check, String content) {
-        this.check = check;
+    public MessageItem(int type, String content) {
+        this.type = type;
         this.content = content;
     }
 
-    public boolean isCheck() {
-        return check;
+    public int getType() {
+        return type;
     }
 
     public String getContent() {

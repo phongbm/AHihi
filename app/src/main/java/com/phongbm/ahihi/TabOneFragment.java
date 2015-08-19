@@ -3,25 +3,34 @@ package com.phongbm.ahihi;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LevelListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseUser;
 import com.phongbm.common.CommonValue;
 import com.phongbm.loginsignup.MainFragment;
 
+import java.io.IOException;
+import java.net.URL;
+
 @SuppressLint("ValidFragment")
-public class TabOneFragment extends Fragment implements View.OnClickListener {
+public class TabOneFragment extends Fragment implements View.OnClickListener,
+        Html.ImageGetter {
     private static final String TAG = "TabOneFragment";
     private View view;
     private Button btnLoguout, btnGoogleMap, btnStop;
@@ -94,8 +103,41 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.btnStop:
                 isRunning = false;
+
+                TextView txtPicture = (TextView) this.view.findViewById(R.id.txtPicture);
+
+                /*SpannableString ss = new SpannableString(" ");
+                Drawable d = TabOneFragment.this.getActivity().getResources()
+                        .getDrawable(R.drawable.emotion_06);
+                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BASELINE);
+                ss.setSpan(span, 0, ss.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                txtPicture.setText(ss);
+                Toast.makeText(TabOneFragment.this.getActivity(), ss.length() + "",
+                        Toast.LENGTH_SHORT).show();*/
+
+                String stringWithHtml = "Sample string with an <a href=\"http://www.exemplary-link.com\">exemplary link</a>.";
+                Spanned spannedValue = Html.fromHtml(stringWithHtml, getImageHTML(), null);
+                txtPicture.setText(spannedValue);
+
                 break;
         }
+    }
+
+    public Html.ImageGetter getImageHTML() {
+        Html.ImageGetter imageGetter = new Html.ImageGetter() {
+            public Drawable getDrawable(String source) {
+                try {
+                    Drawable drawable = Drawable.createFromStream(new URL(source).openStream(), "AHihi");
+                    drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                    return drawable;
+                } catch (IOException exception) {
+                    Log.v("IOException", exception.getMessage());
+                    return null;
+                }
+            }
+        };
+        return imageGetter;
     }
 
     Runnable runnable = new Runnable() {
@@ -119,5 +161,14 @@ public class TabOneFragment extends Fragment implements View.OnClickListener {
         }
     };
 
+
+    @Override
+    public Drawable getDrawable(String source) {
+        LevelListDrawable d = new LevelListDrawable();
+        Drawable empty = getResources().getDrawable(R.drawable.emotion_06);
+        d.addLevel(0, 0, empty);
+        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
+        return d;
+    }
 
 }

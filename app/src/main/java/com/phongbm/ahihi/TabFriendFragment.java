@@ -103,11 +103,13 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         // intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         this.getActivity().startActivity(intentCall);*/
 
-        final String inComingId;
+        final String inComingId, inComingFullName;
         if (activeFriendAdapterVisible) {
             inComingId = activeFriendAdapter.getItem(position).getId();
+            inComingFullName = activeFriendAdapter.getItem(position).getName();
         } else {
             inComingId = allFriendAdapter.getItem(position).getId();
+            inComingFullName = allFriendAdapter.getItem(position).getName();
         }
         final ImageView menu = (ImageView) view.findViewById(R.id.menu);
         menu.setOnClickListener(new View.OnClickListener() {
@@ -121,6 +123,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                             case R.id.action_open_chat:
                                 Intent intentChat = new Intent(getActivity(), MessageActivity.class);
                                 intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                                intentChat.putExtra("NAME", inComingFullName);
                                 TabFriendFragment.this.getActivity().startActivity(intentChat);
                                 break;
                             case R.id.action_voice_call:

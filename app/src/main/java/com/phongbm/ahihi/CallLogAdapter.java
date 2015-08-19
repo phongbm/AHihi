@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +24,16 @@ public class CallLogAdapter extends BaseAdapter {
     private ArrayList<CallLogItem> callLogItems;
     private Handler handler;
     private Random random = new Random();
+    private ArrayList<Integer> colors;
 
     public CallLogAdapter(Context context, ArrayList<CallLogItem> callLogItems, Handler handler) {
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         this.callLogItems = callLogItems;
+        this.colors = new ArrayList<Integer>();
+        for (int i = 0; i < callLogItems.size(); i++) {
+            colors.add(-1);
+        }
         this.handler = handler;
     }
 
@@ -62,8 +68,10 @@ public class CallLogAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.imgAvatar.setCircleColor(Color.rgb(random.nextInt(256), random.nextInt(256),
-                random.nextInt(256)));
+        if (colors.get(position) == -1) {
+            colors.set(position, Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+        }
+        viewHolder.imgAvatar.setCircleColor(colors.get(position));
         viewHolder.imgAvatar.setText(callLogItems.get(position).getFullName().substring(0, 1)
                 .toUpperCase());
         viewHolder.txtFullName.setText(callLogItems.get(position).getFullName());
@@ -89,8 +97,12 @@ public class CallLogAdapter extends BaseAdapter {
                 message.obj = callLogItems.get(position).getId();
                 message.setTarget(handler);
                 message.sendToTarget();
+                colors.add(-1);
             }
         });
+
+        Log.i("CallLogAdapter", colors.size() + "");
+
         return convertView;
     }
 

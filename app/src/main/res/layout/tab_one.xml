@@ -8,7 +8,6 @@
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:text="LOG OUT" />
 
     <Button
@@ -16,7 +15,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnLogout"
-        android:layout_margin="16sp"
         android:text="Google Map" />
 
     <Button
@@ -24,7 +22,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnGoogleMap"
-        android:layout_margin="16sp"
         android:text="Stop" />
+
+    <TextView
+        android:id="@+id/txtPicture"
+        android:layout_width="256dp"
+        android:layout_height="256dp"
+        android:layout_below="@+id/btnStop"
+        android:layout_margin="16dp"
+        android:text="Picture" />
 
 </RelativeLayout>

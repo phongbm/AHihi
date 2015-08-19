@@ -25,6 +25,7 @@ public class CommonValue {
     public static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
     public static final String MESSAGE_CONTENT = "MESSAGE_CONTENT";
     public static final String STATE_MESSAGE_SENT = "STATE_MESSAGE_SENT";
+    public static final String STATE_MESSAGE_INCOMING = "STATE_MESSAGE_INCOMING";
 
     public static final String URL_IMAGE = "URL_IMAGE";
     public static final String X_IMAGE = "X_IMAGE";
