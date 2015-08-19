@@ -1,4 +1,4 @@
-package com.phongbm.ahihi;
+package com.phongbm.call;
 
 public class CallLogItem {
     private String id, fullName, phoneNumber, date, state;

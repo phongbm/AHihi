@@ -27,8 +27,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.phongbm.ahihi.CallLogActivity;
-import com.phongbm.ahihi.CallLogsDBManager;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonMethod;

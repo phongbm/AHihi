@@ -1,4 +1,4 @@
-package com.phongbm.ahihi;
+package com.phongbm.call;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.phongbm.call.OutgoingCallActivity;
+import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonValue;
 
 import java.util.ArrayList;
