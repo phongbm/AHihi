@@ -6,9 +6,12 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
@@ -54,28 +57,26 @@ public class AllFriendAdapter extends BaseAdapter {
                 @Override
                 public void done(final ParseUser parseUser, ParseException e) {
                     ParseFile parseFile = (ParseFile) parseUser.get("avatar");
-                    if (parseFile != null) {
-                        parseFile.getDataInBackground(new GetDataCallback() {
-                            @Override
-                            public void done(byte[] bytes, ParseException e) {
-                                if (e == null) {
-                                    Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0,
-                                            bytes.length);
-                                    allFriendItems.add(new AllFriendItem(parseUser.getObjectId(),
-                                            (String) parseUser.get("fullName"),
-                                            parseUser.getUsername(), avatar));
-                                    Collections.sort(allFriendItems);
-
-                                    if ((boolean) parseUser.get("isOnline")) {
-                                        activeFriendItems.add(new ActiveFriendItem(
-                                                parseUser.getObjectId(),
-                                                (String) parseUser.get("fullName"),
-                                                parseUser.getUsername(), avatar));
-                                    }
-                                }
-                            }
-                        });
+                    if (parseFile == null) {
+                        return;
                     }
+                    parseFile.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] bytes, ParseException e) {
+                            if (e != null) {
+                                return;
+                            }
+                            Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            allFriendItems.add(new AllFriendItem(parseUser.getObjectId(), avatar,
+                                    parseUser.getUsername(), parseUser.getString("fullName")));
+                            Collections.sort(allFriendItems);
+
+                            if (parseUser.getBoolean("isOnline")) {
+                                activeFriendItems.add(new ActiveFriendItem(parseUser.getObjectId(),
+                                        avatar, parseUser.getUsername(), parseUser.getString("fullName")));
+                            }
+                        }
+                    });
                     Message message = new Message();
                     message.what = CommonValue.ACTION_UPDATE_LIST_FRIEND;
                     message.setTarget(handler);
@@ -101,25 +102,53 @@ public class AllFriendAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder viewHolder;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.txtName);
+            viewHolder.menu = (ImageView) convertView.findViewById(R.id.menu);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.imgAvatar.setImageBitmap(allFriendItems.get(position).getAvatar());
-        viewHolder.txtName.setText(allFriendItems.get(position).getName());
+        viewHolder.txtName.setText(allFriendItems.get(position).getFullName());
+        viewHolder.menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu popup = new PopupMenu(parent.getContext(), view);
+                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_open_chat:
+                                Message message = new Message();
+                                message.what = CommonValue.WHAT_OPEN_CHAT;
+                                message.arg1 = position;
+                                message.setTarget(handler);
+                                message.sendToTarget();
+                                break;
+                            case R.id.action_voice_call:
+                                break;
+                            case R.id.action_view_profile:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
+            }
+        });
         return convertView;
     }
 
     private class ViewHolder {
         CircleImageView imgAvatar;
         TextView txtName;
+        ImageView menu;
     }
 
     public ArrayList<AllFriendItem> getAllFriendItems() {

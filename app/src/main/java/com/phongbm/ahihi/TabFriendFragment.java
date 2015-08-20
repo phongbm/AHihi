@@ -11,16 +11,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
 import com.phongbm.message.MessageActivity;
 
@@ -36,6 +35,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private AllFriendAdapter allFriendAdapter;
     private ActiveFriendAdapter activeFriendAdapter;
     private TextView btnTabActive, btnTabAllFriends;
+    private Switch switchOnline;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
     private boolean activeFriendAdapterVisible = true;
 
@@ -49,7 +49,21 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                             allFriendAdapter.getActiveFriendItems());
                     activeFriendAdapter.notifyDataSetChanged();
                     break;
-
+                case CommonValue.WHAT_OPEN_CHAT:
+                    int position = msg.arg1;
+                    String inComingId, inComingFullName;
+                    if (activeFriendAdapterVisible) {
+                        inComingId = activeFriendAdapter.getItem(position).getId();
+                        inComingFullName = activeFriendAdapter.getItem(position).getFullName();
+                    } else {
+                        inComingId = allFriendAdapter.getItem(position).getId();
+                        inComingFullName = allFriendAdapter.getItem(position).getFullName();
+                    }
+                    Intent intentChat = new Intent(TabFriendFragment.this.getActivity(), MessageActivity.class);
+                    intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                    intentChat.putExtra("NAME", inComingFullName);
+                    TabFriendFragment.this.getActivity().startActivity(intentChat);
+                    break;
             }
         }
     };
@@ -81,6 +95,19 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         btnTabActive.setOnClickListener(this);
         btnTabAllFriends = (TextView) view.findViewById(R.id.btnTabAllFriends);
         btnTabAllFriends.setOnClickListener(this);
+        switchOnline = (Switch) view.findViewById(R.id.switchOnline);
+        switchOnline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(TabFriendFragment.this.getActivity(), "ON",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(TabFriendFragment.this.getActivity(), "OFF",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void registerUpdateListFriend() {
@@ -92,24 +119,26 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        /*String ID;
-        if (activeFriendAdapterVisible) {
-            ID = activeFriendAdapter.getItem(position).getId();
-        } else {
-            ID = allFriendAdapter.getItem(position).getId();
-        }
-        Intent intentCall = new Intent(getActivity(), MessageActivity.class);
-        intentCall.putExtra(CommonValue.INCOMING_CALL_ID, ID);
-        // intentCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        this.getActivity().startActivity(intentCall);*/
-
-        final String inComingId, inComingFullName;
+        String inComingId, inComingFullName;
         if (activeFriendAdapterVisible) {
             inComingId = activeFriendAdapter.getItem(position).getId();
-            inComingFullName = activeFriendAdapter.getItem(position).getName();
+            inComingFullName = activeFriendAdapter.getItem(position).getFullName();
         } else {
             inComingId = allFriendAdapter.getItem(position).getId();
-            inComingFullName = allFriendAdapter.getItem(position).getName();
+            inComingFullName = allFriendAdapter.getItem(position).getFullName();
+        }
+        Intent intentChat = new Intent(this.getActivity(), MessageActivity.class);
+        intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+        intentChat.putExtra("NAME", inComingFullName);
+        this.getActivity().startActivity(intentChat);
+
+        /*final String inComingId, inComingFullName;
+        if (activeFriendAdapterVisible) {
+            inComingId = activeFriendAdapter.getItem(position).getId();
+            inComingFullName = activeFriendAdapter.getItem(position).getFullName();
+        } else {
+            inComingId = allFriendAdapter.getItem(position).getId();
+            inComingFullName = allFriendAdapter.getItem(position).getFullName();
         }
         final ImageView menu = (ImageView) view.findViewById(R.id.menu);
         menu.setOnClickListener(new View.OnClickListener() {
@@ -139,7 +168,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                 });
                 popup.show();
             }
-        });
+        });*/
     }
 
     @Override
@@ -175,13 +204,17 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(CommonValue.ACTION_ADD_FRIEND)) {
-                ActiveFriendItem newFriend = ((MainActivity) getActivity()).getNewFriend();
-                allFriendAdapter.getAllFriendItems().add(newFriend);
+                FriendItem newFriend = ((MainActivity) getActivity()).getNewFriend();
+                AllFriendItem allFriendItem = new AllFriendItem(newFriend.getId(),
+                        newFriend.getAvatar(), newFriend.getPhoneNumber(), newFriend.getFullName());
+                allFriendAdapter.getAllFriendItems().add(allFriendItem);
                 Collections.sort(allFriendAdapter.getAllFriendItems());
                 allFriendAdapter.notifyDataSetChanged();
 
                 if (intent.getBooleanExtra("isOnline", true)) {
-                    activeFriendAdapter.getActiveFriendItems().add(newFriend);
+                    ActiveFriendItem activeFriendItem = new ActiveFriendItem(newFriend.getId(),
+                            newFriend.getAvatar(), newFriend.getPhoneNumber(), newFriend.getFullName());
+                    activeFriendAdapter.getActiveFriendItems().add(activeFriendItem);
                     activeFriendAdapter.notifyDataSetChanged();
                 }
             }

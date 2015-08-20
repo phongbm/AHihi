@@ -28,6 +28,7 @@ public class CallLogActivity extends AppCompatActivity {
     private CallLogAdapter callLogAdapter;
     private ArrayList<CallLogItem> callLogItems;
     private RelativeLayout layoutNoCallLogs;
+    private boolean canDelete;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -36,7 +37,6 @@ public class CallLogActivity extends AppCompatActivity {
                     Intent intentOutGoingCall = new Intent(CallLogActivity.this,
                             OutgoingCallActivity.class);
                     intentOutGoingCall.putExtra(CommonValue.INCOMING_CALL_ID, (String) msg.obj);
-                    // intentOutGoingCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     CallLogActivity.this.startActivityForResult(intentOutGoingCall,
                             REQUEST_CALL_LOGS);
                     break;
@@ -53,9 +53,11 @@ public class CallLogActivity extends AppCompatActivity {
         callLogsDBManager = new CallLogsDBManager(this);
         callLogItems = callLogsDBManager.getData();
         if (callLogItems.size() == 0) {
+            canDelete = false;
             listViewCallLog.setVisibility(RelativeLayout.GONE);
             layoutNoCallLogs.setVisibility(RelativeLayout.VISIBLE);
         } else {
+            canDelete = true;
             callLogAdapter = new CallLogAdapter(this, callLogItems, handler);
             listViewCallLog.setAdapter(callLogAdapter);
         }
@@ -91,34 +93,48 @@ public class CallLogActivity extends AppCompatActivity {
                 CallLogActivity.this.finish();
                 return true;
             case R.id.action_delete:
-                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-                alertDialog.setTitle("Delete");
-                alertDialog.setMessage("All call logs will be deleted. Delete?");
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.setCancelable(false);
-
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                alertDialog.dismiss();
-                            }
-                        });
-
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                callLogsDBManager.deleteAllData();
-                                callLogItems.clear();
-                                callLogAdapter.notifyDataSetChanged();
-                                alertDialog.dismiss();
-                                listViewCallLog.setVisibility(RelativeLayout.GONE);
-                                layoutNoCallLogs.setVisibility(RelativeLayout.VISIBLE);
-                            }
-                        });
-
-                alertDialog.show();
+                if (canDelete) {
+                    final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                    alertDialog.setTitle("Delete");
+                    alertDialog.setMessage("All call logs will be deleted. Delete?");
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.setCancelable(false);
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    alertDialog.dismiss();
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    canDelete = false;
+                                    callLogsDBManager.deleteAllData();
+                                    callLogItems.clear();
+                                    callLogAdapter.notifyDataSetChanged();
+                                    alertDialog.dismiss();
+                                    listViewCallLog.setVisibility(RelativeLayout.GONE);
+                                    layoutNoCallLogs.setVisibility(RelativeLayout.VISIBLE);
+                                }
+                            });
+                    alertDialog.show();
+                } else {
+                    final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                    alertDialog.setTitle("Delete");
+                    alertDialog.setMessage("No call logs");
+                    alertDialog.setCanceledOnTouchOutside(true);
+                    alertDialog.setCancelable(true);
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    alertDialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -129,6 +145,9 @@ public class CallLogActivity extends AppCompatActivity {
         Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
         if (requestCode == REQUEST_CALL_LOGS) {
             if (resultCode == Activity.RESULT_OK) {
+                if (!canDelete) {
+                    canDelete = true;
+                }
                 callLogAdapter.setCallLogItems(callLogsDBManager.getData());
                 callLogAdapter.notifyDataSetChanged();
             }

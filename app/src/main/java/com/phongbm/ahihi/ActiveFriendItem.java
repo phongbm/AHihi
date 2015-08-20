@@ -2,15 +2,10 @@ package com.phongbm.ahihi;
 
 import android.graphics.Bitmap;
 
-public class ActiveFriendItem extends AllFriendItem {
+public class ActiveFriendItem extends FriendItem {
 
-    public ActiveFriendItem(String id, String fullName, String phoneNumber, Bitmap avatar) {
-        super(id, fullName, phoneNumber, avatar);
-    }
-
-    @Override
-    public int compareTo(Object another) {
-        return super.compareTo(another);
+    public ActiveFriendItem(String id, Bitmap avatar, String phoneNumber, String fullName) {
+        super(id, avatar, phoneNumber, fullName);
     }
 
 }

@@ -9,13 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -32,6 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MessageActivity";
 
+    private RelativeLayout layoutMain, menu;
+    private InputMethodManager inputMethodManager;
     private ListView listViewMessage;
     private MessageAdapter messageAdapter;
     private String outGoingMessageId, inComingMessageId;
@@ -68,6 +71,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initializeComponent() {
+        inputMethodManager = (InputMethodManager) this.
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        layoutMain = (RelativeLayout) findViewById(R.id.layoutMain);
+        menu = (RelativeLayout) findViewById(R.id.menu);
         listViewMessage = (ListView) findViewById(R.id.listViewMessage);
         listViewMessage.setSelected(false);
         btnSend = (ImageView) findViewById(R.id.btnSend);
@@ -116,7 +123,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                         type = MessageAdapter.TYPE_OUTGOING;
                     }
                     messageAdapter.addMessage(0, new MessageItem(type, message.getString("content")));
-                    Log.i(TAG, message.getString("content"));
                     reentrantLock.unlock();
                 }
             }
@@ -175,6 +181,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override

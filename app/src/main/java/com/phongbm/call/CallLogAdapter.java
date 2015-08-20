@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
-import com.phongbm.call.CallLogItem;
 import com.phongbm.common.CommonValue;
 import com.phongbm.libs.CircleTextView;
 

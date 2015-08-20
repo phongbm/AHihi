@@ -2,36 +2,16 @@ package com.phongbm.ahihi;
 
 import android.graphics.Bitmap;
 
-public class AllFriendItem implements Comparable {
-    private String id, fullName, phoneNumber;
-    private Bitmap avatar;
+public class AllFriendItem extends FriendItem implements Comparable {
 
-    public AllFriendItem(String id, String fullName, String phoneNumber, Bitmap avatar) {
-        this.id = id;
-        this.fullName = fullName;
-        this.phoneNumber = phoneNumber;
-        this.avatar = avatar;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return fullName;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public Bitmap getAvatar() {
-        return avatar;
+    public AllFriendItem(String id, Bitmap avatar, String phoneNumber, String fullName) {
+        super(id, avatar, phoneNumber, fullName);
     }
 
     @Override
     public int compareTo(Object another) {
-        return fullName.toLowerCase().compareTo(((AllFriendItem) another).getName().toLowerCase());
+        return super.getFullName().toLowerCase()
+                .compareTo(((AllFriendItem) another).getFullName().toLowerCase());
     }
 
 }

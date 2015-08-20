@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPager viewPager;
     private TabLayout tabLayout;
     private InputMethodManager inputMethodManager;
-    private ActiveFriendItem newFriend;
+    private FriendItem newFriend;
     private Bitmap userAvatar;
 
     private Handler handler = new Handler() {
@@ -66,13 +66,12 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
 
-    public static final boolean isNetworkConnected(Context context) {
+    public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
                 Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo == null ? false : true;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
         TextView txtName = (TextView) header.findViewById(R.id.txtName);
         txtName.setText((String) currentUser.get("fullName"));
         TextView txtEmail = (TextView) header.findViewById(R.id.txtEmail);
-        txtEmail.setText((String) currentUser.getEmail());
+        txtEmail.setText(currentUser.getEmail());
         final CircleImageView imgAvatar = (CircleImageView) header.findViewById(R.id.imgAvatar);
         ParseFile parseFile = (ParseFile) currentUser.get("avatar");
         if (parseFile != null) {
@@ -199,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onDestroy();
     }
 
-    public ActiveFriendItem getNewFriend() {
+    public FriendItem getNewFriend() {
         return newFriend;
     }
 
@@ -209,27 +208,23 @@ public class MainActivity extends AppCompatActivity implements
             parseFile.getDataInBackground(new GetDataCallback() {
                 @Override
                 public void done(byte[] bytes, ParseException e) {
-                    if (e == null) {
-                        Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        newFriend = new ActiveFriendItem(parseUser.getObjectId(),
-                                (String) parseUser.get("fullName"),
-                                parseUser.getUsername(), avatar);
-                        Intent intentAddFriend = new Intent();
-                        intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
-                        boolean isOnline = (boolean) parseUser.get("isOnline");
-                        intentAddFriend.putExtra("isOnline", isOnline);
-                        sendBroadcast(intentAddFriend);
+                    if (e != null) {
+                        return;
                     }
+                    Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    newFriend = new FriendItem(parseUser.getObjectId(), avatar,
+                            parseUser.getUsername(), parseUser.getString("fullName"));
+                    Intent intentAddFriend = new Intent();
+                    intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
+                    boolean isOnline = parseUser.getBoolean("isOnline");
+                    intentAddFriend.putExtra("isOnline", isOnline);
+                    sendBroadcast(intentAddFriend);
                 }
             });
         }
-        return;
     }
 
-    private class AddFriendDialog extends Dialog implements
-            android.view.View.OnClickListener {
-        private static final String TAG = "AddFriendDialog";
-
+    private class AddFriendDialog extends Dialog implements android.view.View.OnClickListener {
         private EditText edtPhoneNumber;
         private AppCompatButton btnAddFriend;
 
@@ -299,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements
                     break;
             }
         }
-
     }
 
 }
