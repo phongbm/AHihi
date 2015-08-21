@@ -11,23 +11,27 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.OnShowPopupMenu;
 import com.phongbm.message.MessageActivity;
 
 import java.util.Collections;
 
 @SuppressLint("ValidFragment")
 public class TabFriendFragment extends Fragment implements AdapterView.OnItemClickListener,
-        View.OnClickListener {
+        View.OnClickListener, OnShowPopupMenu {
     private static final String TAG = "TabFriendFragment";
 
     private View view;
@@ -80,6 +84,8 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         this.registerUpdateListFriend();
         allFriendAdapter = new AllFriendAdapter(this.getActivity(), handler);
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
+        allFriendAdapter.setOnShowPopupMenu(this);
+        activeFriendAdapter.setOnShowPopupMenu(this);
         listViewFriend.setAdapter(activeFriendAdapter);
     }
 
@@ -141,6 +147,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
             inComingFullName = allFriendAdapter.getItem(position).getFullName();
         }
         final ImageView menu = (ImageView) view.findViewById(R.id.menu);
+        menu.setClickable(true);
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,6 +206,40 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         txt.setTextColor(this.getActivity().getResources().getColor(R.color.green_500));
     }
 
+    @Override
+    public void onShowPopupMenuListener(int position, View view) {
+        final String inComingId, inComingFullName;
+        if (activeFriendAdapterVisible) {
+            inComingId = activeFriendAdapter.getItem(position).getId();
+            inComingFullName = activeFriendAdapter.getItem(position).getFullName();
+        } else {
+            inComingId = allFriendAdapter.getItem(position).getId();
+            inComingFullName = allFriendAdapter.getItem(position).getFullName();
+        }
+        PopupMenu popup = new PopupMenu(TabFriendFragment.this.getActivity(), view);
+        popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_open_chat:
+                        Intent intentChat = new Intent(getActivity(), MessageActivity.class);
+                        intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                        intentChat.putExtra("NAME", inComingFullName);
+                        TabFriendFragment.this.getActivity().startActivity(intentChat);
+                        break;
+                    case R.id.action_voice_call:
+                        Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
+                        intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                        TabFriendFragment.this.getActivity().startActivity(intentCall);
+                        break;
+                    case R.id.action_view_profile:
+                        break;
+                }
+                return true;
+            }
+        });
+        popup.show();
+    }
 
     private class BroadcastUpdateListFriend extends BroadcastReceiver {
         @Override

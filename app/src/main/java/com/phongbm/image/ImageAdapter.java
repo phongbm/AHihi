@@ -40,6 +40,7 @@ public class ImageAdapter extends BaseAdapter {
             imageURLs.add(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
             cursor.moveToNext();
         }
+		cursor.close();
         return;
     }
 

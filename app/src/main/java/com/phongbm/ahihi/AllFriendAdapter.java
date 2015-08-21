@@ -6,12 +6,10 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
@@ -21,6 +19,7 @@ import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.OnShowPopupMenu;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +33,7 @@ public class AllFriendAdapter extends BaseAdapter {
     private ArrayList<AllFriendItem> allFriendItems;
     private ArrayList<ActiveFriendItem> activeFriendItems;
     private LayoutInflater layoutInflater;
+    private OnShowPopupMenu onShowPopupMenu;
 
     public AllFriendAdapter(Context context, Handler handler) {
         layoutInflater = LayoutInflater.from(context);
@@ -103,7 +103,7 @@ public class AllFriendAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
             viewHolder = new ViewHolder();
@@ -119,27 +119,7 @@ public class AllFriendAdapter extends BaseAdapter {
         viewHolder.menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopupMenu popup = new PopupMenu(parent.getContext(), view);
-                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.action_open_chat:
-                                Message message = new Message();
-                                message.what = CommonValue.WHAT_OPEN_CHAT;
-                                message.arg1 = position;
-                                message.setTarget(handler);
-                                message.sendToTarget();
-                                break;
-                            case R.id.action_voice_call:
-                                break;
-                            case R.id.action_view_profile:
-                                break;
-                        }
-                        return true;
-                    }
-                });
-                popup.show();
+                onShowPopupMenu.onShowPopupMenuListener(position, viewHolder.menu);
             }
         });
         return convertView;
@@ -149,6 +129,10 @@ public class AllFriendAdapter extends BaseAdapter {
         CircleImageView imgAvatar;
         TextView txtName;
         ImageView menu;
+    }
+
+    public void setOnShowPopupMenu(OnShowPopupMenu onShowPopupMenu) {
+        this.onShowPopupMenu = onShowPopupMenu;
     }
 
     public ArrayList<AllFriendItem> getAllFriendItems() {

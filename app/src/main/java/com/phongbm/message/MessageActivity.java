@@ -4,14 +4,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,7 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MessageActivity extends AppCompatActivity implements View.OnClickListener {
+public class MessageActivity extends AppCompatActivity implements View.OnClickListener,
+        ViewTreeObserver.OnGlobalLayoutListener {
     private static final String TAG = "MessageActivity";
 
     private RelativeLayout layoutMain, menu;
@@ -74,6 +79,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         inputMethodManager = (InputMethodManager) this.
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         layoutMain = (RelativeLayout) findViewById(R.id.layoutMain);
+        layoutMain.getViewTreeObserver().addOnGlobalLayoutListener(this);
         menu = (RelativeLayout) findViewById(R.id.menu);
         listViewMessage = (ListView) findViewById(R.id.listViewMessage);
         listViewMessage.setSelected(false);
@@ -99,6 +105,17 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void afterTextChanged(Editable s) {
+            }
+        });
+        edtContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    Log.i(TAG, "onFocusChange...");
+                    menu.setVisibility(RelativeLayout.GONE);
+                } else {
+                    menu.setVisibility(RelativeLayout.VISIBLE);
+                }
             }
         });
     }
@@ -154,6 +171,31 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    @Override
+    public void onGlobalLayout() {
+        Rect r = new Rect();
+        //r will be populated with the coordinates of your view that area still visible.
+        layoutMain.getWindowVisibleDisplayFrame(r);
+        int heightDiff = layoutMain.getRootView().getHeight() - (r.bottom + r.top);
+        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
+            Log.i(TAG, "keyboard show");
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    menu.setVisibility(RelativeLayout.GONE);
+                }
+            });
+        } else if (heightDiff <= 100) {
+            Log.i(TAG, "keyboard hide");
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    menu.setVisibility(RelativeLayout.VISIBLE);
+                }
+            });
+        }
+    }
+
     private class BroadcastMessage extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -180,12 +222,12 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+        }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 
     @Override

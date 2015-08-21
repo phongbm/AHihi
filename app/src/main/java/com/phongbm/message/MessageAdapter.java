@@ -1,11 +1,11 @@
 package com.phongbm.message;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
@@ -62,39 +62,62 @@ public class MessageAdapter extends BaseAdapter {
             typePre = getItemViewType(position - 1);
         }
         ViewHolder viewHolder;
-        // if (convertView == null) {
-        if (type == TYPE_OUTGOING) {
-            convertView = layoutInflater.inflate(R.layout.item_message_outgoing, parent, false);
+        if (convertView == null) {
+            switch (type) {
+                case TYPE_OUTGOING:
+                    convertView = layoutInflater.inflate(R.layout.item_message_outgoing, parent, false);
+                    break;
+                case TYPE_INCOMING:
+                    convertView = layoutInflater.inflate(R.layout.item_message_incoming, parent, false);
+                    break;
+            }
+           /* if (position > 0 && (type == TYPE_OUTGOING && typePre == TYPE_OUTGOING)) {
+                convertView = layoutInflater.inflate(R.layout.item_message_outgoing_2, parent, false);
+            } else {
+                if (position > 0 && (type == TYPE_INCOMING && typePre == TYPE_INCOMING)) {
+                    convertView = layoutInflater.inflate(R.layout.item_message_incoming_2, parent, false);
+                } else {
+                    switch (type) {
+                        case TYPE_OUTGOING:
+                            convertView = layoutInflater.inflate(R.layout.item_message_outgoing, parent, false);
+                            break;
+                        case TYPE_INCOMING:
+                            convertView = layoutInflater.inflate(R.layout.item_message_incoming, parent, false);
+                            break;
+                    }
+                }
+            }*/
+            viewHolder = new ViewHolder();
+            viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
+            viewHolder.imgTriangel = (TriangleShapeView) convertView.findViewById(R.id.imgTriangel);
+            viewHolder.txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
+            convertView.setTag(viewHolder);
         } else {
-            convertView = layoutInflater.inflate(R.layout.item_message_incoming, parent, false);
+            viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder = new ViewHolder();
-        viewHolder.space = convertView.findViewById(R.id.space);
-        viewHolder.txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
-        viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
-        viewHolder.imgTriangel = (TriangleShapeView) convertView.findViewById(R.id.imgTriangel);
-        //convertView.setTag(viewHolder);
-        // } else {
-        //viewHolder = (ViewHolder) convertView.getTag();
-        // }
+        switch (type) {
+            case TYPE_OUTGOING:
+                viewHolder.imgAvatar.setImageResource(R.drawable.ic_ava_1);
+                viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#4caf50"));
+                break;
+            case TYPE_INCOMING:
+                viewHolder.imgAvatar.setImageResource(R.drawable.ic_ava_2);
+                viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#ffffff"));
+                break;
+        }
         if (position > 0 && (type == TYPE_OUTGOING && typePre == TYPE_OUTGOING)
                 || (type == TYPE_INCOMING && typePre == TYPE_INCOMING)) {
-            viewHolder.imgAvatar.setVisibility(RelativeLayout.GONE);
-            viewHolder.imgTriangel.setVisibility(RelativeLayout.GONE);
-        }
-        if (position > 0 && (type == TYPE_OUTGOING && typePre == TYPE_INCOMING)
-                || (type == TYPE_INCOMING && typePre == TYPE_OUTGOING)) {
-            viewHolder.space.setVisibility(RelativeLayout.VISIBLE);
+            viewHolder.imgAvatar.setImageResource(R.drawable.ic_transparent);
+            viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
         }
         viewHolder.txtMessage.setText(messageItems.get(position).getContent());
         return convertView;
     }
 
     private class ViewHolder {
-        View space;
-        TextView txtMessage;
-        CircleImageView imgAvatar;
         TriangleShapeView imgTriangel;
+        CircleImageView imgAvatar;
+        TextView txtMessage;
     }
 
     public void addMessage(int position, MessageItem messageItem) {
