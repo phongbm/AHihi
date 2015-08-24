@@ -1,9 +1,6 @@
 package com.phongbm.ahihi;
 
-<<<<<<< HEAD
 import android.app.Activity;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -41,14 +38,10 @@ import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.phongbm.call.CallLogActivity;
-<<<<<<< HEAD
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.image.ImageActivity;
-=======
-import com.phongbm.common.CommonValue;
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,16 +49,10 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements
-<<<<<<< HEAD
         NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private static final String TAG = "MainActivity";
 
     private GlobalApplication globalApplication;
-=======
-        NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG = "MainActivity";
-
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -75,10 +62,7 @@ public class MainActivity extends AppCompatActivity implements
     private InputMethodManager inputMethodManager;
     private FriendItem newFriend;
     private Bitmap userAvatar;
-<<<<<<< HEAD
     private CircleImageView imgAvatar;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
     private Handler handler = new Handler() {
         @Override
@@ -99,10 +83,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main);
-<<<<<<< HEAD
         globalApplication = (GlobalApplication) this.getApplicationContext();
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         this.initializeToolbar();
         this.initializeComponent();
         this.initializeProfileInformation();
@@ -135,11 +116,8 @@ public class MainActivity extends AppCompatActivity implements
 
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(this);
-<<<<<<< HEAD
         imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
         imgAvatar.setOnClickListener(this);
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
         viewPagerAdapter = new ViewPagerAdapter(this, this.getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -160,11 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         txtName.setText((String) currentUser.get("fullName"));
         TextView txtEmail = (TextView) header.findViewById(R.id.txtEmail);
         txtEmail.setText(currentUser.getEmail());
-<<<<<<< HEAD
 
-=======
-        final CircleImageView imgAvatar = (CircleImageView) header.findViewById(R.id.imgAvatar);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         ParseFile parseFile = (ParseFile) currentUser.get("avatar");
         if (parseFile != null) {
             parseFile.getDataInBackground(new GetDataCallback() {
@@ -173,10 +147,7 @@ public class MainActivity extends AppCompatActivity implements
                     if (e == null) {
                         userAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         imgAvatar.setImageBitmap(userAvatar);
-<<<<<<< HEAD
                         globalApplication.setAvatar(userAvatar);
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                     }
                 }
             });
@@ -263,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-<<<<<<< HEAD
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -290,8 +260,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     private class AddFriendDialog extends Dialog implements android.view.View.OnClickListener {
         private EditText edtPhoneNumber;
         private AppCompatButton btnAddFriend;

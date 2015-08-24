@@ -1,11 +1,7 @@
 package com.phongbm.image;
 
-<<<<<<< HEAD
 import android.app.Activity;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,15 +12,9 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.phongbm.ahihi.R;
-<<<<<<< HEAD
 import com.phongbm.common.CommonValue;
 
 public class ImageActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-=======
-
-public class ImageActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    private static final int REQUEST_CODE = 0;
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     private static final String TAG = "ImageActivity";
 
     private GridView gridViewImage;
@@ -54,22 +44,14 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-<<<<<<< HEAD
-        String url = (String)parent.getItemAtPosition(position);
-=======
-        String url = (String) view.getTag();
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
+        String url = (String) parent.getItemAtPosition(position);
         if (!checkMinimumSize(url)) {
             Toast.makeText(this, "Picture too small", Toast.LENGTH_SHORT).show();
             return;
         }
         Intent intent = new Intent(ImageActivity.this, ImageControl.class);
         intent.putExtra(ImageControl.EXTRA_IMAGE, url);
-<<<<<<< HEAD
         this.startActivityForResult(intent, CommonValue.REQUECODE_SET_AVATAR);
-=======
-        this.startActivityForResult(intent, REQUEST_CODE);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         return;
     }
 
@@ -87,19 +69,10 @@ public class ImageActivity extends AppCompatActivity implements AdapterView.OnIt
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent result) {
-<<<<<<< HEAD
-        if ( requestCode == CommonValue.REQUECODE_SET_AVATAR && resultCode == Activity.RESULT_OK ) {
+        if (requestCode == CommonValue.REQUECODE_SET_AVATAR && resultCode == Activity.RESULT_OK) {
             setResult(Activity.RESULT_OK, result);
             finish();
         }
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
-        return;
     }
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 }

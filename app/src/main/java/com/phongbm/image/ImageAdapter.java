@@ -4,10 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-<<<<<<< HEAD
-import android.net.Uri;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -17,10 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.phongbm.ahihi.R;
-<<<<<<< HEAD
 import com.phongbm.libs.SquareImageView;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
 import java.util.ArrayList;
 
@@ -48,11 +41,7 @@ public class ImageAdapter extends BaseAdapter {
             imageURLs.add(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
             cursor.moveToNext();
         }
-<<<<<<< HEAD
-=======
-		cursor.close();
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
-        return;
+        cursor.close();
     }
 
     private void initializeListImageState() {
@@ -79,7 +68,6 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-<<<<<<< HEAD
         SquareImageView imgImage;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_image, parent, false);
@@ -91,11 +79,6 @@ public class ImageAdapter extends BaseAdapter {
         if (!imageStates.get(position).isFinish) {
             imgImage.setImageResource(R.drawable.download);
         }
-=======
-        convertView = layoutInflater.inflate(R.layout.item_image, parent, false);
-        ImageView imgImage = (ImageView) convertView.findViewById(R.id.imgImage);
-        convertView.setTag(imageURLs.get(position));
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         if (imageStates.get(position).isFinish) {
             imgImage.setImageBitmap(imageStates.get(position).image);
         } else {
@@ -104,11 +87,6 @@ public class ImageAdapter extends BaseAdapter {
                 (new ImageAsyncTask(position, imgImage)).execute(imageURLs.get(position));
             }
         }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         return convertView;
     }
 
@@ -160,11 +138,7 @@ public class ImageAdapter extends BaseAdapter {
         @Override
         protected void onProgressUpdate(Bitmap... values) {
             picture.setImageBitmap(values[0]);
-<<<<<<< HEAD
             imageStates.get(this.position).image = values[0];
-=======
-            imageStates.get(position).image = values[0];
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
             imageStates.get(this.position).isFinish = true;
         }
     }

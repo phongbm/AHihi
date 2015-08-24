@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-<<<<<<< HEAD
     xmlns:app="http://schemas.android.com/apk/res-auto"
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     android:id="@+id/layoutMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,11 +26,7 @@
         android:id="@+id/listViewMessage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-<<<<<<< HEAD
         android:layout_above="@+id/layout"
-=======
-        android:layout_above="@+id/editor"
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         android:layout_below="@+id/shadow"
         android:background="@android:color/transparent"
         android:divider="@null"
@@ -41,11 +34,7 @@
         android:stackFromBottom="true" />
 
     <LinearLayout
-<<<<<<< HEAD
         android:id="@+id/layout"
-=======
-        android:id="@+id/editor"
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -85,10 +74,7 @@
                     android:src="@drawable/ic_message_picture" />
 
                 <ImageView
-<<<<<<< HEAD
                     android:id="@+id/imgEmoticon"
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginLeft="8dp"
@@ -123,10 +109,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-<<<<<<< HEAD
             android:id="@+id/editor"
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:paddingLeft="8dp"
@@ -173,7 +156,6 @@
 
         </RelativeLayout>
 
-<<<<<<< HEAD
         <LinearLayout
             android:id="@+id/emoticons"
             android:layout_width="match_parent"
@@ -196,8 +178,6 @@
 
         </LinearLayout>
 
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     </LinearLayout>
 
 </RelativeLayout>

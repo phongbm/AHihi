@@ -35,11 +35,8 @@ import java.util.List;
 public class AHihiService extends Service implements SinchClientListener {
     private static final String TAG = "MyServiceCall";
 
-<<<<<<< HEAD
     public static final int KEY_LENGTH = 13;
 
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     private Context context;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
@@ -186,7 +183,6 @@ public class AHihiService extends Service implements SinchClientListener {
     private class MessageListener implements MessageClientListener {
         @Override
         public void onIncomingMessage(MessageClient messageClient, Message message) {
-<<<<<<< HEAD
             String content = message.getTextBody();
             Intent intentIncoming = new Intent();
             intentIncoming.setAction(CommonValue.STATE_MESSAGE_INCOMING);
@@ -204,18 +200,11 @@ public class AHihiService extends Service implements SinchClientListener {
                         break;
                 }
             }
-=======
-            Intent intentIncoming = new Intent();
-            intentIncoming.setAction(CommonValue.STATE_MESSAGE_INCOMING);
-            intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, message.getTextBody());
-            AHihiService.this.sendBroadcast(intentIncoming);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         }
 
         @Override
         public void onMessageSent(MessageClient messageClient, Message message, String s) {
             Toast.makeText(AHihiService.this, "onMessageSent...", Toast.LENGTH_SHORT).show();
-<<<<<<< HEAD
             String content = message.getTextBody();
             Intent intentSent = new Intent();
             intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
@@ -233,11 +222,6 @@ public class AHihiService extends Service implements SinchClientListener {
                         break;
                 }
             }
-=======
-            Intent intentSent = new Intent();
-            intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
-            AHihiService.this.sendBroadcast(intentSent);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         }
 
         @Override
@@ -310,7 +294,6 @@ public class AHihiService extends Service implements SinchClientListener {
                 case CommonValue.ACTION_SEND_MESSAGE:
                     String id = intent.getStringExtra(CommonValue.INCOMING_MESSAGE_ID);
                     String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
-<<<<<<< HEAD
                     if (intent.getStringExtra(CommonValue.AHIHI_KEY) == null) {
                         AHihiService.this.sendMessage(id, content);
                     } else {
@@ -321,9 +304,6 @@ public class AHihiService extends Service implements SinchClientListener {
                                 break;
                         }
                     }
-=======
-                    AHihiService.this.sendMessage(id, content);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                     break;
             }
         }

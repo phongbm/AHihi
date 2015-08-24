@@ -1,10 +1,7 @@
 package com.phongbm.message;
 
 import android.content.Context;
-<<<<<<< HEAD
 import android.graphics.Bitmap;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
-<<<<<<< HEAD
 import com.phongbm.common.GlobalApplication;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import com.phongbm.libs.TriangleShapeView;
 
 import java.util.ArrayList;
@@ -26,7 +20,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MessageAdapter extends BaseAdapter {
     public static final String TAG = "MessageAdapter";
 
-<<<<<<< HEAD
     public static final int TYPE_COUNT = 2;
     public static final int TYPE_OUTGOING = 0;
     public static final int TYPE_INCOMING = 1;
@@ -41,17 +34,6 @@ public class MessageAdapter extends BaseAdapter {
         this.messageItems = new ArrayList<MessageItem>();
         globalApplication = (GlobalApplication) context.getApplicationContext();
         outGoingMessageAvatar = globalApplication.getAvatar();
-=======
-    public static final int TYPE_OUTGOING = 0;
-    public static final int TYPE_INCOMING = 1;
-
-    private ArrayList<MessageItem> messageItems;
-    private LayoutInflater layoutInflater;
-
-    public MessageAdapter(Context context) {
-        layoutInflater = LayoutInflater.from(context);
-        this.messageItems = new ArrayList<MessageItem>();
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     }
 
     @Override
@@ -71,11 +53,7 @@ public class MessageAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-<<<<<<< HEAD
         return TYPE_COUNT;
-=======
-        return 2;
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     }
 
     @Override
@@ -86,14 +64,7 @@ public class MessageAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         int type = getItemViewType(position);
-<<<<<<< HEAD
         int typePre = (position > 0) ? getItemViewType(position - 1) : 0;
-=======
-        int typePre = 0;
-        if (position > 0) {
-            typePre = getItemViewType(position - 1);
-        }
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         ViewHolder viewHolder;
         if (convertView == null) {
             switch (type) {
@@ -104,25 +75,6 @@ public class MessageAdapter extends BaseAdapter {
                     convertView = layoutInflater.inflate(R.layout.item_message_incoming, parent, false);
                     break;
             }
-<<<<<<< HEAD
-=======
-           /* if (position > 0 && (type == TYPE_OUTGOING && typePre == TYPE_OUTGOING)) {
-                convertView = layoutInflater.inflate(R.layout.item_message_outgoing_2, parent, false);
-            } else {
-                if (position > 0 && (type == TYPE_INCOMING && typePre == TYPE_INCOMING)) {
-                    convertView = layoutInflater.inflate(R.layout.item_message_incoming_2, parent, false);
-                } else {
-                    switch (type) {
-                        case TYPE_OUTGOING:
-                            convertView = layoutInflater.inflate(R.layout.item_message_outgoing, parent, false);
-                            break;
-                        case TYPE_INCOMING:
-                            convertView = layoutInflater.inflate(R.layout.item_message_incoming, parent, false);
-                            break;
-                    }
-                }
-            }*/
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
             viewHolder = new ViewHolder();
             viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
             viewHolder.imgTriangel = (TriangleShapeView) convertView.findViewById(R.id.imgTriangel);
@@ -133,11 +85,7 @@ public class MessageAdapter extends BaseAdapter {
         }
         switch (type) {
             case TYPE_OUTGOING:
-<<<<<<< HEAD
                 viewHolder.imgAvatar.setImageBitmap(outGoingMessageAvatar);
-=======
-                viewHolder.imgAvatar.setImageResource(R.drawable.ic_ava_1);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                 viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#4caf50"));
                 break;
             case TYPE_INCOMING:
@@ -145,7 +93,6 @@ public class MessageAdapter extends BaseAdapter {
                 viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#ffffff"));
                 break;
         }
-<<<<<<< HEAD
         if (position == 0 && messageItems.get(0).getMode() == 1) {
             viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
         }
@@ -171,14 +118,6 @@ public class MessageAdapter extends BaseAdapter {
                     break;
             }
         }
-=======
-        if (position > 0 && (type == TYPE_OUTGOING && typePre == TYPE_OUTGOING)
-                || (type == TYPE_INCOMING && typePre == TYPE_INCOMING)) {
-            viewHolder.imgAvatar.setImageResource(R.drawable.ic_transparent);
-            viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
-        }
-        viewHolder.txtMessage.setText(messageItems.get(position).getContent());
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         return convertView;
     }
 

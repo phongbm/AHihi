@@ -14,20 +14,11 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
-import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
-<<<<<<< HEAD
 import com.phongbm.common.CommonMethod;
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import com.phongbm.libs.SquareImageView;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -86,11 +77,8 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
 
                 imgAvatar.buildDrawingCache();
                 Bitmap avatar = imgAvatar.getDrawingCache();
-<<<<<<< HEAD
+
                 CommonMethod.uploadAvatar(newUser, avatar);
-=======
-                uploadAvatar(newUser, avatar);
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
                 Intent intent = new Intent(this.getActivity(), MainActivity.class);
                 this.getActivity().startActivity(intent);
@@ -98,26 +86,6 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
                 break;
         }
     }
-
-<<<<<<< HEAD
-
-=======
-    private void uploadAvatar(ParseUser parseUser, Bitmap avatar) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        avatar.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        if (bytes != null) {
-            ParseFile parseFile = new ParseFile(bytes);
-            parseUser.put("avatar", parseFile);
-            parseUser.saveInBackground();
-        }
-        try {
-            byteArrayOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
