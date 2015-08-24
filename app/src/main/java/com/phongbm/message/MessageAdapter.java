@@ -76,6 +76,7 @@ public class MessageAdapter extends BaseAdapter {
                     break;
             }
             viewHolder = new ViewHolder();
+            viewHolder.space = convertView.findViewById(R.id.space);
             viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
             viewHolder.imgTriangel = (TriangleShapeView) convertView.findViewById(R.id.imgTriangel);
             viewHolder.txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
@@ -105,6 +106,15 @@ public class MessageAdapter extends BaseAdapter {
                 viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
             }
         }
+        if ((type == TYPE_OUTGOING && typePre == TYPE_INCOMING)
+                || (type == TYPE_INCOMING && typePre == TYPE_OUTGOING)) {
+            viewHolder.space.setVisibility(View.VISIBLE);
+            if (messageItems.get(position).getMode() == 1) {
+                viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
+            }
+        } else {
+            viewHolder.space.setVisibility(View.GONE);
+        }
         viewHolder.txtMessage.setText(messageItems.get(position).getContent());
         if (messageItems.get(position).getMode() == 1) {
             viewHolder.txtMessage.setBackgroundColor(Color.parseColor("#00000000"));
@@ -122,6 +132,7 @@ public class MessageAdapter extends BaseAdapter {
     }
 
     private class ViewHolder {
+        View space;
         TriangleShapeView imgTriangel;
         CircleImageView imgAvatar;
         TextView txtMessage;

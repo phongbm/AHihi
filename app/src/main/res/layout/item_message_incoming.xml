@@ -36,7 +36,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="42dp"
+            android:layout_marginLeft="42dp"
             android:layout_marginRight="42dp"
             android:background="@drawable/bg_message_incoming"
             android:gravity="center_vertical"

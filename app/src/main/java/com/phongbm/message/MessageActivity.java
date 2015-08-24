@@ -162,9 +162,27 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
         emoticonAdapters[1] = new EmoticonAdapter(this, emoticonItems1, inComingMessageId);
 
+        emoticonIds = new int[]{R.drawable.lcil_1, R.drawable.lcil_2, R.drawable.lcil_3,
+                R.drawable.lcil_4, R.drawable.lcil_5, R.drawable.lcil_6, R.drawable.lcil_7,
+                R.drawable.lcil_8, R.drawable.lcil_9, R.drawable.lcil_10, R.drawable.lcil_11,
+                R.drawable.lcil_12, R.drawable.lcil_13, R.drawable.lcil_14, R.drawable.lcil_15,
+                R.drawable.lcil_16, R.drawable.lcil_17, R.drawable.lcil_18, R.drawable.lcil_19,
+                R.drawable.lcil_20, R.drawable.lcil_21, R.drawable.lcil_22, R.drawable.lcil_23,
+                R.drawable.lcil_24, R.drawable.lcil_25, R.drawable.lcil_26, R.drawable.lcil_27,
+                R.drawable.lcil_28, R.drawable.lcil_29, R.drawable.lcil_30, R.drawable.lcil_31,
+                R.drawable.lcil_32, R.drawable.lcil_33, R.drawable.lcil_34, R.drawable.lcil_35,
+                R.drawable.lcil_36, R.drawable.lcil_37, R.drawable.lcil_38, R.drawable.lcil_39,
+                R.drawable.lcil_40};
+        ArrayList<EmoticonItem> emoticonItems2 = new ArrayList<EmoticonItem>();
+        for (int i = 0; i < emoticonIds.length; i++) {
+            emoticonItems2.add(new EmoticonItem(emoticonIds[i]));
+        }
+        emoticonAdapters[2] = new EmoticonAdapter(this, emoticonItems2, inComingMessageId);
+
         collectionEmoticonItems = new ArrayList<CollectionEmoticonItem>();
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[0]));
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[1]));
+        collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[2]));
 
         collectionEmoticonAdapter = new CollectionEmoticonAdapter(this, collectionEmoticonItems);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -174,6 +192,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         tabs.setupWithViewPager(viewPager);
         tabs.getTabAt(0).setIcon(R.drawable.finch_1);
         tabs.getTabAt(1).setIcon(R.drawable.sallyfrien_1);
+        tabs.getTabAt(2).setIcon(R.drawable.lcil_1);
     }
 
     private void getData() {
@@ -260,7 +279,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                     menu.setVisibility(View.GONE);
                     emoticons.setVisibility(View.GONE);
                     isOpenEmoticons = false;
-                    listViewMessage.setSelection(messageAdapter.getCount());
                 }
             });
         } else if (heightDiff <= 100 && emoticons.getVisibility() == View.GONE) {
