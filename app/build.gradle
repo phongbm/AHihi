@@ -27,7 +27,7 @@ android {
         main {
             res.srcDirs = ['src/main/res', 'src/main/res/drawables/finch',
                            'src/main/res/drawables/sallyfrien',
-                           'src/main/res/drawables/linecharactersinlove']
+                           'src/main/res/drawables/linecharactersinlove', 'src/main/res/drawables/yaya']
             assets.srcDirs = ['src/main/assets', 'src/main/assets/']
         }
     }

@@ -179,10 +179,26 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
         emoticonAdapters[2] = new EmoticonAdapter(this, emoticonItems2, inComingMessageId);
 
+        emoticonIds = new int[]{R.drawable.yaya_1, R.drawable.yaya_2, R.drawable.yaya_3,
+                R.drawable.yaya_4, R.drawable.yaya_5, R.drawable.yaya_6, R.drawable.yaya_7,
+                R.drawable.yaya_8, R.drawable.yaya_9, R.drawable.yaya_10, R.drawable.yaya_11,
+                R.drawable.yaya_12, R.drawable.yaya_13, R.drawable.yaya_14, R.drawable.yaya_15,
+                R.drawable.yaya_16, R.drawable.yaya_17, R.drawable.yaya_18, R.drawable.yaya_19,
+                R.drawable.yaya_20, R.drawable.yaya_21, R.drawable.yaya_22, R.drawable.yaya_23,
+                R.drawable.yaya_24, R.drawable.yaya_25, R.drawable.yaya_26, R.drawable.yaya_27,
+                R.drawable.yaya_28, R.drawable.yaya_29, R.drawable.yaya_30, R.drawable.yaya_31,
+                R.drawable.yaya_32};
+        ArrayList<EmoticonItem> emoticonItems3 = new ArrayList<EmoticonItem>();
+        for (int i = 0; i < emoticonIds.length; i++) {
+            emoticonItems3.add(new EmoticonItem(emoticonIds[i]));
+        }
+        emoticonAdapters[3] = new EmoticonAdapter(this, emoticonItems3, inComingMessageId);
+
         collectionEmoticonItems = new ArrayList<CollectionEmoticonItem>();
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[0]));
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[1]));
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[2]));
+        collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[3]));
 
         collectionEmoticonAdapter = new CollectionEmoticonAdapter(this, collectionEmoticonItems);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -190,9 +206,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
         tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
+        tabs.setTabMode(TabLayout.MODE_FIXED);
         tabs.getTabAt(0).setIcon(R.drawable.finch_1);
         tabs.getTabAt(1).setIcon(R.drawable.sallyfrien_1);
         tabs.getTabAt(2).setIcon(R.drawable.lcil_1);
+        tabs.getTabAt(3).setIcon(R.drawable.yaya_1);
     }
 
     private void getData() {
