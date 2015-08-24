@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+<<<<<<< HEAD
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
+=======
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +29,10 @@ import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+<<<<<<< HEAD
 import android.widget.LinearLayout;
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -31,11 +42,16 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.phongbm.ahihi.R;
+<<<<<<< HEAD
 import com.phongbm.common.AHihiService;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 
 import java.util.ArrayList;
+=======
+import com.phongbm.common.CommonValue;
+
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -44,16 +60,21 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         ViewTreeObserver.OnGlobalLayoutListener {
     private static final String TAG = "MessageActivity";
 
+<<<<<<< HEAD
     private static final int NUMBER_COLLECTION_EMOTICON = 20;
 
     private RelativeLayout layoutMain, menu;
     private LinearLayout emoticons;
+=======
+    private RelativeLayout layoutMain, menu;
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     private InputMethodManager inputMethodManager;
     private ListView listViewMessage;
     private MessageAdapter messageAdapter;
     private String outGoingMessageId, inComingMessageId;
     private ReentrantLock reentrantLock = new ReentrantLock();
     private EditText edtContent;
+<<<<<<< HEAD
     private ImageView btnSend, imgEmoticon;
     private BroadcastMessage broadcastMessage;
     private String inComingFullName, content;
@@ -66,24 +87,40 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private EmoticonAdapter[] emoticonAdapters = new EmoticonAdapter[NUMBER_COLLECTION_EMOTICON];
     private ArrayList<CollectionEmoticonItem> collectionEmoticonItems;
     private CollectionEmoticonAdapter collectionEmoticonAdapter;
+=======
+    private ImageView btnSend;
+    private BroadcastMessage broadcastMessage;
+    private String content, inComingFullName;
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_message);
 
+<<<<<<< HEAD
         commonMethod = CommonMethod.getInstance();
 
         Intent intent = this.getIntent();
         outGoingMessageId = ParseUser.getCurrentUser().getObjectId();
         inComingMessageId = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
         inComingFullName = intent.getStringExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME);
+=======
+        Intent intent = this.getIntent();
+        outGoingMessageId = ParseUser.getCurrentUser().getObjectId();
+        inComingMessageId = intent.getStringExtra(CommonValue.INCOMING_CALL_ID);
+        inComingFullName = intent.getStringExtra("NAME");
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
         this.initializeToolbar();
         this.initializeComponent();
         this.registerBroadcastMessage();
 
+<<<<<<< HEAD
         messageAdapter = new MessageAdapter(this, inComingMessageId);
+=======
+        messageAdapter = new MessageAdapter(this);
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         listViewMessage.setAdapter(messageAdapter);
         this.getData();
     }
@@ -101,7 +138,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         layoutMain = (RelativeLayout) findViewById(R.id.layoutMain);
         layoutMain.getViewTreeObserver().addOnGlobalLayoutListener(this);
         menu = (RelativeLayout) findViewById(R.id.menu);
+<<<<<<< HEAD
         emoticons = (LinearLayout) findViewById(R.id.emoticons);
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         listViewMessage = (ListView) findViewById(R.id.listViewMessage);
         listViewMessage.setSelected(false);
         btnSend = (ImageView) findViewById(R.id.btnSend);
@@ -128,6 +168,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             public void afterTextChanged(Editable s) {
             }
         });
+<<<<<<< HEAD
         imgEmoticon = (ImageView) findViewById(R.id.imgEmoticon);
         imgEmoticon.setOnClickListener(this);
 
@@ -171,6 +212,19 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         tabs.setupWithViewPager(viewPager);
         tabs.getTabAt(0).setIcon(R.drawable.finch_1);
         tabs.getTabAt(1).setIcon(R.drawable.sallyfrien_1);
+=======
+        edtContent.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    Log.i(TAG, "onFocusChange...");
+                    menu.setVisibility(RelativeLayout.GONE);
+                } else {
+                    menu.setVisibility(RelativeLayout.VISIBLE);
+                }
+            }
+        });
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     }
 
     private void getData() {
@@ -192,6 +246,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                     if (outGoingMessageId.equals(message.getString("senderId"))) {
                         type = MessageAdapter.TYPE_OUTGOING;
                     }
+<<<<<<< HEAD
                     String content = message.getString("content");
                     if (!content.contains(CommonValue.AHIHI_KEY)) {
                         messageAdapter.addMessage(0, new MessageItem(type,
@@ -202,6 +257,9 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                         SpannableString emoticon = commonMethod.toSpannableString(MessageActivity.this, emoticonId);
                         messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1));
                     }
+=======
+                    messageAdapter.addMessage(0, new MessageItem(type, message.getString("content")));
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                     reentrantLock.unlock();
                 }
             }
@@ -220,6 +278,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 intentSend.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 MessageActivity.this.sendBroadcast(intentSend);
                 break;
+<<<<<<< HEAD
             case R.id.imgEmoticon:
                 if (!isOpenEmoticons) {
                     isOpenEmoticons = true;
@@ -232,6 +291,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                     menu.setVisibility(View.VISIBLE);
                 }
                 break;
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         }
     }
 
@@ -247,6 +308,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onGlobalLayout() {
+<<<<<<< HEAD
         Rect rect = new Rect();
         layoutMain.getWindowVisibleDisplayFrame(rect);
         int heightDiff = layoutMain.getRootView().getHeight() - (rect.bottom + rect.top);
@@ -265,6 +327,26 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 @Override
                 public void run() {
                     menu.setVisibility(View.VISIBLE);
+=======
+        Rect r = new Rect();
+        //r will be populated with the coordinates of your view that area still visible.
+        layoutMain.getWindowVisibleDisplayFrame(r);
+        int heightDiff = layoutMain.getRootView().getHeight() - (r.bottom + r.top);
+        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
+            Log.i(TAG, "keyboard show");
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    menu.setVisibility(RelativeLayout.GONE);
+                }
+            });
+        } else if (heightDiff <= 100) {
+            Log.i(TAG, "keyboard hide");
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    menu.setVisibility(RelativeLayout.VISIBLE);
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                 }
             });
         }
@@ -275,6 +357,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case CommonValue.STATE_MESSAGE_SENT:
+<<<<<<< HEAD
                     String key = intent.getStringExtra(CommonValue.AHIHI_KEY);
                     if (key == null) {
                         messageAdapter.addMessage(messageAdapter.getCount(), new MessageItem(
@@ -309,6 +392,15 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
+=======
+                    messageAdapter.addMessage(messageAdapter.getCount(),
+                            new MessageItem(MessageAdapter.TYPE_OUTGOING, content));
+                    break;
+                case CommonValue.STATE_MESSAGE_INCOMING:
+                    messageAdapter.addMessage(messageAdapter.getCount(),
+                            new MessageItem(MessageAdapter.TYPE_INCOMING,
+                                    intent.getStringExtra(CommonValue.MESSAGE_CONTENT)));
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                     break;
             }
             listViewMessage.setSelection(messageAdapter.getCount());
@@ -332,6 +424,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+<<<<<<< HEAD
     public void onBackPressed() {
         if (isOpenEmoticons) {
             emoticons.setVisibility(View.GONE);
@@ -343,6 +436,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     protected void onDestroy() {
         this.unregisterReceiver(broadcastMessage);
         super.onDestroy();

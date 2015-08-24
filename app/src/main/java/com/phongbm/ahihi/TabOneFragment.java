@@ -21,18 +21,24 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+<<<<<<< HEAD
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import com.parse.ParseUser;
 import com.phongbm.common.CommonValue;
 import com.phongbm.loginsignup.MainFragment;
 
 import java.io.IOException;
 import java.net.URL;
+<<<<<<< HEAD
 import java.util.Arrays;
 import java.util.List;
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
 @SuppressLint("ValidFragment")
 public class TabOneFragment extends Fragment implements View.OnClickListener,
@@ -101,6 +107,7 @@ public class TabOneFragment extends Fragment implements View.OnClickListener,
                 break;
 
             case R.id.btnGoogleMap:
+<<<<<<< HEAD
                 /*latitude = 21.038342;
                 longitude = 105.782418;
                 (new Thread(runnable)).start();*/
@@ -123,6 +130,13 @@ public class TabOneFragment extends Fragment implements View.OnClickListener,
                         }
                     }
                 });
+=======
+                latitude = 21.038342;
+                longitude = 105.782418;
+
+                (new Thread(runnable)).start();
+
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                 break;
             case R.id.btnStop:
                 isRunning = false;
@@ -188,7 +202,11 @@ public class TabOneFragment extends Fragment implements View.OnClickListener,
     @Override
     public Drawable getDrawable(String source) {
         LevelListDrawable d = new LevelListDrawable();
+<<<<<<< HEAD
         Drawable empty = getResources().getDrawable(R.drawable.emoticon_06);
+=======
+        Drawable empty = getResources().getDrawable(R.drawable.emotion_06);
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         d.addLevel(0, 0, empty);
         d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
         return d;

@@ -53,6 +53,24 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                             allFriendAdapter.getActiveFriendItems());
                     activeFriendAdapter.notifyDataSetChanged();
                     break;
+<<<<<<< HEAD
+=======
+                case CommonValue.WHAT_OPEN_CHAT:
+                    int position = msg.arg1;
+                    String inComingId, inComingFullName;
+                    if (activeFriendAdapterVisible) {
+                        inComingId = activeFriendAdapter.getItem(position).getId();
+                        inComingFullName = activeFriendAdapter.getItem(position).getFullName();
+                    } else {
+                        inComingId = allFriendAdapter.getItem(position).getId();
+                        inComingFullName = allFriendAdapter.getItem(position).getFullName();
+                    }
+                    Intent intentChat = new Intent(TabFriendFragment.this.getActivity(), MessageActivity.class);
+                    intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                    intentChat.putExtra("NAME", inComingFullName);
+                    TabFriendFragment.this.getActivity().startActivity(intentChat);
+                    break;
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
             }
         }
     };
@@ -72,8 +90,11 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         allFriendAdapter.setOnShowPopupMenu(this);
         activeFriendAdapter.setOnShowPopupMenu(this);
         listViewFriend.setAdapter(activeFriendAdapter);
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     }
 
     @Override
@@ -122,8 +143,52 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         }
         Intent intentChat = new Intent(this.getActivity(), MessageActivity.class);
         intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+<<<<<<< HEAD
         intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
         this.getActivity().startActivity(intentChat);
+=======
+        intentChat.putExtra("NAME", inComingFullName);
+        this.getActivity().startActivity(intentChat);
+
+        /*final String inComingId, inComingFullName;
+        if (activeFriendAdapterVisible) {
+            inComingId = activeFriendAdapter.getItem(position).getId();
+            inComingFullName = activeFriendAdapter.getItem(position).getFullName();
+        } else {
+            inComingId = allFriendAdapter.getItem(position).getId();
+            inComingFullName = allFriendAdapter.getItem(position).getFullName();
+        }
+        final ImageView menu = (ImageView) view.findViewById(R.id.menu);
+        menu.setClickable(true);
+        menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popup = new PopupMenu(TabFriendFragment.this.getActivity(), menu);
+                popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_open_chat:
+                                Intent intentChat = new Intent(getActivity(), MessageActivity.class);
+                                intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                                intentChat.putExtra("NAME", inComingFullName);
+                                TabFriendFragment.this.getActivity().startActivity(intentChat);
+                                break;
+                            case R.id.action_voice_call:
+                                Intent intentCall = new Intent(getActivity(), OutgoingCallActivity.class);
+                                intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                                TabFriendFragment.this.getActivity().startActivity(intentCall);
+                                break;
+                            case R.id.action_view_profile:
+                                break;
+                        }
+                        return true;
+                    }
+                });
+                popup.show();
+            }
+        });*/
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     }
 
     @Override
@@ -151,7 +216,11 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     private void changeStateHide(TextView txt) {
         txt.setBackgroundResource(R.drawable.bg_button_friend_green);
+<<<<<<< HEAD
         txt.setTextColor(Color.parseColor("#4caf50"));
+=======
+        txt.setTextColor(this.getActivity().getResources().getColor(R.color.green_500));
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
     }
 
     @Override
@@ -172,7 +241,11 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
                     case R.id.action_open_chat:
                         Intent intentChat = new Intent(getActivity(), MessageActivity.class);
                         intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+<<<<<<< HEAD
                         intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
+=======
+                        intentChat.putExtra("NAME", inComingFullName);
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
                         TabFriendFragment.this.getActivity().startActivity(intentChat);
                         break;
                     case R.id.action_voice_call:

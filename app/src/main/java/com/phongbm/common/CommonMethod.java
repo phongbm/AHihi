@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+<<<<<<< HEAD
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -18,6 +19,10 @@ import com.parse.ParseUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+=======
+import android.support.v4.app.NotificationCompat.Builder;
+
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +82,7 @@ public class CommonMethod {
         return simpleDateFormat.format(Calendar.getInstance().getTime());
     }
 
+<<<<<<< HEAD
     public static void uploadAvatar(ParseUser parseUser, Bitmap avatar) {
         if (parseUser == null) return;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -104,4 +110,6 @@ public class CommonMethod {
         return spannableString;
     }
 
+=======
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 }

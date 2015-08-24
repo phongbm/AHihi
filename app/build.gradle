@@ -7,13 +7,22 @@ repositories {
 }
 
 android {
+<<<<<<< HEAD
     compileSdkVersion 23
     buildToolsVersion "23"
+=======
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
 
     defaultConfig {
         applicationId "com.phongbm.ahihi"
         minSdkVersion 15
+<<<<<<< HEAD
         targetSdkVersion 23
+=======
+        targetSdkVersion 22
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
         versionCode 1
         versionName "1.0"
     }
@@ -25,7 +34,11 @@ android {
     }
     sourceSets {
         main {
+<<<<<<< HEAD
             res.srcDirs = ['src/main/res', 'src/main/res/drawables/finch', 'src/main/res/drawables/sallyfrien']
+=======
+            res.srcDirs = ['src/main/res']
+>>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
             assets.srcDirs = ['src/main/assets', 'src/main/assets/']
         }
     }
