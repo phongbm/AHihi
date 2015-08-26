@@ -1,8 +1,10 @@
 package com.phongbm.ahihi;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,6 +44,7 @@ import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.image.ImageActivity;
+import com.phongbm.loginsignup.MainFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,12 +165,47 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
-        menuItem.setChecked(true);
-        drawerLayout.closeDrawers();
+        if (menuItem.isChecked()) {
+            menuItem.setChecked(false);
+        } else {
+            menuItem.setChecked(true);
+        }
+        // drawerLayout.closeDrawers();
         switch (menuItem.getItemId()) {
             case R.id.nav_call_logs:
                 Intent intentCallLogs = new Intent(MainActivity.this, CallLogActivity.class);
                 MainActivity.this.startActivity(intentCallLogs);
+                break;
+            case R.id.nav_log_out:
+                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Confirm");
+                alertDialog.setMessage("Log out?");
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.setCancelable(false);
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                alertDialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ParseUser parseUser = ParseUser.getCurrentUser();
+                                parseUser.put("isOnline", false);
+                                parseUser.saveInBackground();
+                                ParseUser.logOut();
+                                Intent intentLogout = new Intent(CommonValue.ACTION_LOGOUT);
+                                MainActivity.this.sendBroadcast(intentLogout);
+                                Intent intent = new Intent(MainActivity.this, MainFragment.class);
+                                alertDialog.dismiss();
+                                MainActivity.this.startActivity(intent);
+                                MainActivity.this.finish();
+                            }
+                        });
+                alertDialog.show();
                 break;
         }
         return true;

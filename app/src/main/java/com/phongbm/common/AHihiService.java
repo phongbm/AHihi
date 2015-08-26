@@ -2,6 +2,7 @@ package com.phongbm.common;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,10 +10,13 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.phongbm.message.MessagesLogDBManager;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
@@ -33,7 +37,7 @@ import com.sinch.android.rtc.messaging.WritableMessage;
 import java.util.List;
 
 public class AHihiService extends Service implements SinchClientListener {
-    private static final String TAG = "MyServiceCall";
+    private static final String TAG = "AHihiService";
 
     public static final int KEY_LENGTH = 13;
 
@@ -45,6 +49,7 @@ public class AHihiService extends Service implements SinchClientListener {
 
     private MessageListener messageListener;
     private MessageClient messageClient;
+    // private MessagesLogDBManager messagesLogDBManager;
 
     @Override
     public void onCreate() {
@@ -52,6 +57,8 @@ public class AHihiService extends Service implements SinchClientListener {
         if (context == null) {
             context = this;
         }
+        // messagesLogDBManager = new MessagesLogDBManager(this);
+        // messagesLogDBManager.getData();
         this.registerBroadcast();
     }
 
@@ -200,6 +207,24 @@ public class AHihiService extends Service implements SinchClientListener {
                         break;
                 }
             }
+            /*final String c = content;
+            final String senderId = message.getSenderId();
+            ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+            parseQuery.getInBackground(senderId, new GetCallback<ParseUser>() {
+                @Override
+                public void done(ParseUser parseUser, ParseException e) {
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("id", senderId);
+                    contentValues.put("fullName", parseUser.getString("fullName"));
+                    contentValues.put("message", c);
+                    contentValues.put("date", "26/08/2015");
+                    if (!messagesLogDBManager.checkMessagesLogExist(senderId)) {
+                        messagesLogDBManager.insertData(contentValues);
+                    } else {
+                        messagesLogDBManager.update(contentValues);
+                    }
+                }
+            });*/
         }
 
         @Override

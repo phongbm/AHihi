@@ -29,6 +29,7 @@
     <item android:title="Sub items">
         <menu>
             <item
+                android:id="@+id/nav_log_out"
                 android:icon="@drawable/ic_nav_log_out"
                 android:title="Log out" />
         </menu>

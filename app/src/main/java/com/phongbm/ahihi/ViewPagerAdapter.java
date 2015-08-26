@@ -13,7 +13,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public ViewPagerAdapter(Context context, FragmentManager fragmentManager) {
         super(fragmentManager);
         fragments = new ArrayList<Fragment>();
-        fragments.add(new TabOneFragment(context));
+        fragments.add(new TabMessageFragment(context));
         fragments.add(new TabContactFragment(context));
         fragments.add(new TabFriendFragment(context));
         fragments.add(new TabFourFragment(context));
