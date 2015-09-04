@@ -21,11 +21,7 @@
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
-<<<<<<< HEAD
-        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res/drawables/finch;file://$MODULE_DIR$/src/main/res;file://$MODULE_DIR$/src/main/res/drawables/sallyfrien" />
-=======
-        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res" />
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
+        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res/drawables/finch;file://$MODULE_DIR$/src/main/res;file://$MODULE_DIR$/src/main/res/drawables/linecharactersinlove;file://$MODULE_DIR$/src/main/res/drawables/yaya;file://$MODULE_DIR$/src/main/res/drawables/wallpaper;file://$MODULE_DIR$/src/main/res/drawables/sallyfrien" />
         <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
       </configuration>
     </facet>
@@ -55,11 +51,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/res" type="java-resource" />
-<<<<<<< HEAD
       <sourceFolder url="file://$MODULE_DIR$/src/main/res/drawables/finch" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/res/drawables/sallyfrien" type="java-resource" />
-=======
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
+      <sourceFolder url="file://$MODULE_DIR$/src/main/res/drawables/linecharactersinlove" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/res/drawables/yaya" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/res/drawables/wallpaper" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
@@ -80,15 +76,9 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
-<<<<<<< HEAD
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.0.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/design/23.0.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.0/jars" />
-=======
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/design/22.2.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars" />
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/1.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
@@ -105,7 +95,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-<<<<<<< HEAD
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="design-23.0.0" level="project" />
@@ -116,17 +105,5 @@
     <orderEntry type="library" exported="" name="appcompat-v7-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.0.0" level="project" />
-=======
-    <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
-    <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="design-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="circleimageview-1.3.0" level="project" />
-    <orderEntry type="library" exported="" name="Parse-1.9.4" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="bolts-android-1.2.0" level="project" />
-    <orderEntry type="library" exported="" name="sinch-android-rtc-3.6.2" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="appcompat-v7-22.2.1" level="project" />
->>>>>>> 450878eed81f9005e0caa0c7701ceac98ca996e5
   </component>
 </module>

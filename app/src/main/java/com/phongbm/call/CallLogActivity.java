@@ -99,14 +99,14 @@ public class CallLogActivity extends AppCompatActivity {
                     alertDialog.setMessage("All call logs will be deleted. Delete?");
                     alertDialog.setCanceledOnTouchOutside(false);
                     alertDialog.setCancelable(false);
-                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     alertDialog.dismiss();
                                 }
                             });
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

@@ -3,13 +3,17 @@ package com.phongbm.loginsignup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -20,31 +24,39 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonValue;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SignupFragment";
 
-    private View view;
-    private EditText edtPhoneNumber, edtPassword, edtConfirmPassword;
-    private AppCompatButton btnSignup;
-    private CheckBox checkBoxAgree;
-    private TextView login;
-    private boolean isFillPhoneNumber, isFillPassword, isFillConfirmPassword, isCheckBoxChecked;
+    private static final int REQUEST_SIGNUP_FRAGMENT = 0;
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
+    private View view;
+    private EditText edtPhoneNumber, edtPassword, edtConfirmPassword, edtCode;
+    private Button btnSignup;
+    private CheckBox checkBoxAgree;
+    private TextView login, txtLogo;
+    private boolean isFillPhoneNumber, isFillPassword, isFillConfirmPassword, isCheckBoxChecked;
+    private String countryCode;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_signup, null);
+        this.initializeToolbar();
         this.initializeComponent();
         return view;
     }
 
+    private void initializeToolbar() {
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) this.getActivity()).setSupportActionBar(toolbar);
+        this.getActivity().setTitle("SIGN UP");
+    }
+
     private void initializeComponent() {
-        btnSignup = (AppCompatButton) view.findViewById(R.id.btnSignup);
+        txtLogo = (TextView) view.findViewById(R.id.txtLogo);
+        txtLogo.setTypeface(Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/AIRSTREA.TTF"));
+        btnSignup = (Button) view.findViewById(R.id.btnSignup);
         btnSignup.setOnClickListener(this);
         login = (TextView) view.findViewById(R.id.login);
         login.setOnClickListener(this);
@@ -150,6 +162,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
+        edtCode = (EditText) view.findViewById(R.id.edtCode);
+        edtCode.setOnClickListener(this);
+        edtCode.setText("United States (+1)");
+        countryCode = "(+1)";
     }
 
     private void enabledButtonSignup() {
@@ -170,7 +186,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                 progressDialog.show();
 
                 final ParseUser newUser = new ParseUser();
-                newUser.setUsername(edtPhoneNumber.getText().toString().trim());
+                String phoneNumber = edtPhoneNumber.getText().toString().trim();
+                if (phoneNumber.charAt(0) == '0') {
+                    phoneNumber = phoneNumber.substring(1);
+                }
+                newUser.setUsername(countryCode + " " + phoneNumber);
                 newUser.setPassword(edtPassword.getText().toString().trim());
                 newUser.signUpInBackground(new SignUpCallback() {
                     @Override
@@ -195,6 +215,21 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
             case R.id.login:
                 ((MainFragment) this.getActivity()).showLoginFragment();
                 break;
+            case R.id.edtCode:
+                Intent intent = new Intent(this.getActivity(), CountryCodeActivity.class);
+                startActivityForResult(intent, REQUEST_SIGNUP_FRAGMENT);
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_SIGNUP_FRAGMENT && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                String content = data.getStringExtra(CommonValue.COUNTRY_CODE);
+                countryCode = content.substring(content.indexOf("(+"));
+                edtCode.setText(content);
+            }
         }
     }
 

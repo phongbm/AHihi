@@ -27,8 +27,13 @@ public class TabMessageFragment extends Fragment {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         view = layoutInflater.inflate(R.layout.tab_message, null);
         initializeComponent();
-        messagesLogDBManager = new MessagesLogDBManager((MainActivity) TabMessageFragment.this.getActivity());
+        messagesLogDBManager = new MessagesLogDBManager(context);
     }
+
+//    public static TabMessageFragment getInstance() {
+//        TabMessageFragment tabMessageFragment = new TabMessageFragment();
+//
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

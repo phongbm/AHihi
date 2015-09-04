@@ -2,21 +2,23 @@ package com.phongbm.common;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
-import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
-import com.phongbm.message.MessagesLogDBManager;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
@@ -34,12 +36,16 @@ import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
 import com.sinch.android.rtc.messaging.MessageFailureInfo;
 import com.sinch.android.rtc.messaging.WritableMessage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 
 public class AHihiService extends Service implements SinchClientListener {
     private static final String TAG = "AHihiService";
 
-    public static final int KEY_LENGTH = 13;
+    private static final int WITH_SENDER_IMAGE_MAX = 600;
+    private static final int HEIGHT_SEND_IMAGE_MAX = 800;
 
     private Context context;
     private SinchClient sinchClient;
@@ -197,10 +203,11 @@ public class AHihiService extends Service implements SinchClientListener {
                 intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 AHihiService.this.sendBroadcast(intentIncoming);
             } else {
-                String key = content.substring(0, KEY_LENGTH + 1);
-                content = content.substring(KEY_LENGTH + 1);
+                String key = content.substring(0, CommonValue.KEY_LENGTH + 1);
+                content = content.substring(CommonValue.KEY_LENGTH + 1);
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
+                    case CommonValue.AHIHI_KEY_FILE:
                         intentIncoming.putExtra(CommonValue.AHIHI_KEY, key);
                         intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, content);
                         AHihiService.this.sendBroadcast(intentIncoming);
@@ -218,7 +225,7 @@ public class AHihiService extends Service implements SinchClientListener {
                     contentValues.put("fullName", parseUser.getString("fullName"));
                     contentValues.put("message", c);
                     contentValues.put("date", "26/08/2015");
-                    if (!messagesLogDBManager.checkMessagesLogExist(senderId)) {
+                    if (!messagesLogDBManager.checkMessagesLogExists(senderId)) {
                         messagesLogDBManager.insertData(contentValues);
                     } else {
                         messagesLogDBManager.update(contentValues);
@@ -237,12 +244,16 @@ public class AHihiService extends Service implements SinchClientListener {
                 intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 AHihiService.this.sendBroadcast(intentSent);
             } else {
-                String key = content.substring(0, KEY_LENGTH + 1);
-                content = content.substring(KEY_LENGTH + 1);
+                String key = content.substring(0, CommonValue.KEY_LENGTH + 1);
+                content = content.substring(CommonValue.KEY_LENGTH + 1);
+                intentSent.putExtra(CommonValue.AHIHI_KEY, key);
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
-                        intentSent.putExtra(CommonValue.AHIHI_KEY, key);
+                    case CommonValue.AHIHI_KEY_FILE:
                         intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
+                        AHihiService.this.sendBroadcast(intentSent);
+                        break;
+                    case CommonValue.AHIHI_KEY_PICTURE:
                         AHihiService.this.sendBroadcast(intentSent);
                         break;
                 }
@@ -327,6 +338,13 @@ public class AHihiService extends Service implements SinchClientListener {
                                 content = CommonValue.AHIHI_KEY_EMOTICON + content;
                                 AHihiService.this.sendMessage(id, content);
                                 break;
+                            case CommonValue.AHIHI_KEY_FILE:
+                                AHihiService.this.sendFile(id, content);
+                                break;
+                            case CommonValue.AHIHI_KEY_PICTURE:
+                                Log.i(TAG, "ACTION_SEND_MESSAGE...CommonValue.AHIHI_KEY_PICTURE...");
+                                AHihiService.this.sendPicture(id, content);
+                                break;
                         }
                     }
                     break;
@@ -351,6 +369,154 @@ public class AHihiService extends Service implements SinchClientListener {
             }
         });
     }
+
+    private synchronized void sendFile(final String id, final String path) {
+        if (messageClient == null) {
+            return;
+        }
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                final String fileName = path.substring(path.lastIndexOf("/") + 1);
+                final File file = new File(path);
+                if (!file.exists() || !file.isFile() || file.length() > CommonValue.MAX_FILE_SIZE) {
+                    return;
+                }
+                byte[] bytes = new byte[(int) file.length()];
+                try {
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    fileInputStream.read(bytes);
+                    fileInputStream.close();
+                    final ParseFile parseFile = new ParseFile(fileName, bytes);
+                    parseFile.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e != null) {
+                                Toast.makeText(AHihiService.this, "Missing send file",
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            final ParseObject parseObject = new ParseObject("Message");
+                            parseObject.put("file", parseFile);
+                            parseObject.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        Log.i(TAG, "ERROR: " + e.getMessage());
+                                        Toast.makeText(AHihiService.this, "Error send file",
+                                                Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    parseObject.put("senderId", outGoingId);
+                                    parseObject.put("receiverId", id);
+                                    final String content = CommonValue.AHIHI_KEY_FILE +
+                                            parseObject.getObjectId();
+                                    parseObject.put("content", content + "/" + fileName);
+                                    parseObject.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            WritableMessage message = new WritableMessage(id,
+                                                    content + "/" + fileName);
+                                            messageClient.send(message);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }, new ProgressCallback() {
+                        @Override
+                        public void done(Integer integer) {
+                            if (integer > 50) parseFile.cancel();
+                            Log.i(TAG, "Percent: " + integer);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private synchronized void sendPicture(final String id, final String pathPicture) {
+        if (messageClient == null) {
+            return;
+        }
+        final Bitmap bitmapSend = this.createSenderBitmap(pathPicture);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        boolean isChangeByte = bitmapSend.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        if (!isChangeByte) {
+            Toast.makeText(AHihiService.this, "Send image not success!!!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final byte[] bytes = byteArrayOutputStream.toByteArray();
+        final ParseFile parseFile = new ParseFile(bytes);
+        parseFile.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Toast.makeText(AHihiService.this, "Send image not success!!!", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "sendImage_ERROR parsefile: " + e.getMessage());
+                    return;
+                }
+                final ParseObject parseObject = new ParseObject("Message");
+                parseObject.put("file", parseFile);
+                parseObject.put("senderId", outGoingId);
+                parseObject.put("receiverId", id);
+                final String content = CommonValue.AHIHI_KEY_PICTURE + parseFile.getUrl();
+                parseObject.put("content", content);
+                parseObject.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Toast.makeText(AHihiService.this, "Send image not success!!!",
+                                    Toast.LENGTH_SHORT).show();
+                            Log.i(TAG, "sendImage_ERROR parseObject 1: " + e.getMessage());
+                            return;
+                        }
+                        new Handler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ((GlobalApplication) getApplication()).setPictureSend(bitmapSend);
+                            }
+                        });
+                        WritableMessage message = new WritableMessage(id, content);
+                        AHihiService.this.messageClient.send(message);
+                    }
+                });
+            }
+        }, new ProgressCallback() {
+            @Override
+            public void done(Integer integer) {
+                Log.i(TAG, "Percent: " + integer);
+            }
+        });
+    }
+
+    private Bitmap createSenderBitmap(String path) {
+        Bitmap bitmapSend = null;
+        try {
+            bitmapSend = BitmapFactory.decodeFile(path);
+            if (bitmapSend.getWidth() > WITH_SENDER_IMAGE_MAX
+                    || bitmapSend.getHeight() > HEIGHT_SEND_IMAGE_MAX) {
+                Pair<Integer, Integer> pair = CommonMethod.getInstance()
+                        .getStandSizeBitmap(bitmapSend.getWidth(), bitmapSend.getHeight(),
+                                WITH_SENDER_IMAGE_MAX, HEIGHT_SEND_IMAGE_MAX);
+                bitmapSend = Bitmap.createScaledBitmap(bitmapSend, pair.first, pair.second, true);
+            }
+        } catch (OutOfMemoryError e) {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, options);
+            int width = options.outWidth;
+            int height = options.outHeight;
+            Pair<Integer, Integer> pair = CommonMethod.getInstance().getStandSizeBitmap(width,
+                    height, WITH_SENDER_IMAGE_MAX, HEIGHT_SEND_IMAGE_MAX);
+            bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
+                    pair.first, pair.second);
+        }
+        return bitmapSend;
+    }
+
 
     @Override
     public void onDestroy() {

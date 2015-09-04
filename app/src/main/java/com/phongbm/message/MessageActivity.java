@@ -1,12 +1,16 @@
 package com.phongbm.message;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -20,10 +24,12 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -31,7 +37,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.phongbm.ahihi.R;
-import com.phongbm.common.AHihiService;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 
@@ -43,6 +48,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MessageActivity extends AppCompatActivity implements View.OnClickListener,
         ViewTreeObserver.OnGlobalLayoutListener {
     private static final String TAG = "MessageActivity";
+    private static final int REQUEST_ATTACH = 0;
+    private static final int REQUEST_PICTURE = 1;
     private static final int NUMBER_COLLECTION_EMOTICON = 20;
 
     private RelativeLayout layoutMain, menu;
@@ -53,8 +60,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private String outGoingMessageId, inComingMessageId;
     private ReentrantLock reentrantLock = new ReentrantLock();
     private EditText edtContent;
-
-    private ImageView btnSend, imgEmoticon;
+    private ImageButton btnAttach;
+    private ImageView btnSend, imgEmoticon, btnPicture;
     private BroadcastMessage broadcastMessage;
     private String inComingFullName, content;
     private CommonMethod commonMethod;
@@ -107,6 +114,12 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
         listViewMessage = (ListView) findViewById(R.id.listViewMessage);
         listViewMessage.setSelected(false);
+
+        btnAttach = (ImageButton) findViewById(R.id.btnAttach);
+        btnAttach.setOnClickListener(this);
+        btnPicture = (ImageView) findViewById(R.id.btnPicture);
+        btnPicture.setOnClickListener(this);
+
         btnSend = (ImageView) findViewById(R.id.btnSend);
         btnSend.setEnabled(false);
         btnSend.setOnClickListener(this);
@@ -194,7 +207,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
         emoticonAdapters[3] = new EmoticonAdapter(this, emoticonItems3, inComingMessageId);
 
-        collectionEmoticonItems = new ArrayList<CollectionEmoticonItem>();
+        collectionEmoticonItems = new ArrayList<>();
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[0]));
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[1]));
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[2]));
@@ -237,10 +250,21 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                         messageAdapter.addMessage(0, new MessageItem(type,
                                 SpannableString.valueOf(content), 0));
                     } else {
-                        content = content.substring(AHihiService.KEY_LENGTH + 1);
-                        int emoticonId = Integer.parseInt(content);
-                        SpannableString emoticon = commonMethod.toSpannableString(MessageActivity.this, emoticonId);
-                        messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1));
+                        String key = content.substring(0, CommonValue.KEY_LENGTH + 1);
+                        content = content.substring(CommonValue.KEY_LENGTH + 1);
+                        switch (key) {
+                            case CommonValue.AHIHI_KEY_EMOTICON:
+                                int emoticonId = Integer.parseInt(content);
+                                SpannableString emoticon = commonMethod.toSpannableString(
+                                        MessageActivity.this, emoticonId);
+                                messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1));
+                                break;
+                            case CommonValue.AHIHI_KEY_FILE:
+                                messageAdapter.addMessage(0, new MessageItem(type,
+                                        SpannableString.valueOf(content), 2));
+                                break;
+                        }
+
                     }
                     reentrantLock.unlock();
                 }
@@ -251,6 +275,12 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnAttach:
+                Intent intentAttach = new Intent();
+                intentAttach.setAction(Intent.ACTION_GET_CONTENT);
+                intentAttach.setType("file/*");
+                this.startActivityForResult(intentAttach, REQUEST_ATTACH);
+                break;
             case R.id.btnSend:
                 content = edtContent.getText().toString();
                 edtContent.setText("");
@@ -271,6 +301,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                     emoticons.setVisibility(View.GONE);
                     menu.setVisibility(View.VISIBLE);
                 }
+                break;
+            case R.id.btnPicture:
+                Intent intentPicture = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                this.startActivityForResult(intentPicture, REQUEST_PICTURE);
                 break;
         }
     }
@@ -309,6 +344,46 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        switch (requestCode) {
+            case REQUEST_ATTACH:
+                String path = data.getData().getPath();
+                Intent intentSend = new Intent();
+                intentSend.setAction(CommonValue.ACTION_SEND_MESSAGE);
+                intentSend.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentSend.putExtra(CommonValue.MESSAGE_CONTENT, path);
+                intentSend.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_FILE);
+                MessageActivity.this.sendBroadcast(intentSend);
+                break;
+            case REQUEST_PICTURE:
+                String pathPicture = this.getPathFromUri(data.getData());
+                Intent intentPicture = new Intent();
+                intentPicture.setAction(CommonValue.ACTION_SEND_MESSAGE);
+                intentPicture.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentPicture.putExtra(CommonValue.MESSAGE_CONTENT, pathPicture);
+                intentPicture.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_PICTURE);
+                MessageActivity.this.sendBroadcast(intentPicture);
+                break;
+        }
+    }
+
+    private String getPathFromUri(Uri uri) {
+        Cursor cursor = this.getContentResolver().query(uri,
+                new String[]{MediaStore.Images.Media.DATA}, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        cursor.moveToFirst();
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        cursor.close();
+        return path;
+    }
+
     private class BroadcastMessage extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -320,13 +395,22 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 MessageAdapter.TYPE_OUTGOING, SpannableString.valueOf(intent
                                 .getStringExtra(CommonValue.MESSAGE_CONTENT)), 0));
                     } else {
+                        String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
                         switch (key) {
                             case CommonValue.AHIHI_KEY_EMOTICON:
-                                int emoticonId = Integer.parseInt(intent.getStringExtra(
-                                        CommonValue.MESSAGE_CONTENT));
+                                int emoticonId = Integer.parseInt(content);
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_OUTGOING, commonMethod
                                                 .toSpannableString(MessageActivity.this, emoticonId), 1));
+                                break;
+                            case CommonValue.AHIHI_KEY_FILE:
+                                Toast.makeText(MessageActivity.this, "OK", Toast.LENGTH_SHORT).show();
+                                messageAdapter.addMessage(messageAdapter.getCount(),
+                                        new MessageItem(MessageAdapter.TYPE_OUTGOING, SpannableString
+                                                .valueOf(content), 2));
+                                break;
+                            case CommonValue.AHIHI_KEY_PICTURE:
+
                                 break;
                         }
                     }
@@ -338,10 +422,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 new MessageItem(MessageAdapter.TYPE_INCOMING, SpannableString
                                         .valueOf(intent.getStringExtra(CommonValue.MESSAGE_CONTENT)), 0));
                     } else {
+                        String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
                         switch (keyIncoming) {
                             case CommonValue.AHIHI_KEY_EMOTICON:
-                                int emoticonId = Integer.parseInt(intent.getStringExtra(
-                                        CommonValue.MESSAGE_CONTENT));
+                                int emoticonId = Integer.parseInt(content);
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_INCOMING, commonMethod
                                                 .toSpannableString(MessageActivity.this, emoticonId), 1));

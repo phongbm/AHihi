@@ -4,24 +4,38 @@
     android:layout_height="wrap_content"
     android:background="#ffffff">
 
+    <EditText
+        android:id="@+id/edtCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="false"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text="Viet Nam (+84)"
+        android:textColor="@color/green_500" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tILPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp">
+        android:layout_below="@+id/edtCode"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
 
         <EditText
             android:id="@+id/edtPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="center"
             android:hint="Phone Number"
             android:inputType="phone"
             android:textColor="@color/green_500"
             android:textColorHint="@color/colorPrimary"
             android:textSize="20sp" />
-
     </android.support.design.widget.TextInputLayout>
 
     <TextView
@@ -30,18 +44,19 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tILPhoneNumber"
         android:layout_centerHorizontal="true"
-        android:layout_margin="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:gravity="center"
         android:text="Enter someone's phone number to find them on AHihi"
         android:textColor="#bdbdbd" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:id="@+id/btnAddFriend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text"
         android:layout_marginTop="16dp"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/bg_button"
         android:enabled="false"
         android:text="ADD FRIEND"
         android:textColor="#ffffff"

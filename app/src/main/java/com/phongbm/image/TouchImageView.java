@@ -36,9 +36,7 @@ public class TouchImageView extends ImageView {
 
     private Matrix matrix, prevMatrix;
 
-    private static enum State {NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM}
-
-    ;
+    private static enum State {NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM};
     private State state;
 
     private float minScale;

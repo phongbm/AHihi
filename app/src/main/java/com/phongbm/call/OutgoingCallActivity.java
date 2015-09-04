@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -176,8 +177,7 @@ public class OutgoingCallActivity extends AppCompatActivity implements View.OnCl
                         date = commonMethod.getCurrentDateTime();
                     }
                     btnEndCall.setEnabled(false);
-                    txtTime.setBackgroundColor(OutgoingCallActivity.this.getResources()
-                            .getColor(R.color.red_500));
+                    txtTime.setBackgroundColor(ContextCompat.getColor(OutgoingCallActivity.this, R.color.red_500));
                     callingRipple.setVisibility(RelativeLayout.GONE);
                     OutgoingCallActivity.this.setVolumeControlStream(
                             AudioManager.USE_DEFAULT_STREAM_TYPE);
@@ -225,7 +225,6 @@ public class OutgoingCallActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void finish() {
         this.setResult(Activity.RESULT_OK);
-        Toast.makeText(this, "OK CMNL", Toast.LENGTH_SHORT).show();
         super.finish();
     }
 

@@ -9,10 +9,11 @@ import java.util.ArrayList;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     private ArrayList<Fragment> fragments;
+    private String[] titles = new String[]{"Messages", "Contacts", "Friends", "Account"};
 
     public ViewPagerAdapter(Context context, FragmentManager fragmentManager) {
         super(fragmentManager);
-        fragments = new ArrayList<Fragment>();
+        fragments = new ArrayList<>();
         fragments.add(new TabMessageFragment(context));
         fragments.add(new TabContactFragment(context));
         fragments.add(new TabFriendFragment(context));
@@ -31,7 +32,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return null;
+        return titles[position];
     }
 
 }

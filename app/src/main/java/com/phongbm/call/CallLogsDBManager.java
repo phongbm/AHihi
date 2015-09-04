@@ -83,7 +83,7 @@ public class CallLogsDBManager {
 
     public ArrayList<CallLogItem> getData() {
         this.openDatabase();
-        ArrayList<CallLogItem> callLogItems = new ArrayList<CallLogItem>();
+        ArrayList<CallLogItem> callLogItems = new ArrayList<>();
         int indexId, indexFullName, indexPhoneNumber, indexDate, indexState;
         String id, fullName, phoneNumber, date, state;
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM CallLogs", null);
@@ -104,10 +104,12 @@ public class CallLogsDBManager {
             callLogItems.add(0, new CallLogItem(id, fullName, phoneNumber, date, state));
             cursor.moveToNext();
         }
+        cursor.close();
         return callLogItems;
     }
 
     public void deleteAllData() {
+        this.openDatabase();
         sqLiteDatabase.execSQL("DELETE FROM CallLogs");
     }
 

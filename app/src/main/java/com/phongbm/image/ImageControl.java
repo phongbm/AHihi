@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -36,7 +37,7 @@ public class ImageControl extends AppCompatActivity implements View.OnClickListe
     private RelativeLayout layoutImage;
     private TouchImageView image;
     private ImageView imageView;
-    private Button btnCrop;
+    private Button btnCrop, btnRotate;
 
     private float radius;
 
@@ -49,6 +50,7 @@ public class ImageControl extends AppCompatActivity implements View.OnClickListe
         url = getIntent().getStringExtra(ImageControl.EXTRA_IMAGE);
         initLayoutImage();
         intializeComponent();
+
     }
 
     private void initLayoutImage() {
@@ -61,6 +63,8 @@ public class ImageControl extends AppCompatActivity implements View.OnClickListe
     private void intializeComponent() {
         btnCrop = (Button) findViewById(R.id.btnCrop);
         btnCrop.setOnClickListener(this);
+        btnRotate = (Button) findViewById(R.id.btnRotate);
+        btnRotate.setOnClickListener(this);
         image = (TouchImageView) findViewById(R.id.img);
         image.setMaxZoom(5);
         createBmMain();
@@ -164,6 +168,9 @@ public class ImageControl extends AppCompatActivity implements View.OnClickListe
             case R.id.btnCrop:
                 cropimage();
                 break;
+            case R.id.btnRotate:
+                rotateImage();
+                break;
         }
     }
 
@@ -193,6 +200,15 @@ public class ImageControl extends AppCompatActivity implements View.OnClickListe
         intent.putExtra(CommonValue.BYTE_AVATAR, bytes);
         setResult(Activity.RESULT_OK, intent);
         finish();
+    }
+
+    private void rotateImage() {
+        float zoom = image.getCurrentZoom();
+        RectF rect = image.getZoomedRect();
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        bmMain = Bitmap.createBitmap(bmMain , 0, 0, bmMain .getWidth(), bmMain .getHeight(), matrix, true);
+        image.setImageBitmap(bmMain);
     }
 
     @Override

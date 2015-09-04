@@ -10,48 +10,60 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/appBar"
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/coordinator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:fitsSystemWindows="true">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary" />
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_below="@+id/toolbar"
-                app:tabIndicatorColor="#ffffff" />
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary" />
 
-        </android.support.design.widget.AppBarLayout>
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tab"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_below="@+id/toolbar"
+                    app:tabIndicatorColor="#ffffff" />
+
+            </android.support.design.widget.AppBarLayout>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+        <View
+            android:id="@+id/shadow"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_below="@+id/coordinator"
+            android:background="@drawable/shadow" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/appBar" />
+            android:layout_below="@+id/shadow" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/btnNewMessage"
+            android:id="@+id/btnAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="32dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_margin="16dp"
             android:src="@drawable/ic_plus"
             app:backgroundTint="#f44336"
             app:elevation="8dp"
             app:pressedTranslationZ="8dp"
-            app:rippleColor="@color/colorPrimaryDark" />
+            app:rippleColor="#d32f2f" />
 
     </RelativeLayout>
 
@@ -63,6 +75,7 @@
         android:background="#ffffff"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/header_navigation"
+        app:insetForeground="@color/colorPrimary"
         app:menu="@menu/menu_navigation" />
 
 </android.support.v4.widget.DrawerLayout>

@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.util.Log;
 
 import com.phongbm.common.CommonValue;
 
@@ -35,6 +36,7 @@ public class MessagesLogDBManager {
         new File(DATA_PATH).mkdir();
         File file = new File(DATA_PATH + DATA_NAME);
         if (file.exists()) {
+            Log.i(TAG, "Exists");
             return;
         }
         try {
@@ -85,7 +87,7 @@ public class MessagesLogDBManager {
 
     public ArrayList<MessagesLogItem> getData() {
         this.openDatabase();
-        ArrayList<MessagesLogItem> messagesLogItems = new ArrayList<MessagesLogItem>();
+        ArrayList<MessagesLogItem> messagesLogItems = new ArrayList<>();
         int indexId, indexFullName, indexMessage, indexDate;
         String id, fullName, message, date;
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Messages", null);
@@ -105,6 +107,7 @@ public class MessagesLogDBManager {
             ids.add(id);
             cursor.moveToNext();
         }
+        cursor.close();
         return messagesLogItems;
     }
 
@@ -112,7 +115,7 @@ public class MessagesLogDBManager {
         sqLiteDatabase.execSQL("DELETE FROM Messages");
     }
 
-    public boolean checkMessagesLogExist(String id) {
+    public boolean checkMessagesLogExists(String id) {
         if (ids.indexOf(id) != -1) {
             return true;
         }

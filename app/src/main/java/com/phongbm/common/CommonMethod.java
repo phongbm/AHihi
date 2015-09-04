@@ -7,11 +7,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
+import android.util.Pair;
 
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -96,12 +99,56 @@ public class CommonMethod {
 
     public SpannableString toSpannableString(Context context, int emoticonId) {
         SpannableString spannableString = new SpannableString(String.valueOf(emoticonId));
-        Drawable drawable = context.getResources().getDrawable(emoticonId);
+        Drawable drawable = ContextCompat.getDrawable(context, emoticonId);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth() / 2, drawable.getIntrinsicHeight() / 2);
         ImageSpan imageSpan = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
         spannableString.setSpan(imageSpan, 0, spannableString.length(),
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         return spannableString;
+    }
+
+    public Bitmap decodeSampledBitmapFromResource(String uri,
+                                                  int reqWidth, int reqHeight) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(uri, options);
+        options.inSampleSize = calculateInSampleSize(options, reqWidth,
+                reqHeight);
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(uri, options);
+    }
+
+    public int calculateInSampleSize(BitmapFactory.Options options,
+                                     int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize * 2;
+    }
+
+    public Pair<Integer, Integer> getStandSizeBitmap(int width, int height,
+                                                     final int WITH_SENDER_IMAGE_MAX,
+                                                     final int HEIGHT_SEND_IMAGE_MAX) {
+        if (width < WITH_SENDER_IMAGE_MAX && height < HEIGHT_SEND_IMAGE_MAX) {
+            return null;
+        }
+        if (width > WITH_SENDER_IMAGE_MAX) {
+            height = (int) ((float) (WITH_SENDER_IMAGE_MAX) / width * height);
+            width = WITH_SENDER_IMAGE_MAX;
+        }
+        if (height > HEIGHT_SEND_IMAGE_MAX) {
+            width = (int) ((float) (HEIGHT_SEND_IMAGE_MAX) / height * width);
+            height = HEIGHT_SEND_IMAGE_MAX;
+        }
+        return new Pair<>(width, height);
     }
 
 }

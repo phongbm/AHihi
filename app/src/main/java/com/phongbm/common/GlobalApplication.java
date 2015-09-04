@@ -12,6 +12,7 @@ public class GlobalApplication extends Application {
     public static int WIDTH_SCREEN, HEIGHT_SCREEN;
 
     private Bitmap avatar;
+    private Bitmap pictureSend;
 
     @Override
     public void onCreate() {
@@ -35,6 +36,14 @@ public class GlobalApplication extends Application {
 
     public void setAvatar(Bitmap avatar) {
         this.avatar = avatar;
+    }
+
+    public Bitmap getPictureSend() {
+        return pictureSend;
+    }
+
+    public void setPictureSend(Bitmap pictureSend) {
+        this.pictureSend = pictureSend;
     }
 
 }

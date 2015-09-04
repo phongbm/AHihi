@@ -2,35 +2,42 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    android:padding="16dp">
+    android:background="#ffffff"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_below="@+id/toolbar"
+        android:background="@drawable/shadow" />
 
     <TextView
-        android:id="@+id/txtStep1"
+        android:id="@+id/txtLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/shadow"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="32dp"
-        android:text="STEP 2"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txtDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtStep1"
         android:text="Profile Picture"
-        android:textColor="#ffffff"
-        android:textSize="20sp" />
+        android:textColor="@color/green_500"
+        android:textSize="32sp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgAvatar"
-        android:layout_width="144dp"
-        android:layout_height="144dp"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/shadow"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
@@ -44,12 +51,12 @@
         android:background="@drawable/bg_layout_white"
         android:padding="16dp">
 
-        <android.support.v7.widget.AppCompatButton
+        <Button
             android:id="@+id/btnOK"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="@color/colorPrimaryDark"
+            android:background="@drawable/bg_button"
             android:text="SAVE AND CONTINUE"
             android:textColor="#ffffff"
             android:textStyle="bold" />

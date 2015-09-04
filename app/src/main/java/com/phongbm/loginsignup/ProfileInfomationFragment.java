@@ -1,15 +1,15 @@
 package com.phongbm.loginsignup;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -19,24 +19,26 @@ import com.phongbm.ahihi.R;
 public class ProfileInfomationFragment extends Fragment implements View.OnClickListener {
     private View view;
     private EditText edtBirthday, edtFirstName, edtLastName, edtEmail;
-    private AppCompatButton btnOK;
+    private Button btnOK;
     private RadioButton radioMale, radioFemale;
     private boolean isFillFirstName, isFillLastName, isFillEmail;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_profile_infomation, null);
+        this.initializeToolbar();
         this.initializeComponent();
         return view;
     }
 
+    private void initializeToolbar() {
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        ((MainFragment) this.getActivity()).setSupportActionBar(toolbar);
+        this.getActivity().setTitle("STEP 1");
+    }
+
     private void initializeComponent() {
-        btnOK = (AppCompatButton) view.findViewById(R.id.btnOK);
+        btnOK = (Button) view.findViewById(R.id.btnOK);
         btnOK.setOnClickListener(this);
         edtBirthday = (EditText) view.findViewById(R.id.edtBirthday);
         edtBirthday.setOnClickListener(this);

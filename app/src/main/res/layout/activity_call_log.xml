@@ -46,7 +46,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:text="No call logs"
-            android:textColor="@color/textColorPrimary"
+            android:textColor="#666666"
             android:textSize="32sp"
             android:textStyle="normal" />
 

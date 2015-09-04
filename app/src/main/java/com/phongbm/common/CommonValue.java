@@ -6,7 +6,7 @@ public class CommonValue {
     public static final String PACKAGE_NAME_CALL = "com.phongbm.call";
 
     public static final int WHAT_CALL_BACK = 2;
-
+    public static final String COUNTRY_CODE = "COUNTRY_CODE";
     public static final int REQUEST_ADD_FRIEND = 5;
     public static final int ACTION_UPDATE_LIST_FRIEND = 6;
     public static final String ACTION_ADD_FRIEND = "ACTION_ADD_FRIEND";
@@ -29,6 +29,7 @@ public class CommonValue {
     public static final String STATE_MESSAGE_INCOMING = "STATE_MESSAGE_INCOMING";
 
     public static final int KEY_LENGTH = 13;
+    public static final int MAX_FILE_SIZE = 10485760;
     public static final String AHIHI_KEY = "AHIHI_KEY";
     public static final String AHIHI_KEY_EMOTICON = "AHIHI_KEY_EMO_";
     public static final String AHIHI_KEY_FILE = "AHIHI_KEY_FIL_";

@@ -1,17 +1,16 @@
 package com.phongbm.loginsignup;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 
 import com.parse.ParseUser;
@@ -34,23 +33,18 @@ public class ProfilePictureFragment extends Fragment implements View.OnClickList
             R.drawable.ic_ava_7, R.drawable.ic_ava_8, R.drawable.ic_ava_9, R.drawable.ic_ava_10,
             R.drawable.ic_ava_11, R.drawable.ic_ava_12, R.drawable.ic_avatar_default};
     private LayoutInflater layoutInflater;
-    private AppCompatButton btnOK;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        layoutInflater = LayoutInflater.from(activity);
-    }
+    private Button btnOK;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        layoutInflater = LayoutInflater.from(container.getContext());
         view = inflater.inflate(R.layout.fragment_profile_picture, null);
         initializeComponent();
         return view;
     }
 
     private void initializeComponent() {
-        btnOK = (AppCompatButton) view.findViewById(R.id.btnOK);
+        btnOK = (Button) view.findViewById(R.id.btnOK);
         btnOK.setOnClickListener(this);
         imgAvatar = (CircleImageView) view.findViewById(R.id.imgAvatar);
         gridViewAvatarDefault = (GridView) view.findViewById(R.id.gridViewAvatarDefault);

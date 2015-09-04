@@ -63,10 +63,6 @@ public class MainFragment extends AppCompatActivity {
         return profileInfomationFragment;
     }
 
-    public SignupFragment getSignupFragment() {
-        return signupFragment;
-    }
-
     @Override
     public void onBackPressed() {
         if (loginFragment.isVisible() || signupFragment.isVisible()) {

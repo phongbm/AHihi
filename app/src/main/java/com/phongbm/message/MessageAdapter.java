@@ -1,23 +1,39 @@
 package com.phongbm.message;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.GetCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ProgressCallback;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.libs.TriangleShapeView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageAdapter extends BaseAdapter {
+public class MessageAdapter extends BaseAdapter implements View.OnClickListener {
     public static final String TAG = "MessageAdapter";
 
     public static final int TYPE_COUNT = 2;
@@ -31,7 +47,7 @@ public class MessageAdapter extends BaseAdapter {
 
     public MessageAdapter(Context context, String inComingMessageId) {
         layoutInflater = LayoutInflater.from(context);
-        this.messageItems = new ArrayList<MessageItem>();
+        this.messageItems = new ArrayList<>();
         globalApplication = (GlobalApplication) context.getApplicationContext();
         outGoingMessageAvatar = globalApplication.getAvatar();
     }
@@ -91,7 +107,7 @@ public class MessageAdapter extends BaseAdapter {
                 break;
             case TYPE_INCOMING:
                 viewHolder.imgAvatar.setImageResource(R.drawable.ic_ava_2);
-                viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#ffffff"));
+                viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#eeeeee"));
                 break;
         }
         if (position == 0 && messageItems.get(0).getMode() == 1) {
@@ -115,7 +131,28 @@ public class MessageAdapter extends BaseAdapter {
         } else {
             viewHolder.space.setVisibility(View.GONE);
         }
-        viewHolder.txtMessage.setText(messageItems.get(position).getContent());
+
+        switch (messageItems.get(position).getMode()) {
+            case 0:
+            case 1:
+                viewHolder.txtMessage.setText(messageItems.get(position).getContent());
+                viewHolder.txtMessage.setOnClickListener(null);
+                viewHolder.txtMessage.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                break;
+            case 2:
+                viewHolder.txtMessage.setOnClickListener(this);
+                String content = messageItems.get(position).getContent().toString();
+                Log.i(TAG, content);
+                String objectId = content.substring(0, content.lastIndexOf("/"));
+                String fileName = content.substring(content.lastIndexOf("/") + 1);
+                viewHolder.txtMessage.setText(Html.fromHtml(
+                        "<u><font color='#827ca3'>" + fileName + "</font></u>   "));
+                viewHolder.txtMessage.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                        R.drawable.ic_message_download, 0);
+                viewHolder.txtMessage.setTag(objectId);
+                break;
+        }
+
         if (messageItems.get(position).getMode() == 1) {
             viewHolder.txtMessage.setBackgroundColor(Color.parseColor("#00000000"));
         } else {
@@ -129,6 +166,90 @@ public class MessageAdapter extends BaseAdapter {
             }
         }
         return convertView;
+    }
+
+    @Override
+    public void onClick(final View view) {
+        final AlertDialog alertDialog = new AlertDialog.Builder(view.getContext()).create();
+        alertDialog.setTitle("Confirm");
+        alertDialog.setMessage("Download");
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setCancelable(false);
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        alertDialog.dismiss();
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "DOWNLOAD",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String objectId = view.getTag().toString();
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery("Message");
+                        query.getInBackground(objectId, new GetCallback<ParseObject>() {
+                            @Override
+                            public void done(ParseObject parseObject, ParseException e) {
+                                if (e != null) {
+                                    return;
+                                }
+                                final ParseFile parseFile = parseObject.getParseFile("file");
+                                Log.i(TAG, parseFile.getName());
+                                Log.i(TAG, parseFile.getUrl());
+                                String fileName = parseFile.getName().substring(
+                                        parseFile.getName().lastIndexOf("-") + 1);
+                                Log.i(TAG, fileName);
+                                final String path = Environment.getExternalStorageDirectory().getPath() +
+                                        "/" + Environment.DIRECTORY_DOWNLOADS + "/" + fileName;
+                                Log.i(TAG, path);
+                                parseFile.getDataInBackground(new GetDataCallback() {
+                                    @Override
+                                    public void done(byte[] bytes, ParseException e) {
+                                        if (e != null) {
+                                            Toast.makeText(view.getContext(), "Download fail: "
+                                                    + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }
+                                        File file = new File(path);
+                                        Log.i(TAG, "new File");
+                                        boolean checkCreateFile = false;
+                                        int i = 1;
+                                        while (!checkCreateFile) {
+                                            if (!file.exists()) try {
+                                                Log.i(TAG, "!file.exists()");
+                                                file.createNewFile();
+                                                checkCreateFile = true;
+                                                FileOutputStream outputStream = new FileOutputStream(file);
+                                                outputStream.write(bytes);
+                                                outputStream.close();
+                                                Toast.makeText(view.getContext(), "Download successfully",
+                                                        Toast.LENGTH_SHORT).show();
+                                            } catch (IOException iOE) {
+                                                iOE.printStackTrace();
+                                            }
+                                            else {
+                                                int index = path.lastIndexOf(".");
+                                                String newPath = path.replace(path.substring(index,
+                                                        index + 1), "(" + i + ").");
+                                                file = new File(newPath);
+                                                i++;
+                                            }
+                                        }
+                                    }
+                                }, new ProgressCallback() {
+                                    @Override
+                                    public void done(Integer progress) {
+                                        Log.i(TAG, "percent: " + progress);
+                                        // if (progress > 50) parseFile.cancel();
+                                    }
+                                });
+                            }
+                        });
+                        alertDialog.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
     private class ViewHolder {
