@@ -146,23 +146,6 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         this.getActivity().registerReceiver(broadcastUpdateListFriend, filter);
     }
 
-
-    /*@Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String inComingId, inComingFullName;
-        if (activeFriendAdapterVisible) {
-            inComingId = activeFriendAdapter.getItem(position).getId();
-            inComingFullName = activeFriendAdapter.getItem(position).getFullName();
-        } else {
-            inComingId = allFriendAdapter.getItem(position).getId();
-            inComingFullName = allFriendAdapter.getItem(position).getFullName();
-        }
-        Intent intentChat = new Intent(this.getActivity(), MessageActivity.class);
-        intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
-        intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
-        this.getActivity().startActivity(intentChat);
-    }
-*/
     @Override
     public void onClick(View view) {
         switch (view.getId()) {

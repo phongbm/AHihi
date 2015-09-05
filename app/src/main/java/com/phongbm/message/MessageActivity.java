@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -409,7 +408,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                                 .toSpannableString(MessageActivity.this, emoticonId), 1));
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
-                                Toast.makeText(MessageActivity.this, "OK", Toast.LENGTH_SHORT).show();
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_OUTGOING, SpannableString
                                                 .valueOf(content), 2));
@@ -418,6 +416,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_OUTGOING,
                                                 ((GlobalApplication) getApplication()).getPictureSend(), 3));
+                                messageAdapter.getItem(messageAdapter.getCount() - 1).setContent(
+                                        SpannableString.valueOf(content));
                                 break;
                         }
                     }
@@ -436,6 +436,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_INCOMING, commonMethod
                                                 .toSpannableString(MessageActivity.this, emoticonId), 1));
+                                break;
+                            case CommonValue.AHIHI_KEY_FILE:
+                                messageAdapter.addMessage(messageAdapter.getCount(),
+                                        new MessageItem(MessageAdapter.TYPE_INCOMING, SpannableString
+                                                .valueOf(content), 2));
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
                                 messageAdapter.addMessage(messageAdapter.getCount(), new

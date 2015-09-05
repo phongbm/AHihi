@@ -251,10 +251,8 @@ public class AHihiService extends Service implements SinchClientListener {
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
                     case CommonValue.AHIHI_KEY_FILE:
-                        intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
-                        AHihiService.this.sendBroadcast(intentSent);
-                        break;
                     case CommonValue.AHIHI_KEY_PICTURE:
+                        intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
                         AHihiService.this.sendBroadcast(intentSent);
                         break;
                 }
@@ -343,7 +341,6 @@ public class AHihiService extends Service implements SinchClientListener {
                                 AHihiService.this.sendFile(id, content);
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
-                                Log.i(TAG, "ACTION_SEND_MESSAGE...CommonValue.AHIHI_KEY_PICTURE...");
                                 AHihiService.this.sendPicture(id, content);
                                 break;
                         }

@@ -29,6 +29,10 @@ public class MessageItem {
         return content;
     }
 
+    public void setContent(SpannableString content){
+        this.content = content;
+    }
+
     public int getMode() {
         return mode;
     }
