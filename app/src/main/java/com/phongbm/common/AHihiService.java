@@ -208,6 +208,7 @@ public class AHihiService extends Service implements SinchClientListener {
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
                     case CommonValue.AHIHI_KEY_FILE:
+                    case CommonValue.AHIHI_KEY_PICTURE:
                         intentIncoming.putExtra(CommonValue.AHIHI_KEY, key);
                         intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, content);
                         AHihiService.this.sendBroadcast(intentIncoming);
@@ -514,6 +515,8 @@ public class AHihiService extends Service implements SinchClientListener {
             bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
                     pair.first, pair.second);
         }
+        int orientation = CommonMethod.getInstance().getOrientation(path);
+        bitmapSend = CommonMethod.getInstance().getBitmap(orientation, bitmapSend);
         return bitmapSend;
     }
 

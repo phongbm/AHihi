@@ -39,6 +39,7 @@ import com.parse.ParseUser;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -263,6 +264,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 messageAdapter.addMessage(0, new MessageItem(type,
                                         SpannableString.valueOf(content), 2));
                                 break;
+                            case CommonValue.AHIHI_KEY_PICTURE:
+                                messageAdapter.addMessage(0, new MessageItem(type,
+                                        SpannableString.valueOf(content), 3));
+                                break;
                         }
 
                     }
@@ -410,7 +415,9 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                                 .valueOf(content), 2));
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
-
+                                messageAdapter.addMessage(messageAdapter.getCount(),
+                                        new MessageItem(MessageAdapter.TYPE_OUTGOING,
+                                                ((GlobalApplication) getApplication()).getPictureSend(), 3));
                                 break;
                         }
                     }
@@ -429,6 +436,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_INCOMING, commonMethod
                                                 .toSpannableString(MessageActivity.this, emoticonId), 1));
+                                break;
+                            case CommonValue.AHIHI_KEY_PICTURE:
+                                messageAdapter.addMessage(messageAdapter.getCount(), new
+                                        MessageItem(MessageAdapter.TYPE_INCOMING, SpannableString
+                                        .valueOf(content), 3));
                                 break;
                         }
                     }

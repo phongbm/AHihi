@@ -22,7 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,8 +46,6 @@ import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.image.ImageActivity;
 import com.phongbm.loginsignup.MainFragment;
-import com.phongbm.message.MessagesLogDBManager;
-import com.phongbm.message.MessagesLogItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements
     private CircleImageView imgAvatar;
     private FloatingActionButton btnAction;
     private CallLogsDBManager callLogsDBManager;
-    private MessagesLogDBManager messagesLogDBManager;
+    // private MessagesLogDBManager messagesLogDBManager;
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements
         this.initializeProfileInformation();
         this.startService();
         callLogsDBManager = new CallLogsDBManager(this);
-        messagesLogDBManager = new MessagesLogDBManager(this);
+        // messagesLogDBManager = new MessagesLogDBManager(this);
     }
 
     private void initializeToolbar() {
@@ -304,12 +302,8 @@ public class MainActivity extends AppCompatActivity implements
                 startActivitySetAvatar();
                 break;
             case R.id.btnAction:
-                /*Intent intent = new Intent(this, DetailActivity.class);
-                this.startActivity(intent);*/
-                ArrayList<MessagesLogItem> messagesLogItems = messagesLogDBManager.getData();
-                for (int i = 0; i < messagesLogItems.size(); i++) {
-                    Log.i(TAG, messagesLogItems.get(i).getMessage());
-                }
+                Intent intent = new Intent(this, DetailActivity.class);
+                this.startActivity(intent);
                 break;
         }
     }
@@ -399,6 +393,15 @@ public class MainActivity extends AppCompatActivity implements
                     break;
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(Gravity.START)) {
+            drawerLayout.closeDrawers();
+            return;
+        }
+        super.onBackPressed();
     }
 
 }

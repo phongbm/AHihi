@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    android:paddingBottom="1dp"
+    android:paddingBottom="2dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp">
 
@@ -29,6 +29,18 @@
             android:layout_alignParentTop="true"
             android:src="@drawable/ic_avatar_default" />
 
+        <com.phongbm.libs.TriangleShapeView
+            android:id="@+id/imgTriangel"
+            direction="right"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/transparent" />
+
         <TextView
             android:id="@+id/txtMessage"
             android:layout_width="wrap_content"
@@ -41,6 +53,7 @@
             android:background="@drawable/bg_message_incoming"
             android:gravity="center_vertical"
             android:minHeight="36dp"
+            android:minWidth="128dp"
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -49,17 +62,26 @@
             android:textSize="16sp"
             android:textStyle="normal" />
 
-        <com.phongbm.libs.TriangleShapeView
-            android:id="@+id/imgTriangel"
-            direction="right"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+        <LinearLayout
+            android:id="@+id/layoutPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@android:color/transparent" />
+            android:layout_marginEnd="42dp"
+            android:layout_marginRight="42dp"
+            android:background="@drawable/bg_message_incoming"
+            android:padding="8dp"
+            android:visibility="gone">
+
+            <com.phongbm.libs.SquareImageView
+                android:id="@+id/imgPicture"
+                android:layout_width="192dp"
+                android:layout_height="192dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/wallpaper_1" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -22,6 +23,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hudomju.swipe.SwipeToDismissTouchListener;
+import com.hudomju.swipe.adapter.ListViewAdapter;
 import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.OnShowPopupMenu;
@@ -30,8 +33,7 @@ import com.phongbm.message.MessageActivity;
 import java.util.Collections;
 
 @SuppressLint("ValidFragment")
-public class TabFriendFragment extends Fragment implements AdapterView.OnItemClickListener,
-        View.OnClickListener, OnShowPopupMenu {
+public class TabFriendFragment extends Fragment implements View.OnClickListener, OnShowPopupMenu {
     private static final String TAG = "TabFriendFragment";
 
     private View view;
@@ -42,6 +44,8 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     private Switch switchOnline;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
     private boolean activeFriendAdapterVisible = true;
+    private SwipeToDismissTouchListener<ListViewAdapter> touchListener;
+    private Context context;
 
     private Handler handler = new Handler() {
         @Override
@@ -67,6 +71,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
+        context = this.getActivity();
         allFriendAdapter = new AllFriendAdapter(this.getActivity(), handler);
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
         allFriendAdapter.setOnShowPopupMenu(this);
@@ -81,7 +86,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
 
     private void initializeComponent() {
         listViewFriend = (ListView) view.findViewById(R.id.listViewFriend);
-        listViewFriend.setOnItemClickListener(this);
+        // listViewFriend.setOnItemClickListener(this);
         btnTabActive = (TextView) view.findViewById(R.id.btnTabActive);
         btnTabActive.setOnClickListener(this);
         btnTabAllFriends = (TextView) view.findViewById(R.id.btnTabAllFriends);
@@ -91,11 +96,45 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Toast.makeText(TabFriendFragment.this.getActivity(), "ON",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "ON", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(TabFriendFragment.this.getActivity(), "OFF",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "OFF", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        touchListener = new SwipeToDismissTouchListener<>(new ListViewAdapter(listViewFriend),
+                new SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter>() {
+                    @Override
+                    public boolean canDismiss(int position) {
+                        return true;
+                    }
+
+                    @Override
+                    public void onDismiss(ListViewAdapter view, int position) {
+                        Toast.makeText(context, "onDismiss...", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        listViewFriend.setOnTouchListener(touchListener);
+        listViewFriend.setOnScrollListener((AbsListView.OnScrollListener) touchListener.makeScrollListener());
+        listViewFriend.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (touchListener.existPendingDismisses()) {
+                    touchListener.undoPendingDismiss();
+                } else {
+                    String inComingId, inComingFullName;
+                    if (activeFriendAdapterVisible) {
+                        inComingId = activeFriendAdapter.getItem(position).getId();
+                        inComingFullName = activeFriendAdapter.getItem(position).getFullName();
+                    } else {
+                        inComingId = allFriendAdapter.getItem(position).getId();
+                        inComingFullName = allFriendAdapter.getItem(position).getFullName();
+                    }
+                    Intent intentChat = new Intent(context, MessageActivity.class);
+                    intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
+                    intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
+                    context.startActivity(intentChat);
                 }
             }
         });
@@ -108,7 +147,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
     }
 
 
-    @Override
+    /*@Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String inComingId, inComingFullName;
         if (activeFriendAdapterVisible) {
@@ -123,7 +162,7 @@ public class TabFriendFragment extends Fragment implements AdapterView.OnItemCli
         intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
         this.getActivity().startActivity(intentChat);
     }
-
+*/
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
