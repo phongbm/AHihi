@@ -44,8 +44,8 @@ import java.util.List;
 public class AHihiService extends Service implements SinchClientListener {
     private static final String TAG = "AHihiService";
 
-    private static final int WITH_SENDER_IMAGE_MAX = 600;
-    private static final int HEIGHT_SEND_IMAGE_MAX = 800;
+    private static final int WIDTH_IMAGE_MAX = 600;
+    private static final int HEIGHT_IMAGE_MAX = 800;
 
     private Context context;
     private SinchClient sinchClient;
@@ -439,9 +439,9 @@ public class AHihiService extends Service implements SinchClientListener {
         if (messageClient == null) {
             return;
         }
-        final Bitmap bitmapSend = this.createSenderBitmap(pathPicture);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        boolean isChangeByte = bitmapSend.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
+        final Bitmap[] bitmapSend = {this.createSenderBitmap(pathPicture)};
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        boolean isChangeByte = bitmapSend[0].compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
         if (!isChangeByte) {
             Toast.makeText(AHihiService.this, "Send image not success!!!", Toast.LENGTH_SHORT).show();
             return;
@@ -474,7 +474,8 @@ public class AHihiService extends Service implements SinchClientListener {
                         new Handler().post(new Runnable() {
                             @Override
                             public void run() {
-                                ((GlobalApplication) getApplication()).setPictureSend(bitmapSend);
+                                bitmapSend[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                ((GlobalApplication) getApplication()).setPictureSend(bitmapSend[0]);
                             }
                         });
                         WritableMessage message = new WritableMessage(id, content);
@@ -494,12 +495,15 @@ public class AHihiService extends Service implements SinchClientListener {
         Bitmap bitmapSend = null;
         try {
             bitmapSend = BitmapFactory.decodeFile(path);
-            if (bitmapSend.getWidth() > WITH_SENDER_IMAGE_MAX
-                    || bitmapSend.getHeight() > HEIGHT_SEND_IMAGE_MAX) {
+            if (bitmapSend.getWidth() > WIDTH_IMAGE_MAX
+                    || bitmapSend.getHeight() > HEIGHT_IMAGE_MAX) {
                 Pair<Integer, Integer> pair = CommonMethod.getInstance()
                         .getStandSizeBitmap(bitmapSend.getWidth(), bitmapSend.getHeight(),
-                                WITH_SENDER_IMAGE_MAX, HEIGHT_SEND_IMAGE_MAX);
+                                WIDTH_IMAGE_MAX, HEIGHT_IMAGE_MAX);
                 bitmapSend = Bitmap.createScaledBitmap(bitmapSend, pair.first, pair.second, true);
+                /*bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
+                        pair.first, pair.second);*/
+                Toast.makeText(this, "IF ELSE", Toast.LENGTH_SHORT).show();
             }
         } catch (OutOfMemoryError e) {
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -508,9 +512,11 @@ public class AHihiService extends Service implements SinchClientListener {
             int width = options.outWidth;
             int height = options.outHeight;
             Pair<Integer, Integer> pair = CommonMethod.getInstance().getStandSizeBitmap(width,
-                    height, WITH_SENDER_IMAGE_MAX, HEIGHT_SEND_IMAGE_MAX);
-            bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
-                    pair.first, pair.second);
+                    height, WIDTH_IMAGE_MAX, HEIGHT_IMAGE_MAX);
+            bitmapSend = Bitmap.createScaledBitmap(bitmapSend, pair.first, pair.second, true);
+            /*bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
+                    pair.first, pair.second);*/
+            Toast.makeText(this, "OutOfMemoryError...", Toast.LENGTH_SHORT).show();
         }
         int orientation = CommonMethod.getInstance().getOrientation(path);
         bitmapSend = CommonMethod.getInstance().getBitmap(orientation, bitmapSend);

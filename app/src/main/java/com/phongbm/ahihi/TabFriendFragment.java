@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,10 +28,13 @@ import com.hudomju.swipe.SwipeToDismissTouchListener;
 import com.hudomju.swipe.adapter.ListViewAdapter;
 import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
 import com.phongbm.common.OnShowPopupMenu;
 import com.phongbm.message.MessageActivity;
 
 import java.util.Collections;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 @SuppressLint("ValidFragment")
 public class TabFriendFragment extends Fragment implements View.OnClickListener, OnShowPopupMenu {
@@ -41,11 +45,13 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
     private AllFriendAdapter allFriendAdapter;
     private ActiveFriendAdapter activeFriendAdapter;
     private TextView btnTabActive, btnTabAllFriends;
-    private Switch switchOnline;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
     private boolean activeFriendAdapterVisible = true;
     private SwipeToDismissTouchListener<ListViewAdapter> touchListener;
     private Context context;
+    private CircleImageView imgAvatar;
+    private TextView txtFullName, txtStatus;
+    private Switch switchOnline;
 
     private Handler handler = new Handler() {
         @Override
@@ -72,6 +78,7 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
         context = this.getActivity();
+        this.initializeProfile();
         allFriendAdapter = new AllFriendAdapter(this.getActivity(), handler);
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
         allFriendAdapter.setOnShowPopupMenu(this);
@@ -86,22 +93,11 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
 
     private void initializeComponent() {
         listViewFriend = (ListView) view.findViewById(R.id.listViewFriend);
-        // listViewFriend.setOnItemClickListener(this);
+
         btnTabActive = (TextView) view.findViewById(R.id.btnTabActive);
         btnTabActive.setOnClickListener(this);
         btnTabAllFriends = (TextView) view.findViewById(R.id.btnTabAllFriends);
         btnTabAllFriends.setOnClickListener(this);
-        switchOnline = (Switch) view.findViewById(R.id.switchOnline);
-        switchOnline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    Toast.makeText(context, "ON", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "OFF", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
 
         touchListener = new SwipeToDismissTouchListener<>(new ListViewAdapter(listViewFriend),
                 new SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter>() {
@@ -135,6 +131,30 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                     intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
                     intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                     context.startActivity(intentChat);
+                }
+            }
+        });
+    }
+
+    private void initializeProfile() {
+        imgAvatar = (CircleImageView) view.findViewById(R.id.imgAvatar);
+        imgAvatar.setImageBitmap(((GlobalApplication) this.getActivity().getApplication()).getAvatar());
+        txtFullName = (TextView) view.findViewById(R.id.txtFullName);
+        txtFullName.setText(((GlobalApplication) this.getActivity().getApplication()).getFullName());
+        txtStatus = (TextView) view.findViewById(R.id.txtStatus);
+        txtStatus.setText("ONLINE");
+        switchOnline = (Switch) view.findViewById(R.id.switchOnline);
+        switchOnline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    txtStatus.setText("ONLINE");
+                    txtStatus.setTextColor(ContextCompat.getColor(context, R.color.green_500));
+                    listViewFriend.setAdapter(activeFriendAdapter);
+                } else {
+                    txtStatus.setText("OFFLINE");
+                    txtStatus.setTextColor(Color.GRAY);
+                    listViewFriend.setAdapter(null);
                 }
             }
         });

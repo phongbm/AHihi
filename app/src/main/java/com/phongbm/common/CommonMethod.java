@@ -138,18 +138,18 @@ public class CommonMethod {
     }
 
     public Pair<Integer, Integer> getStandSizeBitmap(int width, int height,
-                                                     final int WITH_SENDER_IMAGE_MAX,
-                                                     final int HEIGHT_SEND_IMAGE_MAX) {
-        if (width < WITH_SENDER_IMAGE_MAX && height < HEIGHT_SEND_IMAGE_MAX) {
+                                                     final int WIDTH_IMAGE_MAX,
+                                                     final int HEIGHT_IMAGE_MAX) {
+        if (width < WIDTH_IMAGE_MAX && height < HEIGHT_IMAGE_MAX) {
             return null;
         }
-        if (width > WITH_SENDER_IMAGE_MAX) {
-            height = (int) ((float) (WITH_SENDER_IMAGE_MAX) / width * height);
-            width = WITH_SENDER_IMAGE_MAX;
+        if (width > WIDTH_IMAGE_MAX) {
+            height = (int) ((float) (WIDTH_IMAGE_MAX) / width * height);
+            width = WIDTH_IMAGE_MAX;
         }
-        if (height > HEIGHT_SEND_IMAGE_MAX) {
-            width = (int) ((float) (HEIGHT_SEND_IMAGE_MAX) / height * width);
-            height = HEIGHT_SEND_IMAGE_MAX;
+        if (height > HEIGHT_IMAGE_MAX) {
+            width = (int) ((float) (HEIGHT_IMAGE_MAX) / height * width);
+            height = HEIGHT_IMAGE_MAX;
         }
         return new Pair<>(width, height);
     }

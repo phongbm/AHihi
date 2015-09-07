@@ -4,25 +4,45 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
+
+        <ImageView
+            android:id="@+id/imgPicture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter" />
+
+    </RelativeLayout>
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="#50000000"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <View
-        android:id="@+id/shadow"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_below="@+id/toolbar"
-        android:background="@drawable/shadow" />
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:background="#50000000"
+        android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/imgPicture"
-        android:layout_width="match_parent"
-        android:layout_height="384dp"
-        android:layout_centerVertical="true"
-        android:scaleType="fitCenter" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="DOWNLOAD"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

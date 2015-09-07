@@ -45,6 +45,7 @@ import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.image.ImageActivity;
+import com.phongbm.loginsignup.CountryCodeActivity;
 import com.phongbm.loginsignup.MainFragment;
 
 import java.util.ArrayList;
@@ -158,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements
         ParseUser currentUser = ParseUser.getCurrentUser();
         View header = navigation.getChildAt(0);
         TextView txtName = (TextView) header.findViewById(R.id.txtName);
-        txtName.setText((String) currentUser.get("fullName"));
+        final String fullName = currentUser.getString("fullName");
+        txtName.setText(fullName);
         TextView txtEmail = (TextView) header.findViewById(R.id.txtEmail);
         txtEmail.setText(currentUser.getEmail());
 
@@ -171,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements
                         userAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         imgAvatar.setImageBitmap(userAvatar);
                         globalApplication.setAvatar(userAvatar);
+                        globalApplication.setFullName(fullName);
                     }
                 }
             });
@@ -326,7 +329,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private class AddFriendDialog extends Dialog implements android.view.View.OnClickListener {
-        private EditText edtPhoneNumber;
+        private static final int REQUEST_LOGIN_FRAGMENT = 0;
+
+        private EditText edtCode, edtPhoneNumber;
         private Button btnAddFriend;
 
         public AddFriendDialog() {
@@ -337,6 +342,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         private void initializeComponent() {
+            edtCode = (EditText) findViewById(R.id.edtCode);
+            edtCode.setOnClickListener(this);
             edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
             btnAddFriend = (Button) findViewById(R.id.btnAddFriend);
             btnAddFriend.setOnClickListener(this);
@@ -363,6 +370,10 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
+                case R.id.edtCode:
+                    Intent intent = new Intent(MainActivity.this, CountryCodeActivity.class);
+                    startActivityForResult(intent, REQUEST_LOGIN_FRAGMENT);
+                    break;
                 case R.id.btnAddFriend:
                     String phoneNumber = edtPhoneNumber.getText().toString().trim();
                     final ParseUser currentUser = ParseUser.getCurrentUser();
@@ -393,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
             }
         }
+
     }
 
     @Override

@@ -30,11 +30,6 @@ public class TabMessageFragment extends Fragment {
         messagesLogDBManager = new MessagesLogDBManager(context);
     }
 
-//    public static TabMessageFragment getInstance() {
-//        TabMessageFragment tabMessageFragment = new TabMessageFragment();
-//
-//    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

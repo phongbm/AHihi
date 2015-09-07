@@ -8,17 +8,20 @@ public class MessageItem {
     private SpannableString content;
     private int mode;
     private Bitmap picture;
+    private String date;
 
-    public MessageItem(int type, SpannableString content, int mode) {
+    public MessageItem(int type, SpannableString content, int mode, String date) {
         this.type = type;
         this.content = content;
         this.mode = mode;
+        this.date = date;
     }
 
-    public MessageItem(int type, Bitmap picture, int mode) {
+    public MessageItem(int type, SpannableString content, Bitmap picture, int mode, String date) {
         this.type = type;
         this.picture = picture;
         this.mode = mode;
+        this.date = date;
     }
 
     public int getType() {
@@ -29,7 +32,7 @@ public class MessageItem {
         return content;
     }
 
-    public void setContent(SpannableString content){
+    public void setContent(SpannableString content) {
         this.content = content;
     }
 

@@ -1,6 +1,7 @@
 package com.phongbm.message;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -22,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +38,7 @@ import com.parse.ParseUser;
 import com.parse.ProgressCallback;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.GlobalApplication;
+import com.phongbm.common.OnLoadedAvatar;
 import com.phongbm.libs.SquareImageView;
 import com.phongbm.libs.TriangleShapeView;
 
@@ -64,13 +67,22 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
     private ArrayList<MessageItem> messageItems;
     private LayoutInflater layoutInflater;
     private Bitmap outGoingMessageAvatar, inComingMessageAvatar;
-    private int typeClickListener;
+    private OnLoadedAvatar onLoadedAvatar;
+
+    public void setOnLoadedAvatar(OnLoadedAvatar onLoadedAvatar) {
+        this.onLoadedAvatar = onLoadedAvatar;
+    }
 
     public MessageAdapter(Context context, final String inComingMessageId) {
         layoutInflater = LayoutInflater.from(context);
         this.messageItems = new ArrayList<>();
         globalApplication = (GlobalApplication) context.getApplicationContext();
         outGoingMessageAvatar = globalApplication.getAvatar();
+
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
 
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.getInBackground(inComingMessageId, new GetCallback<ParseUser>() {
@@ -90,6 +102,8 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                                 return;
                             }
                             inComingMessageAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            onLoadedAvatar.onLoaded(true);
+                            progressDialog.dismiss();
                         }
                     });
                 }
@@ -185,7 +199,6 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                 viewHolder.layoutPicture.setVisibility(View.GONE);
                 break;
             case TYPE_FILE:
-                typeClickListener = TYPE_FILE;
                 viewHolder.txtMessage.setVisibility(View.VISIBLE);
                 viewHolder.layoutPicture.setVisibility(View.GONE);
                 viewHolder.txtMessage.setOnClickListener(this);
@@ -208,7 +221,6 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                 viewHolder.txtMessage.setTag(objectId);
                 break;
             case TYPE_PICTURE:
-                typeClickListener = TYPE_PICTURE;
                 viewHolder.txtMessage.setVisibility(View.GONE);
                 viewHolder.layoutPicture.setVisibility(View.VISIBLE);
                 viewHolder.imgPicture.setOnClickListener(this);
@@ -217,7 +229,9 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                     Drawable drawable = viewHolder.imgPicture.getDrawable();
                     if (drawable != null && drawable instanceof AsyncDrawable) {
                         PictureAsyncTask pictureAsyncTask = ((AsyncDrawable) drawable).getLoadImageMessage();
-                        if (pictureAsyncTask != null) pictureAsyncTask.cancel(true);
+                        if (pictureAsyncTask != null) {
+                            pictureAsyncTask.cancel(true);
+                        }
                     }
                     viewHolder.imgPicture.setImageBitmap(messageItems.get(position).getPicture());
                 } else {
@@ -246,7 +260,15 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
 
     @Override
     public void onClick(final View view) {
-        switch (typeClickListener) {
+        int type = -1;
+        if (view instanceof TextView) {
+            type = TYPE_FILE;
+        } else {
+            if (view instanceof ImageView) {
+                type = TYPE_PICTURE;
+            }
+        }
+        switch (type) {
             case TYPE_FILE:
                 final AlertDialog alertDialog = new AlertDialog.Builder(view.getContext()).create();
                 alertDialog.setTitle("Confirm");
