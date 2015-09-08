@@ -2,7 +2,7 @@ package com.phongbm.ahihi;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,20 +20,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -45,11 +40,9 @@ import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.image.ImageActivity;
-import com.phongbm.loginsignup.CountryCodeActivity;
 import com.phongbm.loginsignup.MainFragment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -57,6 +50,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private static final String TAG = "MainActivity";
+    private static final int REQUEST_ADDITION_FRIEND = 0;
 
     private GlobalApplication globalApplication;
     private Toolbar toolbar;
@@ -156,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initializeProfileInformation() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
         View header = navigation.getChildAt(0);
         TextView txtName = (TextView) header.findViewById(R.id.txtName);
         final String fullName = currentUser.getString("fullName");
@@ -174,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements
                         imgAvatar.setImageBitmap(userAvatar);
                         globalApplication.setAvatar(userAvatar);
                         globalApplication.setFullName(fullName);
+                        globalApplication.setPhoneNumber(currentUser.getUsername());
                     }
                 }
             });
@@ -249,9 +244,8 @@ public class MainActivity extends AppCompatActivity implements
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_add_user:
-                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-                AddFriendDialog addFriendDialog = new AddFriendDialog();
-                addFriendDialog.show();
+                Intent intentAdditionFriend = new Intent(MainActivity.this, AdditionFriend.class);
+                MainActivity.this.startActivityForResult(intentAdditionFriend, REQUEST_ADDITION_FRIEND);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -319,92 +313,64 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CommonValue.REQUECODE_SET_AVATAR && resultCode == Activity.RESULT_OK) {
-            byte[] bytes = data.getByteArrayExtra(CommonValue.BYTE_AVATAR);
-            Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            CommonMethod.uploadAvatar(ParseUser.getCurrentUser(), avatar);
-            imgAvatar.setImageBitmap(avatar);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private class AddFriendDialog extends Dialog implements android.view.View.OnClickListener {
-        private static final int REQUEST_LOGIN_FRAGMENT = 0;
-
-        private EditText edtCode, edtPhoneNumber;
-        private Button btnAddFriend;
-
-        public AddFriendDialog() {
-            super(MainActivity.this);
-            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.setContentView(R.layout.dialog_addfriend);
-            this.initializeComponent();
-        }
-
-        private void initializeComponent() {
-            edtCode = (EditText) findViewById(R.id.edtCode);
-            edtCode.setOnClickListener(this);
-            edtPhoneNumber = (EditText) findViewById(R.id.edtPhoneNumber);
-            btnAddFriend = (Button) findViewById(R.id.btnAddFriend);
-            btnAddFriend.setOnClickListener(this);
-            edtPhoneNumber.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (s != null && s.length() > 0) {
-                        btnAddFriend.setEnabled(true);
-                    } else {
-                        btnAddFriend.setEnabled(false);
-                    }
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                }
-            });
-        }
-
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.edtCode:
-                    Intent intent = new Intent(MainActivity.this, CountryCodeActivity.class);
-                    startActivityForResult(intent, REQUEST_LOGIN_FRAGMENT);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case CommonValue.REQUECODE_SET_AVATAR:
+                    byte[] bytes = data.getByteArrayExtra(CommonValue.BYTE_AVATAR);
+                    Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    CommonMethod.uploadAvatar(ParseUser.getCurrentUser(), avatar);
+                    imgAvatar.setImageBitmap(avatar);
+                    ((GlobalApplication) MainActivity.this.getApplication()).setAvatar(avatar);
                     break;
-                case R.id.btnAddFriend:
-                    String phoneNumber = edtPhoneNumber.getText().toString().trim();
+                case REQUEST_ADDITION_FRIEND:
+                    if (data == null) {
+                        return;
+                    }
+                    String phoneNumber = data.getStringExtra("PHONE_NUMBER");
+                    if (phoneNumber.equals(((GlobalApplication) this.getApplication())
+                            .getPhoneNumber())) {
+                        Toast.makeText(MainActivity.this, "You can not make friends with yourself",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    final ProgressDialog progressDialog = new ProgressDialog(this);
+                    progressDialog.setTitle("Addition Friend");
+                    progressDialog.setMessage("Please wait...");
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.show();
+
                     final ParseUser currentUser = ParseUser.getCurrentUser();
                     ParseQuery<ParseUser> query = ParseUser.getQuery();
                     query.whereEqualTo("username", phoneNumber);
-                    query.findInBackground(new FindCallback<ParseUser>() {
+                    query.getFirstInBackground(new GetCallback<ParseUser>() {
                         @Override
-                        public void done(List<ParseUser> list, ParseException e) {
-                            if (e == null) {
-                                if (list.size() == 0) {
-                                    Toast.makeText(MainActivity.this, "That account does not exist",
-                                            Toast.LENGTH_SHORT).show();
-                                    AddFriendDialog.this.dismiss();
-                                    return;
-                                }
-                                ArrayList<String> listFriend = (ArrayList<String>)
-                                        currentUser.get("listFriend");
-                                if (listFriend == null)
-                                    listFriend = new ArrayList<String>();
-                                listFriend.add(list.get(0).getObjectId());
-                                currentUser.put("listFriend", listFriend);
-                                currentUser.saveInBackground();
-                                createNewFriend(list.get(0));
-                                AddFriendDialog.this.dismiss();
+                        public void done(ParseUser parseUser, ParseException e) {
+                            if (e != null) {
+                                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                                progressDialog.dismiss();
+                                return;
                             }
+                            if (parseUser == null) {
+                                Toast.makeText(MainActivity.this, "That account does not exist",
+                                        Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                                return;
+                            }
+                            ArrayList<String> listFriend = (ArrayList<String>) currentUser.get("listFriend");
+                            if (listFriend == null)
+                                listFriend = new ArrayList<String>();
+                            listFriend.add(parseUser.getObjectId());
+                            currentUser.put("listFriend", listFriend);
+                            currentUser.saveInBackground();
+                            createNewFriend(parseUser);
+                            progressDialog.dismiss();
                         }
                     });
                     break;
             }
         }
-
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

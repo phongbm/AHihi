@@ -12,7 +12,7 @@ public class GlobalApplication extends Application {
     public static int WIDTH_SCREEN, HEIGHT_SCREEN;
 
     private Bitmap avatar;
-    private String fullName;
+    private String fullName, phoneNumber;
     private Bitmap pictureSend;
 
     @Override
@@ -45,6 +45,14 @@ public class GlobalApplication extends Application {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public Bitmap getPictureSend() {

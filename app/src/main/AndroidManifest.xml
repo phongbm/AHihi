@@ -74,6 +74,10 @@
             android:label="@string/activity_country_codes"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
+            android:name="com.phongbm.ahihi.AdditionFriend"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity
             android:name="com.phongbm.message.PictureActivity"
             android:label="@string/activity_picture" />
 

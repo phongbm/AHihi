@@ -78,7 +78,6 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
         context = this.getActivity();
-        this.initializeProfile();
         allFriendAdapter = new AllFriendAdapter(this.getActivity(), handler);
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
         allFriendAdapter.setOnShowPopupMenu(this);
@@ -88,6 +87,7 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.initializeProfile();
         return view;
     }
 
