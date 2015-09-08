@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.libs.SquareImageView;
 
@@ -61,6 +62,8 @@ public class EmoticonAdapter extends BaseAdapter {
                 intentEmoticon.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
                 intentEmoticon.putExtra(CommonValue.MESSAGE_CONTENT, "" + emoticonId);
                 intentEmoticon.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_EMOTICON);
+                intentEmoticon.putExtra(CommonValue.AHIHI_KEY_DATE,
+                        CommonMethod.getInstance().getMessageDate());
                 parent.getContext().sendBroadcast(intentEmoticon);
             }
         });

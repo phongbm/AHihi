@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class CommonMethod {
@@ -79,7 +80,12 @@ public class CommonMethod {
     }
 
     public String getCurrentDateTime() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", Locale.US);
+        return simpleDateFormat.format(Calendar.getInstance().getTime());
+    }
+
+    public String getMessageDate() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.US);
         return simpleDateFormat.format(Calendar.getInstance().getTime());
     }
 

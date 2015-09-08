@@ -19,6 +19,7 @@ public class MessageItem {
 
     public MessageItem(int type, SpannableString content, Bitmap picture, int mode, String date) {
         this.type = type;
+        this.content = content;
         this.picture = picture;
         this.mode = mode;
         this.date = date;
@@ -46,6 +47,10 @@ public class MessageItem {
 
     public void setPicture(Bitmap picture) {
         this.picture = picture;
+    }
+
+    public String getDate() {
+        return date;
     }
 
 }

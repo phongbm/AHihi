@@ -34,6 +34,7 @@ public class CommonValue {
     public static final String AHIHI_KEY_EMOTICON = "AHIHI_KEY_EMO_";
     public static final String AHIHI_KEY_FILE = "AHIHI_KEY_FIL_";
     public static final String AHIHI_KEY_PICTURE = "AHIHI_KEY_PIC_";
+    public static final String AHIHI_KEY_DATE = "AHIHI_KEY_DATE";
 
     public static final String URL_IMAGE = "URL_IMAGE";
     public static final String X_IMAGE = "X_IMAGE";

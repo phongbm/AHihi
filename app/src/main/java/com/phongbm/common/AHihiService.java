@@ -56,6 +56,8 @@ public class AHihiService extends Service implements SinchClientListener {
     private MessageListener messageListener;
     private MessageClient messageClient;
     // private MessagesLogDBManager messagesLogDBManager;
+    private CommonMethod commonMethod;
+    private String date;
 
     @Override
     public void onCreate() {
@@ -66,6 +68,7 @@ public class AHihiService extends Service implements SinchClientListener {
         // messagesLogDBManager = new MessagesLogDBManager(this);
         // messagesLogDBManager.getData();
         this.registerBroadcast();
+        commonMethod = CommonMethod.getInstance();
     }
 
     @Override
@@ -199,6 +202,7 @@ public class AHihiService extends Service implements SinchClientListener {
             String content = message.getTextBody();
             Intent intentIncoming = new Intent();
             intentIncoming.setAction(CommonValue.STATE_MESSAGE_INCOMING);
+            intentIncoming.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
             if (!content.contains(CommonValue.AHIHI_KEY)) {
                 intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 AHihiService.this.sendBroadcast(intentIncoming);
@@ -215,6 +219,7 @@ public class AHihiService extends Service implements SinchClientListener {
                         break;
                 }
             }
+
             /*final String c = content;
             final String senderId = message.getSenderId();
             ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
@@ -236,11 +241,12 @@ public class AHihiService extends Service implements SinchClientListener {
         }
 
         @Override
-        public void onMessageSent(MessageClient messageClient, Message message, String s) {
+        public void onMessageSent(MessageClient messageClient, final Message message, String s) {
             Toast.makeText(AHihiService.this, "onMessageSent...", Toast.LENGTH_SHORT).show();
             String content = message.getTextBody();
             Intent intentSent = new Intent();
             intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
+            intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, date);
             if (!content.contains(CommonValue.AHIHI_KEY)) {
                 intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 AHihiService.this.sendBroadcast(intentSent);
@@ -329,19 +335,20 @@ public class AHihiService extends Service implements SinchClientListener {
                 case CommonValue.ACTION_SEND_MESSAGE:
                     String id = intent.getStringExtra(CommonValue.INCOMING_MESSAGE_ID);
                     String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
+                    date = intent.getStringExtra(CommonValue.AHIHI_KEY_DATE);
                     if (intent.getStringExtra(CommonValue.AHIHI_KEY) == null) {
-                        AHihiService.this.sendMessage(id, content);
+                        AHihiService.this.sendMessage(id, content, date);
                     } else {
                         switch (intent.getStringExtra(CommonValue.AHIHI_KEY)) {
                             case CommonValue.AHIHI_KEY_EMOTICON:
                                 content = CommonValue.AHIHI_KEY_EMOTICON + content;
-                                AHihiService.this.sendMessage(id, content);
+                                AHihiService.this.sendMessage(id, content, date);
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
-                                AHihiService.this.sendFile(id, content);
+                                AHihiService.this.sendFile(id, content, date);
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
-                                AHihiService.this.sendPicture(id, content);
+                                AHihiService.this.sendPicture(id, content, date);
                                 break;
                         }
                     }
@@ -350,11 +357,12 @@ public class AHihiService extends Service implements SinchClientListener {
         }
     }
 
-    private synchronized void sendMessage(final String id, final String content) {
+    private synchronized void sendMessage(final String id, final String content, String date) {
         ParseObject message = new ParseObject("Message");
         message.put("senderId", outGoingId);
         message.put("receiverId", id);
         message.put("content", content);
+        message.put("date", date);
         message.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -368,7 +376,7 @@ public class AHihiService extends Service implements SinchClientListener {
         });
     }
 
-    private synchronized void sendFile(final String id, final String path) {
+    private synchronized void sendFile(final String id, final String path, final String date) {
         if (messageClient == null) {
             return;
         }
@@ -410,6 +418,7 @@ public class AHihiService extends Service implements SinchClientListener {
                                     final String content = CommonValue.AHIHI_KEY_FILE +
                                             parseObject.getObjectId();
                                     parseObject.put("content", content + "/" + fileName);
+                                    parseObject.put("date", date);
                                     parseObject.saveInBackground(new SaveCallback() {
                                         @Override
                                         public void done(ParseException e) {
@@ -435,7 +444,7 @@ public class AHihiService extends Service implements SinchClientListener {
         });
     }
 
-    private synchronized void sendPicture(final String id, final String pathPicture) {
+    private synchronized void sendPicture(final String id, final String pathPicture, final String date) {
         if (messageClient == null) {
             return;
         }
@@ -462,6 +471,7 @@ public class AHihiService extends Service implements SinchClientListener {
                 parseObject.put("receiverId", id);
                 final String content = CommonValue.AHIHI_KEY_PICTURE + parseFile.getUrl();
                 parseObject.put("content", content);
+                parseObject.put("date", date);
                 parseObject.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {

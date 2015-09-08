@@ -256,10 +256,10 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                         type = MessageAdapter.TYPE_OUTGOING;
                     }
                     String content = message.getString("content");
-                    String date = message.getString("");
+                    String date = message.getString("date");
                     if (!content.contains(CommonValue.AHIHI_KEY)) {
                         messageAdapter.addMessage(0, new MessageItem(type,
-                                SpannableString.valueOf(content), 0, ""));
+                                SpannableString.valueOf(content), 0, date));
                     } else {
                         String key = content.substring(0, CommonValue.KEY_LENGTH + 1);
                         content = content.substring(CommonValue.KEY_LENGTH + 1);
@@ -268,15 +268,15 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 int emoticonId = Integer.parseInt(content);
                                 SpannableString emoticon = commonMethod.toSpannableString(
                                         MessageActivity.this, emoticonId);
-                                messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1, ""));
+                                messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1, date));
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
                                 messageAdapter.addMessage(0, new MessageItem(type,
-                                        SpannableString.valueOf(content), 2, ""));
+                                        SpannableString.valueOf(content), 2, date));
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
                                 messageAdapter.addMessage(0, new MessageItem(type,
-                                        SpannableString.valueOf(content), 3, ""));
+                                        SpannableString.valueOf(content), 3, date));
                                 break;
                         }
 
@@ -303,6 +303,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 intentSend.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentSend.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
                 intentSend.putExtra(CommonValue.MESSAGE_CONTENT, content);
+                intentSend.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
                 MessageActivity.this.sendBroadcast(intentSend);
                 break;
             case R.id.imgEmoticon:
@@ -382,12 +383,13 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         switch (requestCode) {
             case REQUEST_ATTACH:
                 String pathFile = data.getData().getPath();
-                Intent intentSend = new Intent();
-                intentSend.setAction(CommonValue.ACTION_SEND_MESSAGE);
-                intentSend.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
-                intentSend.putExtra(CommonValue.MESSAGE_CONTENT, pathFile);
-                intentSend.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_FILE);
-                MessageActivity.this.sendBroadcast(intentSend);
+                Intent intentAttach = new Intent();
+                intentAttach.setAction(CommonValue.ACTION_SEND_MESSAGE);
+                intentAttach.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentAttach.putExtra(CommonValue.MESSAGE_CONTENT, pathFile);
+                intentAttach.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_FILE);
+                intentAttach.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
+                MessageActivity.this.sendBroadcast(intentAttach);
                 break;
             case REQUEST_PICTURE:
                 String pathPicture = this.getPathFromUri(data.getData());
@@ -396,6 +398,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 intentPicture.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
                 intentPicture.putExtra(CommonValue.MESSAGE_CONTENT, pathPicture);
                 intentPicture.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_PICTURE);
+                intentPicture.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
                 MessageActivity.this.sendBroadcast(intentPicture);
                 break;
             case REQUEST_CAMERA:
@@ -410,6 +413,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 intentCamera.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
                 intentCamera.putExtra(CommonValue.MESSAGE_CONTENT, capturedImageFilePath);
                 intentCamera.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_PICTURE);
+                intentCamera.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
                 MessageActivity.this.sendBroadcast(intentCamera);
                 break;
         }
@@ -433,10 +437,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             switch (intent.getAction()) {
                 case CommonValue.STATE_MESSAGE_SENT:
                     String key = intent.getStringExtra(CommonValue.AHIHI_KEY);
+                    String dateSend = intent.getStringExtra(CommonValue.AHIHI_KEY_DATE);
                     if (key == null) {
                         messageAdapter.addMessage(messageAdapter.getCount(), new MessageItem(
                                 MessageAdapter.TYPE_OUTGOING, SpannableString.valueOf(intent
-                                .getStringExtra(CommonValue.MESSAGE_CONTENT)), 0, ""));
+                                .getStringExtra(CommonValue.MESSAGE_CONTENT)), 0, dateSend));
                     } else {
                         String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
                         switch (key) {
@@ -445,29 +450,31 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_OUTGOING, commonMethod
                                                 .toSpannableString(MessageActivity.this, emoticonId),
-                                                1, ""));
+                                                1, dateSend));
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_OUTGOING, SpannableString
-                                                .valueOf(content), 2, ""));
+                                                .valueOf(content), 2, dateSend));
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_OUTGOING,
                                                 SpannableString.valueOf(content),
                                                 ((GlobalApplication) getApplication()).getPictureSend(),
-                                                3, ""));
+                                                3, dateSend));
                                 break;
                         }
                     }
                     break;
                 case CommonValue.STATE_MESSAGE_INCOMING:
                     String keyIncoming = intent.getStringExtra(CommonValue.AHIHI_KEY);
+                    String dateReceive = intent.getStringExtra(CommonValue.AHIHI_KEY_DATE);
                     if (keyIncoming == null) {
                         messageAdapter.addMessage(messageAdapter.getCount(),
                                 new MessageItem(MessageAdapter.TYPE_INCOMING, SpannableString
-                                        .valueOf(intent.getStringExtra(CommonValue.MESSAGE_CONTENT)), 0, ""));
+                                        .valueOf(intent.getStringExtra(CommonValue.MESSAGE_CONTENT)),
+                                        0, dateReceive));
                     } else {
                         String content = intent.getStringExtra(CommonValue.MESSAGE_CONTENT);
                         switch (keyIncoming) {
@@ -475,17 +482,18 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 int emoticonId = Integer.parseInt(content);
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_INCOMING, commonMethod
-                                                .toSpannableString(MessageActivity.this, emoticonId), 1, ""));
+                                                .toSpannableString(MessageActivity.this, emoticonId),
+                                                1, dateReceive));
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
                                 messageAdapter.addMessage(messageAdapter.getCount(),
                                         new MessageItem(MessageAdapter.TYPE_INCOMING, SpannableString
-                                                .valueOf(content), 2, ""));
+                                                .valueOf(content), 2, dateReceive));
                                 break;
                             case CommonValue.AHIHI_KEY_PICTURE:
                                 messageAdapter.addMessage(messageAdapter.getCount(), new
                                         MessageItem(MessageAdapter.TYPE_INCOMING, SpannableString
-                                        .valueOf(content), 3, ""));
+                                        .valueOf(content), 3, dateReceive));
                                 break;
                         }
                     }

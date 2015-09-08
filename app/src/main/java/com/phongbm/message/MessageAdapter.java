@@ -157,6 +157,7 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
             viewHolder.txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
             viewHolder.layoutPicture = (LinearLayout) convertView.findViewById(R.id.layoutPicture);
             viewHolder.imgPicture = (SquareImageView) convertView.findViewById(R.id.imgPicture);
+            viewHolder.txtDate = (TextView) convertView.findViewById(R.id.txtDate);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -175,10 +176,12 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
         if (position == 0 && messageItems.get(0).getMode() == TYPE_EMOTICON) {
             viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
         }
-        if (position > 0 && (type == TYPE_OUTGOING && typePre == TYPE_OUTGOING)
-                || (type == TYPE_INCOMING && typePre == TYPE_INCOMING)) {
-            viewHolder.imgAvatar.setImageResource(R.drawable.ic_transparent);
-            viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
+        if (position > 0) {
+            if ((type == TYPE_OUTGOING && typePre == TYPE_OUTGOING)
+                    || (type == TYPE_INCOMING && typePre == TYPE_INCOMING)) {
+                viewHolder.imgAvatar.setImageResource(R.drawable.ic_transparent);
+                viewHolder.imgTriangel.setBackgroundColor(Color.parseColor("#00000000"));
+            }
         }
         if ((type == TYPE_OUTGOING && typePre == TYPE_INCOMING)
                 || (type == TYPE_INCOMING && typePre == TYPE_OUTGOING)) {
@@ -240,6 +243,7 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                 }
 
                 viewHolder.imgPicture.setTag(messageItems.get(position).getContent());
+                Log.i(TAG, "setTag...");
                 break;
         }
 
@@ -255,6 +259,21 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                     break;
             }
         }
+
+        viewHolder.txtDate.setText(messageItems.get(position).getDate());
+        if (position == messageItems.size() - 1) {
+            viewHolder.txtDate.setVisibility(View.VISIBLE);
+        } else {
+            if (getItemViewType(position) == TYPE_OUTGOING
+                    && getItemViewType(position + 1) == TYPE_INCOMING
+                    || getItemViewType(position) == TYPE_INCOMING
+                    && getItemViewType(position + 1) == TYPE_OUTGOING) {
+                viewHolder.txtDate.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.txtDate.setVisibility(View.GONE);
+            }
+        }
+
         return convertView;
     }
 
@@ -348,9 +367,23 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                 alertDialog.show();
                 break;
             case TYPE_PICTURE:
+                if (view == null) {
+                    Log.i(TAG, "View NULL");
+                    return;
+                }
+                SpannableString spannableString = (SpannableString) view.getTag();
+                if (spannableString == null) {
+                    Log.i(TAG, "NULL SpannableString");
+                    return;
+                }
                 String url = ((SpannableString) view.getTag()).toString();
-                PictureActivity.launch((MessageActivity) view.getContext(),
-                        view.findViewById(R.id.imgPicture), url);
+                Log.i(TAG, url);
+                if (url != null) {
+                    PictureActivity.launch((MessageActivity) view.getContext(),
+                            view.findViewById(R.id.imgPicture), url);
+                } else {
+                    Log.i(TAG, "NULL");
+                }
                 break;
         }
     }
@@ -359,7 +392,7 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
         View space;
         TriangleShapeView imgTriangel;
         CircleImageView imgAvatar;
-        TextView txtMessage;
+        TextView txtMessage, txtDate;
         LinearLayout layoutPicture;
         SquareImageView imgPicture;
     }
