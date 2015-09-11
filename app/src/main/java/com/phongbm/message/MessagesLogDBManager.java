@@ -24,11 +24,11 @@ public class MessagesLogDBManager {
 
     private Context context;
     private SQLiteDatabase sqLiteDatabase;
-    private ArrayList<String> ids;
+    // private ArrayList<String> ids;
 
     public MessagesLogDBManager(Context context) {
         this.context = context;
-        ids = new ArrayList<String>();
+        // ids = new ArrayList<>();
         this.copyDatabaseFile();
     }
 
@@ -85,11 +85,23 @@ public class MessagesLogDBManager {
         sqLiteDatabase.delete(DATA_NAME, "id=?", new String[]{id});
     }
 
+    public boolean conversationExist(String id) {
+        this.openDatabase();
+        Cursor cursor = sqLiteDatabase.query(DATA_NAME, null, "id=?", new String[]{id}, null, null, null);
+        if (cursor.getCount() <= 0) {
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
+    }
+
     public ArrayList<MessagesLogItem> getData() {
         this.openDatabase();
         ArrayList<MessagesLogItem> messagesLogItems = new ArrayList<>();
-        int indexId, indexFullName, indexMessage, indexDate;
+        int indexId, indexFullName, indexMessage, indexDate, indexIsRead;
         String id, fullName, message, date;
+        boolean isRead;
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Messages", null);
         if (cursor == null)
             return null;
@@ -98,13 +110,15 @@ public class MessagesLogDBManager {
         indexFullName = cursor.getColumnIndex("fullName");
         indexMessage = cursor.getColumnIndex("message");
         indexDate = cursor.getColumnIndex("date");
+        indexIsRead = cursor.getColumnIndex("isRead");
         while (!cursor.isAfterLast()) {
             id = cursor.getString(indexId);
             fullName = cursor.getString(indexFullName);
             message = cursor.getString(indexMessage);
             date = cursor.getString(indexDate);
-            messagesLogItems.add(0, new MessagesLogItem(id, fullName, message, date));
-            ids.add(id);
+            isRead = Boolean.parseBoolean(cursor.getString(indexIsRead));
+            // ids.add(id);
+            messagesLogItems.add(new MessagesLogItem(id, fullName, message, date, isRead));
             cursor.moveToNext();
         }
         cursor.close();
@@ -115,11 +129,11 @@ public class MessagesLogDBManager {
         sqLiteDatabase.execSQL("DELETE FROM Messages");
     }
 
-    public boolean checkMessagesLogExists(String id) {
+    /*public boolean checkMessagesLogExists(String id) {
         if (ids.indexOf(id) != -1) {
             return true;
         }
         return false;
-    }
+    }*/
 
 }

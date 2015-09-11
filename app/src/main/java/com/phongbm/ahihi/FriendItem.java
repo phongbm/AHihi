@@ -6,6 +6,9 @@ public class FriendItem {
     private String id, fullName, phoneNumber;
     private Bitmap avatar;
 
+    public FriendItem() {
+    }
+
     public FriendItem(String id, Bitmap avatar, String phoneNumber, String fullName) {
         this.id = id;
         this.avatar = avatar;
@@ -17,16 +20,32 @@ public class FriendItem {
         return id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Bitmap getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Bitmap avatar) {
+        this.avatar = avatar;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public Bitmap getAvatar() {
-        return avatar;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
 }

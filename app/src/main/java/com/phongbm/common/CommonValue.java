@@ -11,6 +11,16 @@ public class CommonValue {
     public static final int ACTION_UPDATE_LIST_FRIEND = 6;
     public static final String ACTION_ADD_FRIEND = "ACTION_ADD_FRIEND";
 
+    public static final String RESULT_START_SERVICE = "RESULT_START_SERVICE";
+    public static final String START_FIRST_SINCH = "START_FIRST_SINCH";
+    public static final String ID_START_FIRST_SINCH = "ID_START_FIRST_SINCH";
+
+    public static final String UPDATE_MESSAGE_LOG = "UPDATE_MESSAGE_LOG";
+    public static final String MESSAGE_LOG_ID = "MESSAGE_LOG_ID";
+    public static final String MESSAGE_LOG_FULL_NAME = "MESSAGE_LOG_FULL_NAME";
+    public static final String MESSAGE_LOG_CONTENT = "MESSAGE_LOG_CONTENT";
+    public static final String MESSAGE_LOG_DATE = "MESSAGE_LOG_DATE";
+
     public static final String OUTGOING_CALL_ID = "OUTGOING_CALL_ID";
     public static final String INCOMING_CALL_ID = "INCOMING_CALL_ID";
     public static final String ACTION_OUTGOING_CALL = "ACTION_OUTGOING_CALL";

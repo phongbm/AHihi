@@ -7,25 +7,21 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonMethod;
-import com.phongbm.common.GlobalApplication;
 import com.phongbm.libs.SquareImageView;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -40,7 +36,7 @@ public class ImageAdapter extends BaseAdapter {
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         initializeListImage();
-        for ( String i : imageURLs ) {
+        for (String i : imageURLs) {
             Log.i(TAG, "uri: " + i);
         }
         initializeListImageState();
@@ -92,7 +88,15 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imgImage = (SquareImageView) convertView.getTag();
         }
-        loadBitmap(position, imageURLs.get(position), imgImage);
+        // loadBitmap(position, imageURLs.get(position), imgImage);
+        Picasso.with(parent.getContext())
+                .load(new File(imageURLs.get(position)))
+                .resize(300, 300)
+                .placeholder(R.drawable.loading_picture)
+                .error(R.drawable.ic_launcher_ahihi)
+                .centerCrop()
+                .into(imgImage);
+
         return convertView;
     }
 
@@ -156,14 +160,14 @@ public class ImageAdapter extends BaseAdapter {
                     new AsyncDrawable(this.context.getResources(), imageStates.get(position).image != null ? imageStates.get(position).image :
                             BitmapFactory.decodeResource(context.getResources(), R.drawable.download), task);
             imageView.setImageDrawable(asyncDrawable);
-            if ( imageStates.get(position).image == null ) {
+            if (imageStates.get(position).image == null) {
                 task.execute(data);
             }
         }
     }
 
     static class AsyncDrawable extends BitmapDrawable {
-        private  WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
+        private WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
 
         public AsyncDrawable(Resources res, Bitmap bitmap,
                              BitmapWorkerTask bitmapWorkerTask) {
@@ -204,6 +208,7 @@ public class ImageAdapter extends BaseAdapter {
         }
         return null;
     }
+
     class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewReference;
         private String data = "";
@@ -219,7 +224,7 @@ public class ImageAdapter extends BaseAdapter {
         @Override
         protected Bitmap doInBackground(String... params) {
             data = params[0];
-            if ( imageStates.get(this.position).image != null ) return null;
+            if (imageStates.get(this.position).image != null) return null;
             else return CommonMethod.getInstance().decodeSampledBitmapFromResource(data, 300, 300);
         }
 

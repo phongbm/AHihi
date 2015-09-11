@@ -43,6 +43,7 @@ import com.phongbm.image.ImageActivity;
 import com.phongbm.loginsignup.MainFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements
     private FloatingActionButton btnAction;
     private CallLogsDBManager callLogsDBManager;
     // private MessagesLogDBManager messagesLogDBManager;
+    private ArrayList<AllFriendItem> allFriendItems;
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
@@ -85,12 +87,43 @@ public class MainActivity extends AppCompatActivity implements
         this.startService();
         callLogsDBManager = new CallLogsDBManager(this);
         // messagesLogDBManager = new MessagesLogDBManager(this);
+        this.loadListFriend();
+    }
+
+    private void loadListFriend() {
+        allFriendItems = new ArrayList<>();
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
+        if (listFriendId == null || listFriendId.size() == 0) {
+            return;
+        }
+        for (int i = 0; i < listFriendId.size(); i++) {
+            final ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+            parseQuery.getInBackground(listFriendId.get(i), new GetCallback<ParseUser>() {
+                @Override
+                public void done(final ParseUser parseUser, ParseException e) {
+                    if (e != null) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    ParseFile parseFile = (ParseFile) parseUser.get("avatar");
+                    if (parseFile == null) {
+                        return;
+                    }
+                    allFriendItems.add(new AllFriendItem(parseUser.getObjectId(), parseFile.getUrl(),
+                            parseUser.getUsername(), parseUser.getString("fullName")));
+                    Collections.sort(allFriendItems);
+                }
+            });
+        }
     }
 
     private void initializeToolbar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
-        this.getSupportActionBar().setTitle("Messages");
+        this.getSupportActionBar().setTitle(R.string.app_name);
+        // this.getSupportActionBar().setLogo(R.drawable.ic_xxhdpi);
     }
 
     private void initializeComponent() {
@@ -125,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                MainActivity.this.getSupportActionBar().setTitle(viewPagerAdapter.getPageTitle(position));
+                // MainActivity.this.getSupportActionBar().setTitle(viewPagerAdapter.getPageTitle(position));
             }
 
             @Override
@@ -251,21 +284,6 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        ParseUser parseUser = ParseUser.getCurrentUser();
-        if (parseUser != null) {
-            parseUser.put("isOnline", false);
-            parseUser.saveInBackground();
-        }
-        super.onDestroy();
-    }
-
     public FriendItem getNewFriend() {
         return newFriend;
     }
@@ -380,6 +398,21 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        ParseUser parseUser = ParseUser.getCurrentUser();
+        if (parseUser != null) {
+            parseUser.put("isOnline", false);
+            parseUser.saveInBackground();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
     }
 
 }

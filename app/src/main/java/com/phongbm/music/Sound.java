@@ -16,7 +16,7 @@ public class Sound {
     private final static int MAX_SOUNDS = 10;
     private float lengthMusic;
     private float volume;
-    private int[] soundID = new int[]{R.raw.ringtone};
+    private int[] soundID = new int[]{R.raw.message_sent};
 
     public Sound(Context context, float volumeValue) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -50,7 +50,7 @@ public class Sound {
         volume = volumeValue * lengthMusic;
     }
 
-    public void playRingtone() {
+    public void playMessageSent() {
         if (PLAY_SOUND) {
             soundPool.play(soundID[0], volume, volume, 1, 0, 1.0F);
         }

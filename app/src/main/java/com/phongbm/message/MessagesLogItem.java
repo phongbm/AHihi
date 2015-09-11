@@ -1,13 +1,15 @@
 package com.phongbm.message;
 
 public class MessagesLogItem {
-    String id, fullName, message, date;
+    private String id, fullName, message, date;
+    private boolean isRead;
 
-    public MessagesLogItem(String id, String fullName, String message, String date) {
+    public MessagesLogItem(String id, String fullName, String message, String date, boolean isRead) {
         this.id = id;
         this.fullName = fullName;
         this.message = message;
         this.date = date;
+        this.isRead = isRead;
     }
 
     public String getMessage() {
@@ -40,6 +42,14 @@ public class MessagesLogItem {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setIsRead(boolean isRead) {
+        this.isRead = isRead;
     }
 
 }

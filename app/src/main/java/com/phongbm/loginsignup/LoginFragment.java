@@ -3,12 +3,16 @@ package com.phongbm.loginsignup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +29,7 @@ import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonValue;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "LoginFragment";
     private static final int REQUEST_LOGIN_FRAGMENT = 0;
 
     private View view;
@@ -34,9 +39,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private TextView txtLogo, forgotPassword, register;
     private boolean isFillPhoneNumber, isFillPassword;
 
+    private BroadcastLogin broadcastLogin;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_login, null);
+        view = inflater.inflate(R.layout.fragment_login, container, false);
+        registerBroadcastLogin();
         this.initializeToolbar();
         this.initializeComponent();
         return view;
@@ -111,11 +119,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    private ProgressDialog progressDialog;
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLogin:
-                final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
+                progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setTitle("Logging in");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);
@@ -125,20 +135,25 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 if (phoneNumber.charAt(0) == '0') {
                     phoneNumber = phoneNumber.substring(1);
                 }
-                phoneNumber = countryCode + " " + phoneNumber;
-                String password = edtPassword.getText().toString().trim();
-                ParseUser.logInInBackground(phoneNumber, password, new LogInCallback() {
+                final String phoneNumberStand = countryCode + " " + phoneNumber;
+                final String password = edtPassword.getText().toString().trim();
+                ParseUser.logInInBackground(phoneNumberStand, password, new LogInCallback() {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
+                            Log.i(TAG, "Login sucess!!!");
+                            Intent i = new Intent();
+                            i.setAction(CommonValue.START_FIRST_SINCH);
+                            i.putExtra(CommonValue.ID_START_FIRST_SINCH, parseUser.getObjectId());
+                            LoginFragment.this.getActivity().sendBroadcast(i);
                             parseUser.put("isOnline", true);
                             parseUser.saveInBackground();
 
-                            Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
-                            LoginFragment.this.getActivity().startActivity(intent);
-
-                            progressDialog.dismiss();
-                            LoginFragment.this.getActivity().finish();
+//                            Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
+//                            LoginFragment.this.getActivity().startActivity(intent);
+//
+//                            progressDialog.dismiss();
+//                            LoginFragment.this.getActivity().finish();
                         } else {
                             progressDialog.dismiss();
                             Toast.makeText(LoginFragment.this.getActivity(),
@@ -168,6 +183,38 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 edtCode.setText(content);
             }
         }
+    }
+
+    private void registerBroadcastLogin() {
+        if (broadcastLogin == null) {
+            broadcastLogin = new BroadcastLogin();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(CommonValue.RESULT_START_SERVICE);
+            getActivity().registerReceiver(broadcastLogin, filter);
+        }
+    }
+
+    private class BroadcastLogin extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(CommonValue.RESULT_START_SERVICE)) {
+                Log.i("BroadcastLogin", "onReceive_ login success");
+                Intent i = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
+                LoginFragment.this.getActivity().startActivity(i);
+
+                progressDialog.dismiss();
+                LoginFragment.this.getActivity().finish();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (broadcastLogin != null) {
+            getActivity().unregisterReceiver(broadcastLogin);
+            broadcastLogin = null;
+        }
+        super.onDestroyView();
     }
 
 }

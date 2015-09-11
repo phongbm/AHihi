@@ -37,10 +37,12 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.phongbm.ahihi.R;
+import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.common.OnLoadedAvatar;
+import com.phongbm.music.Sound;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,11 +79,14 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayList<CollectionEmoticonItem> collectionEmoticonItems;
     private CollectionEmoticonAdapter collectionEmoticonAdapter;
     private Uri capturedImageURI;
+    private Sound sound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_message);
+
+        sound = new Sound(this, 10);
 
         commonMethod = CommonMethod.getInstance();
 
@@ -108,7 +113,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        this.setTitle(inComingFullName);
+        this.getSupportActionBar().setTitle(inComingFullName);
+        toolbar.setSubtitle("Online");
     }
 
     private void initializeComponent() {
@@ -302,6 +308,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 Intent intentSend = new Intent();
                 intentSend.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentSend.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentSend.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                 intentSend.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 intentSend.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
                 MessageActivity.this.sendBroadcast(intentSend);
@@ -436,6 +443,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case CommonValue.STATE_MESSAGE_SENT:
+                    sound.playMessageSent();
+
                     String key = intent.getStringExtra(CommonValue.AHIHI_KEY);
                     String dateSend = intent.getStringExtra(CommonValue.AHIHI_KEY_DATE);
                     if (key == null) {
@@ -514,6 +523,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
+                break;
+            case R.id.action_voice_call:
+                Intent intentCall = new Intent(this, OutgoingCallActivity.class);
+                intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingMessageId);
+                this.startActivity(intentCall);
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -11,6 +11,7 @@ import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.libs.SquareImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -52,7 +53,9 @@ public class EmoticonAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.imgEmoticon.setImageResource(emoticonItems.get(position).getEmotionId());
+        Picasso.with(parent.getContext())
+                .load(emoticonItems.get(position).getEmotionId())
+                .into(viewHolder.imgEmoticon);
         viewHolder.imgEmoticon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
