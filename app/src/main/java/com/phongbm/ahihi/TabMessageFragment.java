@@ -122,26 +122,27 @@ public class TabMessageFragment extends Fragment {
                     String fullName = intent.getStringExtra(CommonValue.MESSAGE_LOG_FULL_NAME);
                     String content = intent.getStringExtra(CommonValue.MESSAGE_LOG_CONTENT);
                     String date = intent.getStringExtra(CommonValue.MESSAGE_LOG_DATE);
-                    int position = hasIdMessagesLogItem(id);
+                    /*int position = hasIdMessagesLogItem(id);
                     if (position > -1) {
                         messagesLogItems.get(position).setMessage("You: " + content);
                     } else {
                         messagesLogItems.add(0, new MessagesLogItem(id, fullName, content, date, false));
-                    }
+                    }*/
+                    messagesLogItems.add(0, new MessagesLogItem(id, fullName, content, date, false));
                     messageLogAdapter.notifyDataSetChanged();
                     break;
             }
         }
     }
 
-    private int hasIdMessagesLogItem(String id) {
+    /*private int hasIdMessagesLogItem(String id) {
         for (int i = 0; i < messagesLogItems.size(); i++) {
             if (id.equals(messagesLogItems.get(i).getId())) {
                 return i;
             }
         }
         return -1;
-    }
+    }*/
 
     @Override
     public void onDestroy() {

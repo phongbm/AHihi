@@ -172,7 +172,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < emoticonIds.length; i++) {
             emoticonItems0.add(new EmoticonItem(emoticonIds[i]));
         }
-        emoticonAdapters[0] = new EmoticonAdapter(this, emoticonItems0, inComingMessageId);
+        emoticonAdapters[0] = new EmoticonAdapter(this, emoticonItems0, inComingMessageId, inComingFullName);
 
         emoticonIds = new int[]{R.drawable.sallyfrien_1, R.drawable.sallyfrien_2, R.drawable.sallyfrien_3,
                 R.drawable.sallyfrien_4, R.drawable.sallyfrien_5, R.drawable.sallyfrien_6, R.drawable.sallyfrien_7,
@@ -189,7 +189,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < emoticonIds.length; i++) {
             emoticonItems1.add(new EmoticonItem(emoticonIds[i]));
         }
-        emoticonAdapters[1] = new EmoticonAdapter(this, emoticonItems1, inComingMessageId);
+        emoticonAdapters[1] = new EmoticonAdapter(this, emoticonItems1, inComingMessageId, inComingFullName);
 
         emoticonIds = new int[]{R.drawable.lcil_1, R.drawable.lcil_2, R.drawable.lcil_3,
                 R.drawable.lcil_4, R.drawable.lcil_5, R.drawable.lcil_6, R.drawable.lcil_7,
@@ -206,7 +206,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < emoticonIds.length; i++) {
             emoticonItems2.add(new EmoticonItem(emoticonIds[i]));
         }
-        emoticonAdapters[2] = new EmoticonAdapter(this, emoticonItems2, inComingMessageId);
+        emoticonAdapters[2] = new EmoticonAdapter(this, emoticonItems2, inComingMessageId, inComingFullName);
 
         emoticonIds = new int[]{R.drawable.yaya_1, R.drawable.yaya_2, R.drawable.yaya_3,
                 R.drawable.yaya_4, R.drawable.yaya_5, R.drawable.yaya_6, R.drawable.yaya_7,
@@ -221,7 +221,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < emoticonIds.length; i++) {
             emoticonItems3.add(new EmoticonItem(emoticonIds[i]));
         }
-        emoticonAdapters[3] = new EmoticonAdapter(this, emoticonItems3, inComingMessageId);
+        emoticonAdapters[3] = new EmoticonAdapter(this, emoticonItems3, inComingMessageId, inComingFullName);
 
         collectionEmoticonItems = new ArrayList<>();
         collectionEmoticonItems.add(new CollectionEmoticonItem(emoticonAdapters[0]));
@@ -393,6 +393,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 Intent intentAttach = new Intent();
                 intentAttach.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentAttach.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentAttach.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                 intentAttach.putExtra(CommonValue.MESSAGE_CONTENT, pathFile);
                 intentAttach.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_FILE);
                 intentAttach.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
@@ -403,6 +404,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 Intent intentPicture = new Intent();
                 intentPicture.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentPicture.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentPicture.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                 intentPicture.putExtra(CommonValue.MESSAGE_CONTENT, pathPicture);
                 intentPicture.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_PICTURE);
                 intentPicture.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());
@@ -418,6 +420,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 Intent intentCamera = new Intent();
                 intentCamera.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentCamera.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentCamera.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                 intentCamera.putExtra(CommonValue.MESSAGE_CONTENT, capturedImageFilePath);
                 intentCamera.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_PICTURE);
                 intentCamera.putExtra(CommonValue.AHIHI_KEY_DATE, commonMethod.getMessageDate());

@@ -141,7 +141,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
-                            Log.i(TAG, "Login sucess!!!");
+                            Log.i(TAG, "Login success!!!");
                             Intent i = new Intent();
                             i.setAction(CommonValue.START_FIRST_SINCH);
                             i.putExtra(CommonValue.ID_START_FIRST_SINCH, parseUser.getObjectId());

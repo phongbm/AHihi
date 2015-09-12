@@ -187,6 +187,7 @@ public class InComingCallActivity extends AppCompatActivity implements View.OnCl
                         txtTime.setText("End Call: " + time);
                         state = "inComingCall";
                     } else {
+                        vibrator.cancel();
                         ringtoneManager.stopRingtone();
                         commonMethod.pushNotification(InComingCallActivity.this, CallLogActivity.class,
                                 "Missed Call", NOTIFICATION_MISSED_CALL,

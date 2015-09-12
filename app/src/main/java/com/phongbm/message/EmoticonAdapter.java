@@ -18,12 +18,13 @@ import java.util.ArrayList;
 public class EmoticonAdapter extends BaseAdapter {
     private ArrayList<EmoticonItem> emoticonItems;
     private LayoutInflater layoutInflater;
-    private String inComingMessageId;
+    private String inComingMessageId, inComingFullName;
 
     public EmoticonAdapter(Context context, ArrayList<EmoticonItem> emoticonItems,
-                           String inComingMessageId) {
+                           String inComingMessageId, String inComingFullName) {
         this.emoticonItems = emoticonItems;
         this.inComingMessageId = inComingMessageId;
+        this.inComingFullName = inComingFullName;
         layoutInflater = LayoutInflater.from(context);
     }
 
@@ -63,6 +64,7 @@ public class EmoticonAdapter extends BaseAdapter {
                 Intent intentEmoticon = new Intent();
                 intentEmoticon.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentEmoticon.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
+                intentEmoticon.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                 intentEmoticon.putExtra(CommonValue.MESSAGE_CONTENT, "" + emoticonId);
                 intentEmoticon.putExtra(CommonValue.AHIHI_KEY, CommonValue.AHIHI_KEY_EMOTICON);
                 intentEmoticon.putExtra(CommonValue.AHIHI_KEY_DATE,
