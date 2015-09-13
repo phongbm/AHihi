@@ -1,44 +1,25 @@
 package com.phongbm.common;
 
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 
 import com.parse.Parse;
-import com.sinch.android.rtc.ClientRegistration;
-import com.sinch.android.rtc.PushPair;
-import com.sinch.android.rtc.Sinch;
-import com.sinch.android.rtc.SinchClient;
-import com.sinch.android.rtc.SinchClientListener;
-import com.sinch.android.rtc.SinchError;
-import com.sinch.android.rtc.messaging.Message;
-import com.sinch.android.rtc.messaging.MessageClient;
-import com.sinch.android.rtc.messaging.MessageClientListener;
-import com.sinch.android.rtc.messaging.MessageDeliveryInfo;
-import com.sinch.android.rtc.messaging.MessageFailureInfo;
-import com.sinch.android.rtc.messaging.WritableMessage;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class GlobalApplication extends Application implements SinchClientListener, MessageClientListener {
+public class GlobalApplication extends Application {
     public static int WIDTH_SCREEN, HEIGHT_SCREEN;
 
     private Bitmap avatar;
     private String fullName, phoneNumber;
     private Bitmap pictureSend;
 
-    private SinchClient sinchClient;
-    private MessageClient messageClient;
-    private int count = -1;
-    private ArrayList<String> idUsers;
-    private BroadcastGlobalApplication broadcastGlobalApplication;
+    // private SinchClient sinchClient;
+    // private MessageClient messageClient;
+    // private int count = -1;
+    // private ArrayList<String> idUsers;
+    // private BroadcastGlobalApplication broadcastGlobalApplication;
 
     @Override
     public void onCreate() {
@@ -46,8 +27,8 @@ public class GlobalApplication extends Application implements SinchClientListene
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, ServerInfo.PARSE_APPLICATION_ID, ServerInfo.PARSE_CLIENT_KEY);
         this.initializeComponent();
-        this.registerBroadcastGlobalApplication();
-        idUsers = new ArrayList<>();
+        // this.registerBroadcastGlobalApplication();
+        // idUsers = new ArrayList<>();
     }
 
     private void initializeComponent() {
@@ -90,7 +71,7 @@ public class GlobalApplication extends Application implements SinchClientListene
         this.pictureSend = pictureSend;
     }
 
-    private void startSinchService(String idUser) {
+    /*private void startSinchService(String idUser) {
         if (sinchClient != null) {
             sinchClient.stopListeningOnActiveConnection();
             sinchClient.terminate();
@@ -210,6 +191,6 @@ public class GlobalApplication extends Application implements SinchClientListene
             broadcastGlobalApplication = null;
         }
         super.onTerminate();
-    }
+    }*/
 
 }

@@ -141,19 +141,25 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
-                            Log.i(TAG, "Login success!!!");
+                           /* Log.i(TAG, "Login success!!!");
                             Intent i = new Intent();
                             i.setAction(CommonValue.START_FIRST_SINCH);
                             i.putExtra(CommonValue.ID_START_FIRST_SINCH, parseUser.getObjectId());
                             LoginFragment.this.getActivity().sendBroadcast(i);
                             parseUser.put("isOnline", true);
-                            parseUser.saveInBackground();
-
+                            parseUser.saveInBackground();*/
 //                            Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
 //                            LoginFragment.this.getActivity().startActivity(intent);
-//
 //                            progressDialog.dismiss();
 //                            LoginFragment.this.getActivity().finish();
+                            parseUser.put("isOnline", true);
+                            parseUser.saveInBackground();
+
+                            Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
+                            LoginFragment.this.getActivity().startActivity(intent);
+
+                            progressDialog.dismiss();
+                            LoginFragment.this.getActivity().finish();
                         } else {
                             progressDialog.dismiss();
                             Toast.makeText(LoginFragment.this.getActivity(),

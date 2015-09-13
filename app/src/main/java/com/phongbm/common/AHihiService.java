@@ -1,5 +1,6 @@
 package com.phongbm.common;
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -58,6 +59,7 @@ public class AHihiService extends Service implements SinchClientListener,
 
     private static final int WIDTH_IMAGE_MAX = 600;
     private static final int HEIGHT_IMAGE_MAX = 800;
+    private static boolean IS_SEND = false;
 
     private Context context;
     private SinchClient sinchClient;
@@ -225,6 +227,7 @@ public class AHihiService extends Service implements SinchClientListener,
     private class MessageListener implements MessageClientListener {
         @Override
         public void onIncomingMessage(MessageClient messageClient, Message message) {
+            Log.i(TAG, "onIncomingMessage...");
             /*ActivityManager activityManager = (ActivityManager) AHihiService.this
                     .getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
@@ -236,7 +239,6 @@ public class AHihiService extends Service implements SinchClientListener,
                     AHihiService.this.openChatHead();
                 }
             }*/
-
             String content = message.getTextBody();
             Intent intentIncoming = new Intent();
             intentIncoming.setAction(CommonValue.STATE_MESSAGE_INCOMING);
@@ -281,6 +283,9 @@ public class AHihiService extends Service implements SinchClientListener,
         @Override
         public void onMessageSent(MessageClient messageClient, final Message message, String s) {
             Toast.makeText(AHihiService.this, "onMessageSent...", Toast.LENGTH_SHORT).show();
+            if (!IS_SEND) {
+                IS_SEND = true;
+            }
             String content = message.getTextBody();
             Intent intentSent = new Intent();
             intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
@@ -301,7 +306,7 @@ public class AHihiService extends Service implements SinchClientListener,
                         break;
                 }
             }
-            // AHihiService.this.openChatHead();
+            AHihiService.this.openChatHead();
 
             String id = message.getSenderId();
             String fullName = message.getHeaders().get("fullName");
