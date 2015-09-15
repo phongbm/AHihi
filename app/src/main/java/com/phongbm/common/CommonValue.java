@@ -5,15 +5,11 @@ public class CommonValue {
     public static final String PACKAGE_NAME_COMMON = "com.phongbm.common";
     public static final String PACKAGE_NAME_CALL = "com.phongbm.call";
 
+    public static final String USER_ID = "USER_ID";
     public static final int WHAT_CALL_BACK = 2;
     public static final String COUNTRY_CODE = "COUNTRY_CODE";
-    public static final int REQUEST_ADD_FRIEND = 5;
     public static final int ACTION_UPDATE_LIST_FRIEND = 6;
     public static final String ACTION_ADD_FRIEND = "ACTION_ADD_FRIEND";
-
-    public static final String RESULT_START_SERVICE = "RESULT_START_SERVICE";
-    public static final String START_FIRST_SINCH = "START_FIRST_SINCH";
-    public static final String ID_START_FIRST_SINCH = "ID_START_FIRST_SINCH";
 
     public static final String UPDATE_MESSAGE_LOG = "UPDATE_MESSAGE_LOG";
     public static final String MESSAGE_LOG_ID = "MESSAGE_LOG_ID";
@@ -51,7 +47,6 @@ public class CommonValue {
     public static final String Y_IMAGE = "Y_IMAGE";
     public static final String CROP_PICTURE = "CROP_PICTURE";
 
-    public static final int REQUECODE_SET_AVATAR = 29837;
     public static final String BYTE_AVATAR = "BYTE_AVATAR";
 
 }

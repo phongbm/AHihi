@@ -408,7 +408,7 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
             PictureAsyncTask pictureAsyncTask = new PictureAsyncTask(position, url, imgPicture);
             AsyncDrawable asyncDrawable = new AsyncDrawable(context.getResources(), messageItems
                     .get(position).getPicture() != null ? messageItems.get(position).getPicture() :
-                    BitmapFactory.decodeResource(context.getResources(), R.drawable.loading_picture),
+                    BitmapFactory.decodeResource(context.getResources(), R.drawable.image_placeholder),
                     pictureAsyncTask);
             imgPicture.setImageDrawable(asyncDrawable);
             if (messageItems.get(position).getPicture() == null) {

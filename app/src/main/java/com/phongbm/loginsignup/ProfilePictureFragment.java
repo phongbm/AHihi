@@ -1,116 +1,155 @@
 package com.phongbm.loginsignup;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.GridView;
 
 import com.parse.ParseUser;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonMethod;
-import com.phongbm.libs.SquareImageView;
+import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
+import com.phongbm.image.ImageActivity;
+import com.phongbm.image.ImageControl;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfilePictureFragment extends Fragment implements View.OnClickListener,
-        AdapterView.OnItemClickListener {
+public class ProfilePictureFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ProfilePictureFragment";
+    private static final int REQUEST_TAKE_PHOTO = 0;
+    private static final int REQUEST_UPLOAD_PHOTO = 1;
 
     private View view;
-    private GridView gridViewAvatarDefault;
     private CircleImageView imgAvatar;
-    private int[] avatarDefaultIDs = new int[]{R.drawable.ic_ava_1, R.drawable.ic_ava_2,
-            R.drawable.ic_ava_3, R.drawable.ic_ava_4, R.drawable.ic_ava_5, R.drawable.ic_ava_6,
-            R.drawable.ic_ava_7, R.drawable.ic_ava_8, R.drawable.ic_ava_9, R.drawable.ic_ava_10,
-            R.drawable.ic_ava_11, R.drawable.ic_ava_12, R.drawable.ic_avatar_default};
-    private LayoutInflater layoutInflater;
-    private Button btnOK;
+    private Bitmap bitmapAvatar, bitmapDefault;
+    private Uri capturedImageURI;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        layoutInflater = LayoutInflater.from(container.getContext());
+        bitmapDefault = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_avatar_default);
         view = inflater.inflate(R.layout.fragment_profile_picture, null);
-        initializeComponent();
+        this.initializeComponent();
         return view;
     }
 
     private void initializeComponent() {
-        btnOK = (Button) view.findViewById(R.id.btnOK);
-        btnOK.setOnClickListener(this);
         imgAvatar = (CircleImageView) view.findViewById(R.id.imgAvatar);
-        gridViewAvatarDefault = (GridView) view.findViewById(R.id.gridViewAvatarDefault);
-        gridViewAvatarDefault.setOnItemClickListener(this);
-        gridViewAvatarDefault.setAdapter(new AvatarDefaultAdapter());
+        bitmapAvatar = ((BitmapDrawable) imgAvatar.getDrawable()).getBitmap();
+        view.findViewById(R.id.layoutUploadPhoto).setOnClickListener(this);
+        view.findViewById(R.id.layoutTakePhoto).setOnClickListener(this);
+        view.findViewById(R.id.btnSkip).setOnClickListener(this);
+        view.findViewById(R.id.btnOK).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btnSkip:
+                this.signUpSuccess(bitmapDefault);
+                break;
             case R.id.btnOK:
-                final String fullName = ((MainFragment) getActivity()).getProfileInfomationFragment().getFullName();
-                final String email = ((MainFragment) getActivity()).getProfileInfomationFragment().getEmail();
-                final String birthday = ((MainFragment) getActivity()).getProfileInfomationFragment().getBirthday();
-                final boolean sex = ((MainFragment) getActivity()).getProfileInfomationFragment().getSex();
-
-                ParseUser newUser = ParseUser.getCurrentUser();
-
-                newUser.put("fullName", fullName);
-                newUser.setEmail(email);
-                newUser.put("birthday", birthday);
-                newUser.put("sex", sex);
-                newUser.saveInBackground();
-
-                imgAvatar.buildDrawingCache();
-                Bitmap avatar = imgAvatar.getDrawingCache();
-
-                CommonMethod.uploadAvatar(newUser, avatar);
-
-                Intent intent = new Intent(this.getActivity(), MainActivity.class);
-                this.getActivity().startActivity(intent);
-                this.getActivity().finish();
+                this.signUpSuccess(bitmapAvatar);
+                break;
+            case R.id.layoutUploadPhoto:
+                Intent intentUpload = new Intent();
+                intentUpload.setClass(this.getActivity(), ImageActivity.class);
+                this.startActivityForResult(intentUpload, REQUEST_UPLOAD_PHOTO);
+                break;
+            case R.id.layoutTakePhoto:
+                Intent intentTakePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (intentTakePhoto.resolveActivity(getActivity().getPackageManager()) != null) {
+                    @SuppressLint("SimpleDateFormat")
+                    String date = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                    String fileName = "AHIHI_" + date;
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(MediaStore.Images.Media.TITLE, fileName);
+                    capturedImageURI = getActivity().getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                    intentTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageURI);
+                    this.startActivityForResult(intentTakePhoto, REQUEST_TAKE_PHOTO);
+                } else {
+                    Snackbar.make(view, "Device does not support camera", Snackbar.LENGTH_LONG)
+                            .setAction("ACTION", null)
+                            .show();
+                }
                 break;
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        imgAvatar.setImageResource(avatarDefaultIDs[position]);
+    private void signUpSuccess(final Bitmap avatar) {
+        MainFragment mainFragment = (MainFragment) this.getActivity();
+        final String phoneNumber = mainFragment.getSignUpFragment().getPhoneNumber();
+        final String fullName = mainFragment.getProfileInfomationFragment().getFullName();
+        final String email = mainFragment.getProfileInfomationFragment().getEmail();
+        String birthday = mainFragment.getProfileInfomationFragment().getBirthday();
+        boolean sex = mainFragment.getProfileInfomationFragment().getSex();
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        currentUser.put("fullName", fullName);
+        currentUser.setEmail(email);
+        currentUser.put("birthday", birthday);
+        currentUser.put("sex", sex);
+        currentUser.saveInBackground();
+        CommonMethod.uploadAvatar(currentUser, avatar);
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                GlobalApplication globalApplication = (GlobalApplication) ProfilePictureFragment.this
+                        .getActivity().getApplication();
+                globalApplication.setAvatar(avatar);
+                globalApplication.setFullName(fullName);
+                globalApplication.setPhoneNumber(phoneNumber);
+                globalApplication.setEmail(email);
+            }
+        });
+
+        Intent intent = new Intent(mainFragment, MainActivity.class);
+        mainFragment.startActivity(intent);
+        mainFragment.finish();
     }
 
-    private class AvatarDefaultAdapter extends BaseAdapter {
-        @Override
-        public int getCount() {
-            return avatarDefaultIDs.length;
-        }
-
-        @Override
-        public Integer getItem(int position) {
-            return avatarDefaultIDs[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @SuppressLint("ViewHolder")
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = layoutInflater.inflate(R.layout.item_image, parent, false);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_UPLOAD_PHOTO:
+                    byte[] bytes = data.getByteArrayExtra(CommonValue.BYTE_AVATAR);
+                    bitmapAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    imgAvatar.setImageBitmap(bitmapAvatar);
+                    break;
+                case REQUEST_TAKE_PHOTO:
+                    Cursor cursor = getActivity().getContentResolver().query(capturedImageURI,
+                            new String[]{MediaStore.Images.Media.DATA}, null, null, null);
+                    int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    cursor.moveToFirst();
+                    String capturedImageFilePath = cursor.getString(index);
+                    cursor.close();
+                    Intent intentCropImage = new Intent();
+                    intentCropImage.setClass(getActivity(), ImageControl.class);
+                    intentCropImage.putExtra(ImageControl.EXTRA_IMAGE, capturedImageFilePath);
+                    this.startActivityForResult(intentCropImage, REQUEST_UPLOAD_PHOTO);
+                    break;
             }
-            SquareImageView imgImage = (SquareImageView) convertView.findViewById(R.id.imgImage);
-            imgImage.setImageResource(avatarDefaultIDs[position]);
-            return convertView;
+            view.findViewById(R.id.btnOK).setEnabled(true);
         }
     }
 

@@ -81,6 +81,9 @@
         <activity
             android:name="com.phongbm.message.PictureActivity"
             android:label="@string/activity_picture" />
+        <activity
+            android:name="com.phongbm.ahihi.NewMessageActivity"
+            android:label="@string/activity_new_message" />
 
         <service
             android:name="com.phongbm.common.AHihiService"

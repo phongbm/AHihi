@@ -7,19 +7,17 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import com.parse.Parse;
+import com.phongbm.ahihi.AllFriendItem;
+
+import java.util.ArrayList;
 
 public class GlobalApplication extends Application {
     public static int WIDTH_SCREEN, HEIGHT_SCREEN;
 
     private Bitmap avatar;
-    private String fullName, phoneNumber;
+    private String fullName, phoneNumber, email;
     private Bitmap pictureSend;
-
-    // private SinchClient sinchClient;
-    // private MessageClient messageClient;
-    // private int count = -1;
-    // private ArrayList<String> idUsers;
-    // private BroadcastGlobalApplication broadcastGlobalApplication;
+    private ArrayList<AllFriendItem> allFriendItems;
 
     @Override
     public void onCreate() {
@@ -27,8 +25,6 @@ public class GlobalApplication extends Application {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, ServerInfo.PARSE_APPLICATION_ID, ServerInfo.PARSE_CLIENT_KEY);
         this.initializeComponent();
-        // this.registerBroadcastGlobalApplication();
-        // idUsers = new ArrayList<>();
     }
 
     private void initializeComponent() {
@@ -63,6 +59,14 @@ public class GlobalApplication extends Application {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public Bitmap getPictureSend() {
         return pictureSend;
     }
@@ -71,126 +75,12 @@ public class GlobalApplication extends Application {
         this.pictureSend = pictureSend;
     }
 
-    /*private void startSinchService(String idUser) {
-        if (sinchClient != null) {
-            sinchClient.stopListeningOnActiveConnection();
-            sinchClient.terminate();
-            sinchClient = null;
-        }
-        sinchClient = Sinch.getSinchClientBuilder()
-                .context(this)
-                .userId(idUser)
-                .applicationKey(ServerInfo.SINCH_APPLICATION_KEY)
-                .applicationSecret(ServerInfo.SINCH_SECRET)
-                .environmentHost(ServerInfo.SINCH_ENVIROMENT)
-                .build();
-        sinchClient.setSupportCalling(true);
-        sinchClient.setSupportMessaging(true);
-        sinchClient.setSupportActiveConnectionInBackground(true);
-        sinchClient.addSinchClientListener(this);
-        sinchClient.checkManifest();
-        sinchClient.start();
+    public ArrayList<AllFriendItem> getAllFriendItems() {
+        return allFriendItems;
     }
 
-    // MessageClientListenr
-    @Override
-    public void onIncomingMessage(MessageClient messageClient, Message message) {
+    public void setAllFriendItems(ArrayList<AllFriendItem> allFriendItems) {
+        this.allFriendItems = allFriendItems;
     }
-
-    @Override
-    public void onMessageSent(MessageClient messageClient, Message message, String s) {
-        Log.i("Application", "onMessageSent...");
-        if (count % 2 == 0) {
-            if (count >= 100) count = 0;
-            count++;
-            if (sinchClient != null) {
-                sinchClient.stopListeningOnActiveConnection();
-                sinchClient.terminate();
-                sinchClient = null;
-            }
-            // messageClient.removeMessageClientListener(this);
-            Intent i = new Intent();
-            i.setAction(CommonValue.RESULT_START_SERVICE);
-            sendBroadcast(i);
-        }
-        Log.i("Application", "onMessageSent...finish");
-    }
-
-    @Override
-    public void onMessageFailed(MessageClient messageClient, Message message, MessageFailureInfo messageFailureInfo) {
-    }
-
-    @Override
-    public void onMessageDelivered(MessageClient messageClient, MessageDeliveryInfo messageDeliveryInfo) {
-    }
-
-    @Override
-    public void onShouldSendPushData(MessageClient messageClient, Message message, List<PushPair> list) {
-    }
-
-    // SinchClientListener
-    @Override
-    public void onClientStarted(SinchClient sinchClient) {
-        messageClient = this.sinchClient.getMessageClient();
-        messageClient.addMessageClientListener(this);
-        this.sinchClient.startListeningOnActiveConnection();
-        WritableMessage message = new WritableMessage("1cSWKDINiZ", "HELLO ANDROID");
-        messageClient.send(message);
-    }
-
-    @Override
-    public void onClientStopped(SinchClient sinchClient) {
-    }
-
-    @Override
-    public void onClientFailed(SinchClient sinchClient, SinchError sinchError) {
-    }
-
-    @Override
-    public void onRegistrationCredentialsRequired(SinchClient sinchClient, ClientRegistration clientRegistration) {
-    }
-
-    @Override
-    public void onLogMessage(int i, String s, String s1) {
-    }
-
-    private void registerBroadcastGlobalApplication() {
-        if (broadcastGlobalApplication == null) {
-            broadcastGlobalApplication = new BroadcastGlobalApplication();
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(CommonValue.START_FIRST_SINCH);
-            registerReceiver(broadcastGlobalApplication, filter);
-        }
-    }
-
-    private class BroadcastGlobalApplication extends BroadcastReceiver {
-        @Override
-        public synchronized void onReceive(Context context, Intent intent) {
-            String id = intent.getStringExtra(CommonValue.ID_START_FIRST_SINCH);
-            if (!idUsers.contains(id)) {
-                count++;
-                Log.i("GlobalApplication", "BroadcastGlobalApplication...");
-                idUsers.add(id);
-                GlobalApplication.this.startSinchService(id);
-            } else {
-                Intent i = new Intent();
-                i.setAction(CommonValue.RESULT_START_SERVICE);
-                sendBroadcast(i);
-            }
-        }
-    }
-
-    public void addIdUser(String idUser) {
-        idUsers.add(idUser);
-    }
-
-    @Override
-    public void onTerminate() {
-        if (broadcastGlobalApplication != null) {
-            this.unregisterReceiver(broadcastGlobalApplication);
-            broadcastGlobalApplication = null;
-        }
-        super.onTerminate();
-    }*/
 
 }

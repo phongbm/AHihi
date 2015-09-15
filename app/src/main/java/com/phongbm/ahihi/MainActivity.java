@@ -11,8 +11,11 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -20,13 +23,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.GetCallback;
 import com.parse.GetDataCallback;
@@ -36,10 +38,8 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.phongbm.call.CallLogActivity;
 import com.phongbm.call.CallLogsDBManager;
-import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
-import com.phongbm.image.ImageActivity;
 import com.phongbm.loginsignup.MainFragment;
 
 import java.util.ArrayList;
@@ -60,14 +60,13 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPagerAdapter viewPagerAdapter;
     private ViewPager viewPager;
     private TabLayout tab;
-    private InputMethodManager inputMethodManager;
     private FriendItem newFriend;
     private Bitmap userAvatar;
     private CircleImageView imgAvatar;
     private FloatingActionButton btnAction;
-    private CallLogsDBManager callLogsDBManager;
-    // private MessagesLogDBManager messagesLogDBManager;
     private ArrayList<AllFriendItem> allFriendItems;
+    private ParseUser currentUser;
+    private CallLogsDBManager callLogsDBManager;
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
@@ -79,6 +78,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.loadListFriend();
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 3000);
+
         this.setContentView(R.layout.activity_main);
         globalApplication = (GlobalApplication) this.getApplicationContext();
         this.initializeToolbar();
@@ -86,20 +98,17 @@ public class MainActivity extends AppCompatActivity implements
         this.initializeProfileInformation();
         this.startService();
         callLogsDBManager = new CallLogsDBManager(this);
-        // messagesLogDBManager = new MessagesLogDBManager(this);
-        this.loadListFriend();
     }
 
     private void loadListFriend() {
         allFriendItems = new ArrayList<>();
-
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        final ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
+        currentUser = ParseUser.getCurrentUser();
+        ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
         if (listFriendId == null || listFriendId.size() == 0) {
             return;
         }
         for (int i = 0; i < listFriendId.size(); i++) {
-            final ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
+            ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
             parseQuery.getInBackground(listFriendId.get(i), new GetCallback<ParseUser>() {
                 @Override
                 public void done(final ParseUser parseUser, ParseException e) {
@@ -111,9 +120,18 @@ public class MainActivity extends AppCompatActivity implements
                     if (parseFile == null) {
                         return;
                     }
-                    allFriendItems.add(new AllFriendItem(parseUser.getObjectId(), parseFile.getUrl(),
-                            parseUser.getUsername(), parseUser.getString("fullName")));
-                    Collections.sort(allFriendItems);
+                    parseFile.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(byte[] bytes, ParseException e) {
+                            if (e != null) {
+                                return;
+                            }
+                            Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                            allFriendItems.add(new AllFriendItem(parseUser.getObjectId(), avatar,
+                                    parseUser.getUsername(), parseUser.getString("fullName")));
+                            Collections.sort(allFriendItems);
+                        }
+                    });
                 }
             });
         }
@@ -123,12 +141,9 @@ public class MainActivity extends AppCompatActivity implements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
         this.getSupportActionBar().setTitle(R.string.app_name);
-        // this.getSupportActionBar().setLogo(R.drawable.ic_xxhdpi);
     }
 
     private void initializeComponent() {
-        inputMethodManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                 toolbar, R.string.open_navigation_drawer, R.string.close_navigation_drawer) {
@@ -158,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                // MainActivity.this.getSupportActionBar().setTitle(viewPagerAdapter.getPageTitle(position));
             }
 
             @Override
@@ -175,30 +189,37 @@ public class MainActivity extends AppCompatActivity implements
             tab.getTabAt(i).setIcon(tabBackgroundIds[i]);
         }
 
-        imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
-        imgAvatar.setOnClickListener(this);
-
         btnAction = (FloatingActionButton) findViewById(R.id.btnAction);
         btnAction.setOnClickListener(this);
     }
 
     private void initializeProfileInformation() {
-        final ParseUser currentUser = ParseUser.getCurrentUser();
-        View header = navigation.getChildAt(0);
-        TextView txtName = (TextView) header.findViewById(R.id.txtName);
-        final String fullName = currentUser.getString("fullName");
-        txtName.setText(fullName);
-        TextView txtEmail = (TextView) header.findViewById(R.id.txtEmail);
-        txtEmail.setText(currentUser.getEmail());
+        imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
+        imgAvatar.setOnClickListener(this);
 
+        final TextView txtName = (TextView) findViewById(R.id.txtName);
+        final TextView txtEmail = (TextView) findViewById(R.id.txtEmail);
+
+        if (globalApplication.getAvatar() != null) {
+            imgAvatar.setImageBitmap(globalApplication.getAvatar());
+            txtName.setText(globalApplication.getFullName());
+            txtEmail.setText(globalApplication.getEmail());
+            Log.i(TAG, "Get Profile Information from GlobalApplication");
+            return;
+        }
+
+        Log.i(TAG, "Get Profile Information from Server");
         ParseFile parseFile = (ParseFile) currentUser.get("avatar");
         if (parseFile != null) {
             parseFile.getDataInBackground(new GetDataCallback() {
                 @Override
                 public void done(byte[] bytes, ParseException e) {
                     if (e == null) {
+                        String fullName = currentUser.getString("fullName");
                         userAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         imgAvatar.setImageBitmap(userAvatar);
+                        txtName.setText(fullName);
+                        txtEmail.setText(currentUser.getEmail());
                         globalApplication.setAvatar(userAvatar);
                         globalApplication.setFullName(fullName);
                         globalApplication.setPhoneNumber(currentUser.getUsername());
@@ -304,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements
                     intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
                     boolean isOnline = parseUser.getBoolean("isOnline");
                     intentAddFriend.putExtra("isOnline", isOnline);
-                    sendBroadcast(intentAddFriend);
+                    MainActivity.this.sendBroadcast(intentAddFriend);
                 }
             });
         }
@@ -314,32 +335,23 @@ public class MainActivity extends AppCompatActivity implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.imgAvatar:
-                startActivitySetAvatar();
+                Intent intentProfile = new Intent(this, DetailActivity.class);
+                intentProfile.putExtra(CommonValue.USER_ID, currentUser.getObjectId());
+                this.startActivity(intentProfile);
                 break;
             case R.id.btnAction:
-                Intent intent = new Intent(this, DetailActivity.class);
-                this.startActivity(intent);
+                Intent intentNewMessage = new Intent(this, NewMessageActivity.class);
+                globalApplication.setAllFriendItems(allFriendItems);
+                this.startActivity(intentNewMessage);
                 break;
         }
     }
 
-    private void startActivitySetAvatar() {
-        Intent intentAccount = new Intent();
-        intentAccount.setClass(MainActivity.this, ImageActivity.class);
-        MainActivity.this.startActivityForResult(intentAccount, CommonValue.REQUECODE_SET_AVATAR);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final CoordinatorLayout coordinator = (CoordinatorLayout) findViewById(R.id.coordinator);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
-                case CommonValue.REQUECODE_SET_AVATAR:
-                    byte[] bytes = data.getByteArrayExtra(CommonValue.BYTE_AVATAR);
-                    Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    CommonMethod.uploadAvatar(ParseUser.getCurrentUser(), avatar);
-                    imgAvatar.setImageBitmap(avatar);
-                    ((GlobalApplication) MainActivity.this.getApplication()).setAvatar(avatar);
-                    break;
                 case REQUEST_ADDITION_FRIEND:
                     if (data == null) {
                         return;
@@ -347,8 +359,10 @@ public class MainActivity extends AppCompatActivity implements
                     String phoneNumber = data.getStringExtra("PHONE_NUMBER");
                     if (phoneNumber.equals(((GlobalApplication) this.getApplication())
                             .getPhoneNumber())) {
-                        Toast.makeText(MainActivity.this, "You can not make friends with yourself",
-                                Toast.LENGTH_SHORT).show();
+                        Snackbar.make(coordinator, "You can not make friends with yourself",
+                                Snackbar.LENGTH_LONG)
+                                .setAction("ACTION", null)
+                                .show();
                         return;
                     }
                     final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -364,14 +378,19 @@ public class MainActivity extends AppCompatActivity implements
                         @Override
                         public void done(ParseUser parseUser, ParseException e) {
                             if (e != null) {
-                                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                Snackbar.make(coordinator, "Error",
+                                        Snackbar.LENGTH_LONG)
+                                        .setAction("ACTION", null)
+                                        .show();
                                 e.printStackTrace();
                                 progressDialog.dismiss();
                                 return;
                             }
                             if (parseUser == null) {
-                                Toast.makeText(MainActivity.this, "That account does not exist",
-                                        Toast.LENGTH_SHORT).show();
+                                Snackbar.make(coordinator, "That account does not exist",
+                                        Snackbar.LENGTH_LONG)
+                                        .setAction("ACTION", null)
+                                        .show();
                                 progressDialog.dismiss();
                                 return;
                             }
@@ -402,10 +421,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
-        ParseUser parseUser = ParseUser.getCurrentUser();
-        if (parseUser != null) {
-            parseUser.put("isOnline", false);
-            parseUser.saveInBackground();
+        if (currentUser != null) {
+            currentUser.put("isOnline", false);
+            currentUser.saveInBackground();
         }
         super.onDestroy();
     }

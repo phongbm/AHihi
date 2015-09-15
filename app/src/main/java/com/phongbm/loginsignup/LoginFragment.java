@@ -3,23 +3,23 @@ package com.phongbm.loginsignup;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Typeface;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -36,35 +36,39 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     private EditText edtPhoneNumber, edtPassword, edtCode;
     private Button btnLogin;
     private String countryCode;
-    private TextView txtLogo, forgotPassword, register;
+    private TextView forgotPassword;
+    private CheckBox rememberMe;
     private boolean isFillPhoneNumber, isFillPassword;
-
-    private BroadcastLogin broadcastLogin;
+    private ProgressDialog progressDialog;
+    private Activity activity;
+    private FloatingActionButton btnSignUp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_login, container, false);
-        registerBroadcastLogin();
-        this.initializeToolbar();
         this.initializeComponent();
+        activity = this.getActivity();
         return view;
     }
 
-    private void initializeToolbar() {
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((MainFragment) this.getActivity()).setSupportActionBar(toolbar);
-        this.getActivity().setTitle("LOG IN");
-    }
-
     private void initializeComponent() {
-        txtLogo = (TextView) view.findViewById(R.id.txtLogo);
-        txtLogo.setTypeface(Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/AIRSTREA.TTF"));
         btnLogin = (Button) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
+        btnSignUp = (FloatingActionButton) view.findViewById(R.id.btnSignUp);
+        btnSignUp.setOnClickListener(this);
+        rememberMe = (CheckBox) view.findViewById(R.id.rememberMe);
+        rememberMe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    rememberMe.setTextColor(ContextCompat.getColor(activity, R.color.green_500));
+                } else {
+                    rememberMe.setTextColor(Color.parseColor("#666666"));
+                }
+            }
+        });
         forgotPassword = (TextView) view.findViewById(R.id.forgotPassword);
         forgotPassword.setOnClickListener(this);
-        register = (TextView) view.findViewById(R.id.register);
-        register.setOnClickListener(this);
         edtPhoneNumber = (EditText) view.findViewById(R.id.edtPhoneNumber);
         edtPassword = (EditText) view.findViewById(R.id.edtPassword);
         edtPhoneNumber.addTextChangedListener(new TextWatcher() {
@@ -74,9 +78,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s != null && s.length() > 0) {
+                if (s != null && s.length() > 1) {
                     isFillPhoneNumber = true;
-                    enabledButtonLogin();
+                    LoginFragment.this.enabledButtonLogin();
                 } else {
                     isFillPhoneNumber = false;
                     btnLogin.setEnabled(false);
@@ -94,9 +98,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s != null && s.length() > 0) {
+                if (s != null && s.length() > 1) {
                     isFillPassword = true;
-                    enabledButtonLogin();
+                    LoginFragment.this.enabledButtonLogin();
                 } else {
                     isFillPassword = false;
                     btnLogin.setEnabled(false);
@@ -119,13 +123,11 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private ProgressDialog progressDialog;
-
     @Override
-    public void onClick(View view) {
+    public void onClick(final View view) {
         switch (view.getId()) {
             case R.id.btnLogin:
-                progressDialog = new ProgressDialog(getActivity());
+                progressDialog = new ProgressDialog(activity);
                 progressDialog.setTitle("Logging in");
                 progressDialog.setMessage("Please wait...");
                 progressDialog.setCanceledOnTouchOutside(false);
@@ -141,41 +143,46 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void done(ParseUser parseUser, ParseException e) {
                         if (parseUser != null) {
-                           /* Log.i(TAG, "Login success!!!");
-                            Intent i = new Intent();
-                            i.setAction(CommonValue.START_FIRST_SINCH);
-                            i.putExtra(CommonValue.ID_START_FIRST_SINCH, parseUser.getObjectId());
-                            LoginFragment.this.getActivity().sendBroadcast(i);
-                            parseUser.put("isOnline", true);
-                            parseUser.saveInBackground();*/
-//                            Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
-//                            LoginFragment.this.getActivity().startActivity(intent);
-//                            progressDialog.dismiss();
-//                            LoginFragment.this.getActivity().finish();
                             parseUser.put("isOnline", true);
                             parseUser.saveInBackground();
 
-                            Intent intent = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
-                            LoginFragment.this.getActivity().startActivity(intent);
-
                             progressDialog.dismiss();
-                            LoginFragment.this.getActivity().finish();
+                            btnSignUp.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#e91e63")));
+                            btnSignUp.setImageResource(R.drawable.ic_checkmark);
+                            Snackbar snackbar = Snackbar.make(view, "Logged successfully", Snackbar.LENGTH_LONG)
+                                    .setAction("ACTION", null)
+                                    .setCallback(new Snackbar.Callback() {
+                                        @Override
+                                        public void onDismissed(Snackbar snackbar, int event) {
+                                            super.onDismissed(snackbar, event);
+                                            Intent intent = new Intent(activity, MainActivity.class);
+                                            activity.startActivity(intent);
+                                            activity.finish();
+                                        }
+                                    });
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#4caf50"));
+                            snackbar.show();
                         } else {
                             progressDialog.dismiss();
-                            Toast.makeText(LoginFragment.this.getActivity(),
-                                    "There was an error logging in", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(view, "There was an error logging in", Snackbar.LENGTH_LONG)
+                                    .setAction("ACTION", null)
+                                    .show();
                         }
                     }
                 });
                 break;
             case R.id.forgotPassword:
+                Snackbar.make(view, "Features are being developed", Snackbar.LENGTH_LONG)
+                        .setAction("ACTION", null)
+                        .show();
                 break;
-            case R.id.register:
-                ((MainFragment) this.getActivity()).showSigupFragment();
+            case R.id.btnSignUp:
+                ((MainFragment) activity).showSigupFragment();
                 break;
             case R.id.edtCode:
-                Intent intent = new Intent(this.getActivity(), CountryCodeActivity.class);
-                startActivityForResult(intent, REQUEST_LOGIN_FRAGMENT);
+                Intent intent = new Intent(activity, CountryCodeActivity.class);
+                this.startActivityForResult(intent, REQUEST_LOGIN_FRAGMENT);
                 break;
         }
     }
@@ -189,38 +196,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 edtCode.setText(content);
             }
         }
-    }
-
-    private void registerBroadcastLogin() {
-        if (broadcastLogin == null) {
-            broadcastLogin = new BroadcastLogin();
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(CommonValue.RESULT_START_SERVICE);
-            getActivity().registerReceiver(broadcastLogin, filter);
-        }
-    }
-
-    private class BroadcastLogin extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(CommonValue.RESULT_START_SERVICE)) {
-                Log.i("BroadcastLogin", "onReceive_ login success");
-                Intent i = new Intent(LoginFragment.this.getActivity(), MainActivity.class);
-                LoginFragment.this.getActivity().startActivity(i);
-
-                progressDialog.dismiss();
-                LoginFragment.this.getActivity().finish();
-            }
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        if (broadcastLogin != null) {
-            getActivity().unregisterReceiver(broadcastLogin);
-            broadcastLogin = null;
-        }
-        super.onDestroyView();
     }
 
 }

@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 public class AllFriendItem extends FriendItem implements Comparable {
     private String urlAvatar;
 
+    public AllFriendItem() {
+    }
+
     public AllFriendItem(String id, Bitmap avatar, String phoneNumber, String fullName) {
         super(id, avatar, phoneNumber, fullName);
     }

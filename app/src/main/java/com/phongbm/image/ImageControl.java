@@ -6,84 +6,90 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 
 import java.io.ByteArrayOutputStream;
 
-
 public class ImageControl extends AppCompatActivity implements View.OnClickListener {
+    private static final String TAG = "ImageControl";
     public static final String EXTRA_IMAGE = "EXTRA_IMAGE";
+    private static final int SIZE_IMAGE = GlobalApplication.WIDTH_SCREEN;
+    private static final int HEIGHT_SCREEN = GlobalApplication.HEIGHT_SCREEN;
+
     private String url;
-
-    private static final float SIZE_IMAGE = GlobalApplication.WIDTH_SCREEN;
-
+    private int orientation;
     private RelativeLayout layoutImage;
     private TouchImageView image;
     private ImageView imageView;
-    private Button btnCrop, btnRotate;
-
     private float radius;
-
-    private Bitmap bmMain;
+    private Bitmap bitmapMain;
+    private CommonMethod commonMethod;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_control);
+        this.setContentView(R.layout.activity_image_control);
         url = getIntent().getStringExtra(ImageControl.EXTRA_IMAGE);
-        initLayoutImage();
-        intializeComponent();
-
+        this.initializeLayoutImage();
+        this.initializeComponent();
+        commonMethod = CommonMethod.getInstance();
     }
 
-    private void initLayoutImage() {
+    private void initializeLayoutImage() {
         layoutImage = (RelativeLayout) findViewById(R.id.layoutImage);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((int) SIZE_IMAGE, (int) SIZE_IMAGE);
-        params.gravity = Gravity.CENTER;
-        layoutImage.setLayoutParams(params);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)
+                layoutImage.getLayoutParams();
+        params.height = SIZE_IMAGE;
+        params.width = SIZE_IMAGE;
+
+        RelativeLayout.LayoutParams paramImage = (RelativeLayout.LayoutParams)
+                findViewById(R.id.image).getLayoutParams();
+        paramImage.height = SIZE_IMAGE;
+        paramImage.width = SIZE_IMAGE;
+
+        RelativeLayout.LayoutParams paramImageView = (RelativeLayout.LayoutParams)
+                findViewById(R.id.imageView).getLayoutParams();
+        paramImageView.height = SIZE_IMAGE;
+        paramImageView.width = SIZE_IMAGE;
     }
 
-    private void intializeComponent() {
-        btnCrop = (Button) findViewById(R.id.btnCrop);
-        btnCrop.setOnClickListener(this);
-        btnRotate = (Button) findViewById(R.id.btnRotate);
-        btnRotate.setOnClickListener(this);
-        image = (TouchImageView) findViewById(R.id.img);
+    private void initializeComponent() {
+        findViewById(R.id.btnCrop).setOnClickListener(this);
+        findViewById(R.id.btnRotate).setOnClickListener(this);
+        findViewById(R.id.btnCancel).setOnClickListener(this);
+
+        image = (TouchImageView) findViewById(R.id.image);
         image.setMaxZoom(5);
-        createBmMain();
-        cropFadeCirle(radius);
-
+        this.createBitmapMain();
+        this.cropFadeCircle(radius);
     }
 
-    private void createBmMain() {
+    private void createBitmapMain() {
         int widthResize, heightResize;
         try {
-            bmMain = BitmapFactory.decodeFile(url);
-            widthResize = GlobalApplication.WIDTH_SCREEN;
-            heightResize = (int) ((float) GlobalApplication.WIDTH_SCREEN / bmMain.getWidth() * bmMain.getHeight());
-            if (heightResize > GlobalApplication.HEIGHT_SCREEN) {
-                heightResize = GlobalApplication.HEIGHT_SCREEN;
-                widthResize = (int) ((float) GlobalApplication.HEIGHT_SCREEN / heightResize * widthResize);
+            bitmapMain = BitmapFactory.decodeFile(url);
+            heightResize = (int) ((float) SIZE_IMAGE / bitmapMain.getWidth() * bitmapMain.getHeight());
+            widthResize = SIZE_IMAGE;
+            if (heightResize > HEIGHT_SCREEN) {
+                widthResize = (int) ((float) HEIGHT_SCREEN / heightResize * widthResize);
+                heightResize = HEIGHT_SCREEN;
             }
-            bmMain = Bitmap.createScaledBitmap(bmMain, widthResize, heightResize, true);
-
+            bitmapMain = Bitmap.createScaledBitmap(bitmapMain, widthResize, heightResize, true);
         } catch (OutOfMemoryError e) {
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inJustDecodeBounds = true;
@@ -92,130 +98,96 @@ public class ImageControl extends AppCompatActivity implements View.OnClickListe
             int height = o.outHeight;
             widthResize = width;
             heightResize = height;
-            if (widthResize > GlobalApplication.WIDTH_SCREEN) {
-                heightResize = (int) ((float) GlobalApplication.WIDTH_SCREEN
-                        / widthResize * heightResize);
-                widthResize = GlobalApplication.WIDTH_SCREEN;
+            if (widthResize > SIZE_IMAGE) {
+                heightResize = (int) ((float) SIZE_IMAGE / widthResize * heightResize);
+                widthResize = SIZE_IMAGE;
             }
-            if (heightResize > GlobalApplication.HEIGHT_SCREEN) {
-                widthResize = (int) ((float) GlobalApplication.HEIGHT_SCREEN
-                        / heightResize * widthResize);
-                heightResize = GlobalApplication.HEIGHT_SCREEN;
+            if (heightResize > HEIGHT_SCREEN) {
+                widthResize = (int) ((float) HEIGHT_SCREEN / heightResize * widthResize);
+                heightResize = HEIGHT_SCREEN;
             }
-
-            bmMain = decodeSampledBitmapFromResource(url, widthResize, heightResize);
-//            bmMain = Bitmap.createScaledBitmap(bmMain, widthResize,
-//                    heightResize, true);
+            bitmapMain = commonMethod.decodeSampledBitmapFromResource(url, widthResize, heightResize);
 
         }
-        image.setImageBitmap(bmMain);
+        orientation = CommonMethod.getInstance().getOrientation(url);
+        bitmapMain = CommonMethod.getInstance().getBitmap(orientation, bitmapMain);
+        image.setImageBitmap(bitmapMain);
+        bitmapMain = ((BitmapDrawable) image.getDrawable()).getBitmap();
         imageView = (ImageView) findViewById(R.id.imageView);
-        if (bmMain.getWidth() > bmMain.getHeight()) {
-            radius = (float) heightResize / 2;
-            if (radius * 2 > SIZE_IMAGE) radius = SIZE_IMAGE / 2;
-        } else {
-            radius = (float) widthResize / 2;
-            if (radius * 2 > SIZE_IMAGE) radius = SIZE_IMAGE / 2;
-            radius = SIZE_IMAGE / 2;
-        }
+        radius = (float) SIZE_IMAGE / 2;
     }
 
-    public static int calculateInSampleSize(BitmapFactory.Options options,
-                                            int reqWidth, int reqHeight) {
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-        return inSampleSize * 2;
-    }
-
-
-    public static Bitmap decodeSampledBitmapFromResource(String uri,
-                                                         int reqWidth, int reqHeight) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(uri, options);
-        options.inSampleSize = calculateInSampleSize(options, reqWidth,
-                reqHeight);
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(uri, options);
-    }
-
-
-    private void cropFadeCirle(float radius) {
-        Bitmap bitmapFade = Bitmap.createBitmap(bmMain.getWidth(),
-                bmMain.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvasbitmapFade = new Canvas(bitmapFade);
-        canvasbitmapFade.drawColor(Color.parseColor("#AF000000"));
+    private void cropFadeCircle(float radius) {
+        Bitmap bitmapFade = Bitmap.createBitmap((int) radius * 2,
+                (int) radius * 2, Bitmap.Config.ARGB_8888);
+        Canvas canvasBitmapFade = new Canvas(bitmapFade);
+        canvasBitmapFade.drawColor(Color.parseColor("#AF000000"));
         Paint eraser = new Paint();
         eraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         eraser.setAntiAlias(true);
-        canvasbitmapFade.drawCircle(bmMain.getWidth() / 2,
-                bmMain.getHeight() / 2, radius, eraser);
+        canvasBitmapFade.drawCircle((int) radius,
+                (int) radius, radius, eraser);
         imageView.setImageBitmap(bitmapFade);
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.btnCrop:
-                cropimage();
+                this.cropImage();
                 break;
             case R.id.btnRotate:
-                rotateImage();
+                this.rotateBMMain();
+                break;
+            case R.id.btnCancel:
+                this.setResult(Activity.RESULT_CANCELED);
+                this.finish();
                 break;
         }
     }
 
-    private void cropimage() {
+    private void rotateBMMain() {
+        image.resetZoom();
+        bitmapMain = CommonMethod.getInstance().getBitmap(90, bitmapMain);
+        image.setImageBitmap(bitmapMain);
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    }
+
+    private void cropImage() {
         RectF rect = image.getZoomedRect();
-        float currentZoom = image.getCurrentZoom();
 
-        float leftReal = (rect.left * bmMain.getWidth());
-        float topReal = (rect.top * bmMain.getHeight());
-        float radiusReal = (radius / currentZoom);
+        float leftReal = (rect.left * bitmapMain.getWidth());
+        float topReal = (rect.top * bitmapMain.getHeight());
+        float rightReal = rect.right * bitmapMain.getWidth();
+        float bottomReal = rect.bottom * bitmapMain.getHeight();
 
-        Bitmap bmCrop = Bitmap.createBitmap((int) (radiusReal * 2), (int) (radiusReal * 2),
-                Bitmap.Config.RGB_565);
+        if (bitmapMain.getWidth() < bitmapMain.getHeight())
+            radius = (float) bitmapMain.getWidth() / 2;
+        else radius = (float) bitmapMain.getHeight() / 2;
+
+        Bitmap bmCrop = Bitmap.createBitmap((int) (rightReal - leftReal),
+                (int) (bottomReal - topReal), Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bmCrop);
 
-        canvas.drawBitmap(bmMain, new Rect((int) leftReal, (int) topReal,
-                        (int) (leftReal + radiusReal * 2), (int) (topReal + radiusReal * 2)),
-                new Rect(0, 0, (int) (radiusReal * 2), (int) (radiusReal * 2)), null);
-        bmCrop = Bitmap.createScaledBitmap(bmCrop, (int) (radius * 2), (int) (radius * 2), true);
+        canvas.drawBitmap(bitmapMain, new Rect((int) leftReal, (int) topReal,
+                        (int) (rightReal), (int) (bottomReal)),
+                new Rect(0, 0, bmCrop.getWidth(), bmCrop.getHeight()), null);
 
         bmCrop = Bitmap.createScaledBitmap(bmCrop, 300, 300, true);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bmCrop.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream);
         byte[] bytes = byteArrayOutputStream.toByteArray();
-
         Intent intent = new Intent();
         intent.putExtra(CommonValue.BYTE_AVATAR, bytes);
-        setResult(Activity.RESULT_OK, intent);
-        finish();
-    }
-
-    private void rotateImage() {
-        float zoom = image.getCurrentZoom();
-        RectF rect = image.getZoomedRect();
-        Matrix matrix = new Matrix();
-        matrix.postRotate(90);
-        bmMain = Bitmap.createBitmap(bmMain , 0, 0, bmMain .getWidth(), bmMain .getHeight(), matrix, true);
-        image.setImageBitmap(bmMain);
+        this.setResult(Activity.RESULT_OK, intent);
+        this.finish();
     }
 
     @Override
     protected void onDestroy() {
-        if (bmMain != null) {
-            bmMain.recycle();
-            bmMain = null;
+        if (bitmapMain != null) {
+            bitmapMain.recycle();
+            bitmapMain = null;
         }
         super.onDestroy();
     }
