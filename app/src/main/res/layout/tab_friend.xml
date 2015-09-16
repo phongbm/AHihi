@@ -38,7 +38,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/me"
+        android:id="@+id/layoutMe"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/menu"
@@ -98,7 +98,7 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@+id/me"
+        android:layout_below="@+id/layoutMe"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="48dp"
         android:layout_marginRight="16dp"

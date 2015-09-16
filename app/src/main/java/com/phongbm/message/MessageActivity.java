@@ -85,6 +85,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_message);
+        GlobalApplication.startActivityMessage = true;
 
         sound = new Sound(this, 10);
 
@@ -274,7 +275,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 int emoticonId = Integer.parseInt(content);
                                 SpannableString emoticon = commonMethod.toSpannableString(
                                         MessageActivity.this, emoticonId);
-                                messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1, date));
+                                messageAdapter.addMessage(0, new MessageItem(type,   emoticon, 1, date));
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
                                 messageAdapter.addMessage(0, new MessageItem(type,
@@ -441,6 +442,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         return path;
     }
 
+
+
     private class BroadcastMessage extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -549,6 +552,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onDestroy() {
+        GlobalApplication.startActivityMessage = false;
         this.unregisterReceiver(broadcastMessage);
         super.onDestroy();
     }

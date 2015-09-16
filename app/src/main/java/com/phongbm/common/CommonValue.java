@@ -49,4 +49,6 @@ public class CommonValue {
 
     public static final String BYTE_AVATAR = "BYTE_AVATAR";
 
+    public static final String MESSAGE_LOG_STOP = "MESSAGE_LOG_STOP";
+
 }

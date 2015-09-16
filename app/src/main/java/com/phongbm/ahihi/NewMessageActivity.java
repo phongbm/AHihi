@@ -39,6 +39,7 @@ public class NewMessageActivity extends AppCompatActivity implements AdapterView
     private int positionItem = -1;
     private View view = null;
     private String id = null, fullName = null;
+    private RelativeLayout layoutNoFriends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,11 @@ public class NewMessageActivity extends AppCompatActivity implements AdapterView
         allFriendItems = ((GlobalApplication) this.getApplication()).getAllFriendItems();
         newMessageAdapter = new NewMessageAdapter(this, allFriendItems);
         listViewAllFriend.setAdapter(newMessageAdapter);
+
+        if (allFriendItems.size() == 0) {
+            listViewAllFriend.setVisibility(View.GONE);
+            layoutNoFriends.setVisibility(View.VISIBLE);
+        }
     }
 
     private void initializeToolbar() {
@@ -84,6 +90,7 @@ public class NewMessageActivity extends AppCompatActivity implements AdapterView
         btnOK = (TextView) findViewById(R.id.btnOK);
         btnOK.setOnClickListener(this);
         txtReceiver = (TextView) findViewById(R.id.txtReceiver);
+        layoutNoFriends = (RelativeLayout) findViewById(R.id.layoutNoFriends);
     }
 
     @Override

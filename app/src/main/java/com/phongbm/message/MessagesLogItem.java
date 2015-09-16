@@ -1,5 +1,7 @@
 package com.phongbm.message;
 
+import com.phongbm.common.GlobalApplication;
+
 public class MessagesLogItem {
     private String id, fullName, message, date;
     private boolean isRead;
@@ -50,6 +52,14 @@ public class MessagesLogItem {
 
     public void setIsRead(boolean isRead) {
         this.isRead = isRead;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o instanceof MessagesLogItem)
+            return ((MessagesLogItem) o).id.equals(id);
+        else return false;
     }
 
 }

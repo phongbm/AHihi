@@ -10,9 +10,7 @@ import android.util.Log;
 
 import com.phongbm.common.CommonValue;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,11 +24,9 @@ public class MessagesLogDBManager {
 
     private Context context;
     private SQLiteDatabase sqLiteDatabase;
-    // private ArrayList<String> ids;
 
     public MessagesLogDBManager(Context context) {
         this.context = context;
-        // ids = new ArrayList<>();
         this.copyDatabaseFile();
     }
 
@@ -119,7 +115,6 @@ public class MessagesLogDBManager {
             message = cursor.getString(indexMessage);
             date = cursor.getString(indexDate);
             isRead = Boolean.parseBoolean(cursor.getString(indexIsRead));
-            // ids.add(id);
             messagesLogItems.add(new MessagesLogItem(id, fullName, message, date, isRead));
             cursor.moveToNext();
         }
@@ -128,14 +123,8 @@ public class MessagesLogDBManager {
     }
 
     public void deleteAllData() {
+        this.openDatabase();
         sqLiteDatabase.execSQL("DELETE FROM Messages");
     }
-
-    /*public boolean checkMessagesLogExists(String id) {
-        if (ids.indexOf(id) != -1) {
-            return true;
-        }
-        return false;
-    }*/
 
 }

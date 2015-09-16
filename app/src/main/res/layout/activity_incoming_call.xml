@@ -113,7 +113,8 @@
                         android:contentDescription="@null"
                         android:padding="8dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_call_speaker" />
+                        android:src="@drawable/ic_message_microphone"
+                        android:tint="#2196f3" />
 
                     <ImageView
                         android:layout_width="42dp"

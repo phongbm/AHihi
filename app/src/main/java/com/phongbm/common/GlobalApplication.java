@@ -18,6 +18,13 @@ public class GlobalApplication extends Application {
     private String fullName, phoneNumber, email;
     private Bitmap pictureSend;
     private ArrayList<AllFriendItem> allFriendItems;
+    private ArrayList<String> listIds;
+
+    private ArrayList<String> idUsers;
+    volatile public static boolean checkLoginThisId = false;
+    volatile public static boolean startActivityMessage = false;
+    volatile public static boolean startWaitingAHihi = false;
+    private SharedPreferencesAHihi sharedPreferencesAHihi;
 
     @Override
     public void onCreate() {
@@ -25,6 +32,10 @@ public class GlobalApplication extends Application {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, ServerInfo.PARSE_APPLICATION_ID, ServerInfo.PARSE_CLIENT_KEY);
         this.initializeComponent();
+        sharedPreferencesAHihi = new SharedPreferencesAHihi(this);
+        idUsers = sharedPreferencesAHihi.readListID();
+        allFriendItems = new ArrayList<>();
+        listIds = new ArrayList<>();
     }
 
     private void initializeComponent() {
@@ -81,6 +92,23 @@ public class GlobalApplication extends Application {
 
     public void setAllFriendItems(ArrayList<AllFriendItem> allFriendItems) {
         this.allFriendItems = allFriendItems;
+    }
+
+    public void addIdUser(String idUser) {
+        idUsers.add(idUser);
+        sharedPreferencesAHihi.writeUserID(idUser);
+    }
+
+    public ArrayList<String> getIdUers() {
+        return idUsers;
+    }
+
+    public ArrayList<String> getListIds() {
+        return listIds;
+    }
+
+    public void setListIds(ArrayList<String> listIds) {
+        this.listIds = listIds;
     }
 
 }

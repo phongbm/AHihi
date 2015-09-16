@@ -27,6 +27,7 @@ import com.parse.ParseUser;
 import com.phongbm.ahihi.MainActivity;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
 
 public class LoginFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "LoginFragment";
@@ -145,6 +146,20 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         if (parseUser != null) {
                             parseUser.put("isOnline", true);
                             parseUser.saveInBackground();
+
+                            String objectId = parseUser.getObjectId();
+                            GlobalApplication globalApplication = (GlobalApplication)
+                                    getActivity().getApplication();
+                            if (!globalApplication.getIdUers().contains(objectId)) {
+                                globalApplication.addIdUser(objectId);
+                                GlobalApplication.startWaitingAHihi = false;
+                                GlobalApplication.checkLoginThisId = false;
+                                GlobalApplication.startActivityMessage = false;
+                            } else {
+                                GlobalApplication.startWaitingAHihi = true;
+                                GlobalApplication.checkLoginThisId = true;
+                                GlobalApplication.startActivityMessage = false;
+                            }
 
                             progressDialog.dismiss();
                             btnSignUp.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#e91e63")));

@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG = "MainActivity";
     private static final int REQUEST_ADDITION_FRIEND = 0;
 
-    private GlobalApplication globalApplication;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigation;
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements
     private Bitmap userAvatar;
     private CircleImageView imgAvatar;
     private FloatingActionButton btnAction;
-    private ArrayList<AllFriendItem> allFriendItems;
+    // private ArrayList<AllFriendItem> allFriendItems;
     private ParseUser currentUser;
     private CallLogsDBManager callLogsDBManager;
 
@@ -92,7 +91,6 @@ public class MainActivity extends AppCompatActivity implements
         }, 3000);
 
         this.setContentView(R.layout.activity_main);
-        globalApplication = (GlobalApplication) this.getApplicationContext();
         this.initializeToolbar();
         this.initializeComponent();
         this.initializeProfileInformation();
@@ -101,9 +99,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void loadListFriend() {
-        allFriendItems = new ArrayList<>();
         currentUser = ParseUser.getCurrentUser();
-        ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
+        final ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
+        final ArrayList<String> listIds = ((GlobalApplication) this.getApplication()).getListIds();
+        final ArrayList<AllFriendItem> allFriendItems = ((GlobalApplication)
+                this.getApplication()).getAllFriendItems();
         if (listFriendId == null || listFriendId.size() == 0) {
             return;
         }
@@ -127,8 +127,10 @@ public class MainActivity extends AppCompatActivity implements
                                 return;
                             }
                             Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            allFriendItems.add(new AllFriendItem(parseUser.getObjectId(), avatar,
+                            String id = parseUser.getObjectId();
+                            allFriendItems.add(new AllFriendItem(id, avatar,
                                     parseUser.getUsername(), parseUser.getString("fullName")));
+                            listIds.add(id);
                             Collections.sort(allFriendItems);
                         }
                     });
@@ -166,22 +168,9 @@ public class MainActivity extends AppCompatActivity implements
         viewPagerAdapter = new ViewPagerAdapter(this, this.getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(viewPagerAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
 
         int[] tabBackgroundIds = new int[]{R.drawable.bg_tab_message, R.drawable.bg_tab_contact,
-                R.drawable.bg_tab_friend, R.drawable.bg_tab_info};
+                R.drawable.bg_tab_friend, R.drawable.bg_tab_setting};
         tab = (TabLayout) findViewById(R.id.tab);
         tab.setupWithViewPager(viewPager);
         for (int i = 0; i < viewPagerAdapter.getCount(); i++) {
@@ -196,14 +185,13 @@ public class MainActivity extends AppCompatActivity implements
     private void initializeProfileInformation() {
         imgAvatar = (CircleImageView) findViewById(R.id.imgAvatar);
         imgAvatar.setOnClickListener(this);
-
         final TextView txtName = (TextView) findViewById(R.id.txtName);
         final TextView txtEmail = (TextView) findViewById(R.id.txtEmail);
 
-        if (globalApplication.getAvatar() != null) {
-            imgAvatar.setImageBitmap(globalApplication.getAvatar());
-            txtName.setText(globalApplication.getFullName());
-            txtEmail.setText(globalApplication.getEmail());
+        if (((GlobalApplication) getApplication()).getAvatar() != null) {
+            imgAvatar.setImageBitmap(((GlobalApplication) getApplication()).getAvatar());
+            txtName.setText(((GlobalApplication) getApplication()).getFullName());
+            txtEmail.setText(((GlobalApplication) getApplication()).getEmail());
             Log.i(TAG, "Get Profile Information from GlobalApplication");
             return;
         }
@@ -216,13 +204,17 @@ public class MainActivity extends AppCompatActivity implements
                 public void done(byte[] bytes, ParseException e) {
                     if (e == null) {
                         String fullName = currentUser.getString("fullName");
+                        String email = currentUser.getEmail();
+
                         userAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         imgAvatar.setImageBitmap(userAvatar);
                         txtName.setText(fullName);
-                        txtEmail.setText(currentUser.getEmail());
-                        globalApplication.setAvatar(userAvatar);
-                        globalApplication.setFullName(fullName);
-                        globalApplication.setPhoneNumber(currentUser.getUsername());
+                        txtEmail.setText(email);
+
+                        ((GlobalApplication) getApplication()).setAvatar(userAvatar);
+                        ((GlobalApplication) getApplication()).setFullName(fullName);
+                        ((GlobalApplication) getApplication()).setPhoneNumber(currentUser.getUsername());
+                        ((GlobalApplication) getApplication()).setEmail(email);
                     }
                 }
             });
@@ -271,6 +263,14 @@ public class MainActivity extends AppCompatActivity implements
                                 ParseUser.logOut();
                                 callLogsDBManager.deleteAllData();
                                 callLogsDBManager.closeDatabase();
+
+                                ((GlobalApplication) getApplication()).setAvatar(null);
+                                ((GlobalApplication) getApplication()).setFullName(null);
+                                ((GlobalApplication) getApplication()).setPhoneNumber(null);
+                                ((GlobalApplication) getApplication()).setEmail(null);
+                                ((GlobalApplication) getApplication()).setPictureSend(null);
+                                ((GlobalApplication) getApplication()).setAllFriendItems(null);
+
                                 Intent intentLogout = new Intent(CommonValue.ACTION_LOGOUT);
                                 MainActivity.this.sendBroadcast(intentLogout);
                                 Intent intent = new Intent(MainActivity.this, MainFragment.class);
@@ -319,8 +319,25 @@ public class MainActivity extends AppCompatActivity implements
                         return;
                     }
                     Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    newFriend = new FriendItem(parseUser.getObjectId(), avatar,
-                            parseUser.getUsername(), parseUser.getString("fullName"));
+                    final String id = parseUser.getObjectId();
+                    newFriend = new FriendItem(id, avatar, parseUser.getUsername(),
+                            parseUser.getString("fullName"));
+
+                    new Handler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            AllFriendItem allFriendItem = new AllFriendItem(newFriend.getId(),
+                                    newFriend.getAvatar(), newFriend.getPhoneNumber(),
+                                    newFriend.getFullName());
+                            ((GlobalApplication) MainActivity.this.getApplication())
+                                    .getAllFriendItems().add((AllFriendItem) allFriendItem);
+                            Collections.sort(((GlobalApplication) MainActivity.this.
+                                    getApplication()).getAllFriendItems());
+                            ((GlobalApplication) MainActivity.this.getApplication())
+                                    .getListIds().add(id);
+                        }
+                    });
+
                     Intent intentAddFriend = new Intent();
                     intentAddFriend.setAction(CommonValue.ACTION_ADD_FRIEND);
                     boolean isOnline = parseUser.getBoolean("isOnline");
@@ -341,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.btnAction:
                 Intent intentNewMessage = new Intent(this, NewMessageActivity.class);
-                globalApplication.setAllFriendItems(allFriendItems);
                 this.startActivity(intentNewMessage);
                 break;
         }

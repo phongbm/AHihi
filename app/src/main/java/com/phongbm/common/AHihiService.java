@@ -1,6 +1,5 @@
 package com.phongbm.common;
 
-import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -49,6 +48,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
+import java.util.Map;
 
 import jp.co.recruit_lifestyle.android.floatingview.FloatingViewListener;
 import jp.co.recruit_lifestyle.android.floatingview.FloatingViewManager;
@@ -59,17 +59,16 @@ public class AHihiService extends Service implements SinchClientListener,
 
     private static final int WIDTH_IMAGE_MAX = 600;
     private static final int HEIGHT_IMAGE_MAX = 800;
-    // private static boolean IS_SEND = false;
 
     private Context context;
     private SinchClient sinchClient;
     private Call outGoingCall = null, inComingCall = null;
     private AHihiBroadcast aHihiBroadcast = null;
-    private String outGoingId = null;
+    private String outGoingId = null, senderName = null;
 
     private MessageListener messageListener;
     private MessageClient messageClient;
-    // private MessagesLogDBManager messagesLogDBManager = null;
+    private MessagesLogDBManager messagesLogDBManager = null;
     private CommonMethod commonMethod;
     private String date;
 
@@ -85,10 +84,11 @@ public class AHihiService extends Service implements SinchClientListener,
         if (context == null) {
             context = this;
         }
-        // messagesLogDBManager = new MessagesLogDBManager(this);
-        // messagesLogDBManager.getData();
         this.registerBroadcast();
         commonMethod = CommonMethod.getInstance();
+        if (messagesLogDBManager == null) {
+            messagesLogDBManager = new MessagesLogDBManager(this);
+        }
     }
 
     @Override
@@ -103,11 +103,10 @@ public class AHihiService extends Service implements SinchClientListener,
         WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
 
-        /*if (messagesLogDBManager == null) {
-            messagesLogDBManager = new MessagesLogDBManager(this);
-        }*/
         ParseUser currentUser = ParseUser.getCurrentUser();
         outGoingId = currentUser != null ? currentUser.getObjectId() : null;
+        senderName = currentUser != null ? currentUser.getString("fullName") : null;
+
         if (intent == null) {
             if (outGoingId != null) {
                 this.startSinchService();
@@ -227,7 +226,6 @@ public class AHihiService extends Service implements SinchClientListener,
     private class MessageListener implements MessageClientListener {
         @Override
         public void onIncomingMessage(MessageClient messageClient, Message message) {
-            Log.i(TAG, "onIncomingMessage...");
             /*ActivityManager activityManager = (ActivityManager) AHihiService.this
                     .getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
@@ -240,96 +238,116 @@ public class AHihiService extends Service implements SinchClientListener,
                 }
             }*/
             String content = message.getTextBody();
-            Intent intentIncoming = new Intent();
-            intentIncoming.setAction(CommonValue.STATE_MESSAGE_INCOMING);
-            intentIncoming.putExtra(CommonValue.AHIHI_KEY_DATE, message.getHeaders().get("date"));
-            if (!content.contains(CommonValue.AHIHI_KEY)) {
-                intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, content);
-                AHihiService.this.sendBroadcast(intentIncoming);
-            } else {
-                String key = content.substring(0, CommonValue.KEY_LENGTH + 1);
+            String key = null;
+            if (content.contains(CommonValue.AHIHI_KEY)) {
+                key = content.substring(0, CommonValue.KEY_LENGTH + 1);
                 content = content.substring(CommonValue.KEY_LENGTH + 1);
+            }
+
+            if (GlobalApplication.startActivityMessage) {
+                Intent intentSent = new Intent();
+                intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
+                intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, message.getHeaders().get("date"));
+                intentSent.putExtra(CommonValue.AHIHI_KEY, key);
+                intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
+                AHihiService.this.sendBroadcast(intentSent);
+            }
+            String id = message.getSenderId();
+            Map<String, String> header = message.getHeaders();
+            String fullName = header.get("senderName");
+            String date = header.get("date");
+            if (key != null) {
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
+                        content = "Has emotion";
+                        break;
                     case CommonValue.AHIHI_KEY_FILE:
+                        content = "Has file";
+                        break;
                     case CommonValue.AHIHI_KEY_PICTURE:
-                        intentIncoming.putExtra(CommonValue.AHIHI_KEY, key);
-                        intentIncoming.putExtra(CommonValue.MESSAGE_CONTENT, content);
-                        AHihiService.this.sendBroadcast(intentIncoming);
+                        content = "Has picture";
                         break;
                 }
             }
-
-            /*final String c = content;
-            final String senderId = message.getSenderId();
-            ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
-            parseQuery.getInBackground(senderId, new GetCallback<ParseUser>() {
-                @Override
-                public void done(ParseUser parseUser, ParseException e) {
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put("id", senderId);
-                    contentValues.put("fullName", parseUser.getString("fullName"));
-                    contentValues.put("message", c);
-                    contentValues.put("date", "26/08/2015");
-                    if (!messagesLogDBManager.checkMessagesLogExists(senderId)) {
-                        messagesLogDBManager.insertData(contentValues);
-                    } else {
-                        messagesLogDBManager.update(contentValues);
-                    }
-                }
-            });*/
+            AHihiService.this.updateMessagesLogDBManager(id, fullName, content, date);
+            if (!GlobalApplication.startWaitingAHihi) {
+                GlobalApplication.startWaitingAHihi = true;
+                GlobalApplication.checkLoginThisId = false;
+                Intent intent = new Intent();
+                intent.setAction(CommonValue.MESSAGE_LOG_STOP);
+                sendBroadcast(intent);
+            }
+            if (GlobalApplication.checkLoginThisId) {
+                Intent intentIncoming = new Intent();
+                intentIncoming.setAction(CommonValue.UPDATE_MESSAGE_LOG);
+                intentIncoming.putExtra(CommonValue.MESSAGE_LOG_ID, id);
+                intentIncoming.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
+                intentIncoming.putExtra(CommonValue.MESSAGE_LOG_CONTENT, content);
+                intentIncoming.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
+                AHihiService.this.sendBroadcast(intentIncoming);
+            }
         }
 
         @Override
         public void onMessageSent(MessageClient messageClient, final Message message, String s) {
-            Toast.makeText(AHihiService.this, "onMessageSent...", Toast.LENGTH_SHORT).show();
-           /* if (!IS_SEND) {
-                IS_SEND = true;
-            }*/
             String content = message.getTextBody();
-            Intent intentSent = new Intent();
-            intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
-            intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, date);
-            if (!content.contains(CommonValue.AHIHI_KEY)) {
+            String key = null;
+            if (content.contains(CommonValue.AHIHI_KEY)) {
+                key = content.substring(0, CommonValue.KEY_LENGTH + 1);
+                content = content.substring(CommonValue.KEY_LENGTH + 1);
+            }
+
+            if (GlobalApplication.startActivityMessage) {
+                Intent intentSent = new Intent();
+                intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
+                intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, date);
+                intentSent.putExtra(CommonValue.AHIHI_KEY, key);
                 intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
                 AHihiService.this.sendBroadcast(intentSent);
-            } else {
-                String key = content.substring(0, CommonValue.KEY_LENGTH + 1);
-                content = content.substring(CommonValue.KEY_LENGTH + 1);
-                intentSent.putExtra(CommonValue.AHIHI_KEY, key);
+            }
+            String id = message.getRecipientIds().get(0);
+            Map<String, String> header = message.getHeaders();
+            String fullName = header.get("fullName");
+            String date = header.get("date");
+            if (key != null) {
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
+                        content = "Has emotion";
+                        break;
                     case CommonValue.AHIHI_KEY_FILE:
+                        content = "Has file";
+                        break;
                     case CommonValue.AHIHI_KEY_PICTURE:
-                        intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
-                        AHihiService.this.sendBroadcast(intentSent);
+                        content = "Has picture";
                         break;
                 }
             }
-            AHihiService.this.openChatHead();
-
-            String id = message.getSenderId();
-            String fullName = message.getHeaders().get("fullName");
-            // AHihiService.this.updateMessagesLogDBManager(id, fullName, content, date);
-
-            Intent intentMessage = new Intent();
-            intentMessage.setAction(CommonValue.UPDATE_MESSAGE_LOG);
-            intentMessage.putExtra(CommonValue.MESSAGE_LOG_ID, id);
-            intentMessage.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
-            intentMessage.putExtra(CommonValue.MESSAGE_LOG_CONTENT, content);
-            intentMessage.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
-            AHihiService.this.sendBroadcast(intentMessage);
+            AHihiService.this.updateMessagesLogDBManager(id, fullName, "You:  " + content, date);
+            if (!GlobalApplication.startWaitingAHihi) {
+                GlobalApplication.startWaitingAHihi = true;
+                GlobalApplication.checkLoginThisId = false;
+                Intent intent = new Intent();
+                intent.setAction(CommonValue.MESSAGE_LOG_STOP);
+                sendBroadcast(intent);
+            }
+            if (GlobalApplication.checkLoginThisId) {
+                Intent intentMessage = new Intent();
+                intentMessage.setAction(CommonValue.UPDATE_MESSAGE_LOG);
+                intentMessage.putExtra(CommonValue.MESSAGE_LOG_ID, id);
+                intentMessage.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
+                intentMessage.putExtra(CommonValue.MESSAGE_LOG_CONTENT, "You: " + content);
+                intentMessage.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
+                AHihiService.this.sendBroadcast(intentMessage);
+            }
         }
 
         @Override
         public void onMessageFailed(MessageClient messageClient, Message message,
                                     MessageFailureInfo messageFailureInfo) {
-            Log.i(TAG, "onMessageFailed...");
         }
 
         @Override
         public void onMessageDelivered(MessageClient messageClient, MessageDeliveryInfo messageDeliveryInfo) {
-            Log.i(TAG, "onMessageDelivered...");
         }
 
         @Override
@@ -385,6 +403,11 @@ public class AHihiService extends Service implements SinchClientListener,
                     sinchClient.stopListeningOnActiveConnection();
                     sinchClient.terminate();
                     sinchClient = null;
+
+                    messagesLogDBManager.deleteAllData();
+                    GlobalApplication.checkLoginThisId = false;
+                    GlobalApplication.startActivityMessage = false;
+                    GlobalApplication.startWaitingAHihi = false;
                     break;
 
                 // Message
@@ -431,6 +454,7 @@ public class AHihiService extends Service implements SinchClientListener,
                 WritableMessage message = new WritableMessage(id, content);
                 message.addHeader("date", date);
                 message.addHeader("fullName", fullName);
+                message.addHeader("senderName", senderName);
                 messageClient.send(message);
             }
         });
@@ -487,6 +511,7 @@ public class AHihiService extends Service implements SinchClientListener,
                                                     content + "/" + fileName);
                                             message.addHeader("date", date);
                                             message.addHeader("fullName", fullName);
+                                            message.addHeader("senderName", senderName);
                                             messageClient.send(message);
                                         }
                                     });
@@ -555,6 +580,7 @@ public class AHihiService extends Service implements SinchClientListener,
                         WritableMessage message = new WritableMessage(id, content);
                         message.addHeader("date", date);
                         message.addHeader("fullName", fullName);
+                        message.addHeader("senderName", senderName);
                         AHihiService.this.messageClient.send(message);
                     }
                 });
@@ -577,8 +603,6 @@ public class AHihiService extends Service implements SinchClientListener,
                         .getStandSizeBitmap(bitmapSend.getWidth(), bitmapSend.getHeight(),
                                 WIDTH_IMAGE_MAX, HEIGHT_IMAGE_MAX);
                 bitmapSend = Bitmap.createScaledBitmap(bitmapSend, pair.first, pair.second, true);
-                /*bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
-                        pair.first, pair.second);*/
                 Toast.makeText(this, "IF ELSE", Toast.LENGTH_SHORT).show();
             }
         } catch (OutOfMemoryError e) {
@@ -590,8 +614,6 @@ public class AHihiService extends Service implements SinchClientListener,
             Pair<Integer, Integer> pair = CommonMethod.getInstance().getStandSizeBitmap(width,
                     height, WIDTH_IMAGE_MAX, HEIGHT_IMAGE_MAX);
             bitmapSend = Bitmap.createScaledBitmap(bitmapSend, pair.first, pair.second, true);
-            /*bitmapSend = CommonMethod.getInstance().decodeSampledBitmapFromResource(path,
-                    pair.first, pair.second);*/
             Toast.makeText(this, "OutOfMemoryError...", Toast.LENGTH_SHORT).show();
         }
         int orientation = CommonMethod.getInstance().getOrientation(path);
@@ -621,8 +643,8 @@ public class AHihiService extends Service implements SinchClientListener,
                 (int) (16 * displayMetrics.density));
     }
 
-    /*private void updateMessagesLogDBManager(String id, String fullName, String message,
-                                            String date) {
+    private synchronized void updateMessagesLogDBManager(String id, String fullName, String message,
+                                                         String date) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("id", id);
         contentValues.put("fullName", fullName);
@@ -631,12 +653,10 @@ public class AHihiService extends Service implements SinchClientListener,
         contentValues.put("isRead", false);
         if (messagesLogDBManager.conversationExist(id)) {
             messagesLogDBManager.update(contentValues);
-            Log.i(TAG, "updateMessagesLogDBManager update");
         } else {
             messagesLogDBManager.insertData(contentValues);
-            Log.i(TAG, "updateMessagesLogDBManager insert");
         }
-    }*/
+    }
 
     @Override
     public void onDestroy() {
@@ -644,7 +664,7 @@ public class AHihiService extends Service implements SinchClientListener,
             floatingViewManager.removeAllViewToWindow();
             floatingViewManager = null;
         }
-        // messagesLogDBManager.closeDatabase();
+        messagesLogDBManager.closeDatabase();
         this.unregisterReceiver(aHihiBroadcast);
         super.onDestroy();
     }

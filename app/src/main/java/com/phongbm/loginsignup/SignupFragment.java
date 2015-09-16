@@ -25,6 +25,7 @@ import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
 
 public class SignupFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "SignupFragment";
@@ -205,6 +206,13 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                                         @Override
                                         public void onDismissed(Snackbar snackbar, int event) {
                                             super.onDismissed(snackbar, event);
+
+                                            ((GlobalApplication) getActivity().getApplication()).
+                                                    addIdUser(newUser.getObjectId());
+                                            GlobalApplication.startWaitingAHihi = true;
+                                            GlobalApplication.checkLoginThisId = true;
+                                            GlobalApplication.startActivityMessage = false;
+
                                             ((MainFragment) activity).showProfileInformationFragment();
                                         }
                                     });
