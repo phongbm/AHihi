@@ -21,7 +21,7 @@ public class ActiveFriendAdapter extends BaseAdapter {
 
     public ActiveFriendAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
-        activeFriendItems = new ArrayList<ActiveFriendItem>();
+        activeFriendItems = new ArrayList<>();
     }
 
     public void setActiveFriendItems(ArrayList<ActiveFriendItem> activeFriendItems) {

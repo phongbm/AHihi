@@ -7,10 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,8 +53,9 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
     private TextView txtFullName, txtStatus;
     private Switch switchOnline;
     private RelativeLayout layoutMe;
+    private boolean enableTabAllFriend = false;
 
-    private Handler handler = new Handler() {
+    /*private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -67,7 +67,7 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                     break;
             }
         }
-    };
+    };*/
 
     public TabFriendFragment(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -80,9 +80,9 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
         context = this.getActivity();
-        allFriendAdapter = new AllFriendAdapter(this.getActivity(), handler);
+        // allFriendAdapter = new AllFriendAdapter(this.getActivity(), this.getActivity());
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
-        allFriendAdapter.setOnShowPopupMenu(this);
+        // allFriendAdapter.setOnShowPopupMenu(this);
         activeFriendAdapter.setOnShowPopupMenu(this);
         listViewFriend.setAdapter(activeFriendAdapter);
     }
@@ -181,6 +181,12 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                 tabActive = true;
                 break;
             case R.id.btnTabAllFriends:
+                if (!enableTabAllFriend) {
+                    Log.i(TAG, "enableTabAllFriend...");
+                    enableTabAllFriend = true;
+                    allFriendAdapter = new AllFriendAdapter(this.getActivity(), this.getActivity());
+                    allFriendAdapter.setOnShowPopupMenu(this);
+                }
                 this.changeStateShow(btnTabAllFriends);
                 this.changeStateHide(btnTabActive);
                 listViewFriend.setAdapter(allFriendAdapter);

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements
     // private ArrayList<AllFriendItem> allFriendItems;
     private ParseUser currentUser;
     private CallLogsDBManager callLogsDBManager;
+    private CoordinatorLayout coordinator;
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initializeComponent() {
+        coordinator = (CoordinatorLayout) findViewById(R.id.coordinator);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
                 toolbar, R.string.open_navigation_drawer, R.string.close_navigation_drawer) {
@@ -316,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements
                 @Override
                 public void done(byte[] bytes, ParseException e) {
                     if (e != null) {
+                        e.printStackTrace();
                         return;
                     }
                     Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
@@ -330,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements
                                     newFriend.getAvatar(), newFriend.getPhoneNumber(),
                                     newFriend.getFullName());
                             ((GlobalApplication) MainActivity.this.getApplication())
-                                    .getAllFriendItems().add((AllFriendItem) allFriendItem);
+                                    .getAllFriendItems().add(allFriendItem);
                             Collections.sort(((GlobalApplication) MainActivity.this.
                                     getApplication()).getAllFriendItems());
                             ((GlobalApplication) MainActivity.this.getApplication())
@@ -365,7 +369,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        final CoordinatorLayout coordinator = (CoordinatorLayout) findViewById(R.id.coordinator);
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_ADDITION_FRIEND:
@@ -394,20 +397,20 @@ public class MainActivity extends AppCompatActivity implements
                         @Override
                         public void done(ParseUser parseUser, ParseException e) {
                             if (e != null) {
+                                e.printStackTrace();
+                                progressDialog.dismiss();
                                 Snackbar.make(coordinator, "Error",
                                         Snackbar.LENGTH_LONG)
                                         .setAction("ACTION", null)
                                         .show();
-                                e.printStackTrace();
-                                progressDialog.dismiss();
                                 return;
                             }
                             if (parseUser == null) {
+                                progressDialog.dismiss();
                                 Snackbar.make(coordinator, "That account does not exist",
                                         Snackbar.LENGTH_LONG)
                                         .setAction("ACTION", null)
                                         .show();
-                                progressDialog.dismiss();
                                 return;
                             }
                             ArrayList<String> listFriend = (ArrayList<String>) currentUser.get("listFriend");
@@ -416,8 +419,14 @@ public class MainActivity extends AppCompatActivity implements
                             listFriend.add(parseUser.getObjectId());
                             currentUser.put("listFriend", listFriend);
                             currentUser.saveInBackground();
-                            createNewFriend(parseUser);
+                            MainActivity.this.createNewFriend(parseUser);
                             progressDialog.dismiss();
+                            Snackbar snackbar = Snackbar.make(coordinator, "Addition friend successfully",
+                                    Snackbar.LENGTH_LONG)
+                                    .setAction("ACTION", null);
+                            View snackbarView = snackbar.getView();
+                            snackbarView.setBackgroundColor(Color.parseColor("#4caf50"));
+                            snackbar.show();
                         }
                     });
                     break;

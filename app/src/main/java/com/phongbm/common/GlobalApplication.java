@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.parse.Parse;
@@ -12,6 +13,7 @@ import com.phongbm.ahihi.AllFriendItem;
 import java.util.ArrayList;
 
 public class GlobalApplication extends Application {
+    public static final String TAG = "GlobalApplication";
     public static int WIDTH_SCREEN, HEIGHT_SCREEN;
 
     private Bitmap avatar;
@@ -29,6 +31,7 @@ public class GlobalApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i(TAG, "onCreate()...");
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, ServerInfo.PARSE_APPLICATION_ID, ServerInfo.PARSE_CLIENT_KEY);
         this.initializeComponent();

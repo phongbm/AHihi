@@ -1,10 +1,7 @@
 package com.phongbm.ahihi;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,39 +9,31 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.parse.GetCallback;
-import com.parse.GetDataCallback;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
 import com.phongbm.common.OnShowPopupMenu;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AllFriendAdapter extends BaseAdapter {
     private static final String TAG = "FriendAdapter";
 
-    private Handler handler;
+    // private Handler handler;
     private ArrayList<AllFriendItem> allFriendItems;
-    private ArrayList<ActiveFriendItem> activeFriendItems;
+    // private ArrayList<ActiveFriendItem> activeFriendItems;
     private LayoutInflater layoutInflater;
     private OnShowPopupMenu onShowPopupMenu;
 
-    public AllFriendAdapter(Context context, Handler handler) {
+    public AllFriendAdapter(Context context, Activity activity) {
         layoutInflater = LayoutInflater.from(context);
-        this.handler = handler;
-        allFriendItems = new ArrayList<AllFriendItem>();
-        activeFriendItems = new ArrayList<ActiveFriendItem>();
-        if (MainActivity.isNetworkConnected(context))
-            this.initializeListFriend();
+        // this.handler = handler;
+        allFriendItems = ((GlobalApplication) activity.getApplication()).getAllFriendItems();
+        // activeFriendItems = new ArrayList<>();
+        // this.initializeListFriend();
     }
 
-    private void initializeListFriend() {
+    /*private void initializeListFriend() {
         ParseUser currentUser = ParseUser.getCurrentUser();
         ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
         if (listFriendId == null || listFriendId.size() == 0) {
@@ -84,7 +73,7 @@ public class AllFriendAdapter extends BaseAdapter {
                 }
             });
         }
-    }
+    }*/
 
     @Override
     public int getCount() {
@@ -137,10 +126,6 @@ public class AllFriendAdapter extends BaseAdapter {
 
     public ArrayList<AllFriendItem> getAllFriendItems() {
         return allFriendItems;
-    }
-
-    public ArrayList<ActiveFriendItem> getActiveFriendItems() {
-        return activeFriendItems;
     }
 
 }
