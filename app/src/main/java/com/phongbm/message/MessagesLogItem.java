@@ -1,12 +1,10 @@
 package com.phongbm.message;
 
-import com.phongbm.common.GlobalApplication;
-
 public class MessagesLogItem {
     private String id, fullName, message, date;
-    private boolean isRead;
+    private int isRead;
 
-    public MessagesLogItem(String id, String fullName, String message, String date, boolean isRead) {
+    public MessagesLogItem(String id, String fullName, String message, String date, int isRead) {
         this.id = id;
         this.fullName = fullName;
         this.message = message;
@@ -46,20 +44,20 @@ public class MessagesLogItem {
         this.date = date;
     }
 
-    public boolean isRead() {
+    public int isRead() {
         return isRead;
     }
 
-    public void setIsRead(boolean isRead) {
+    public void setIsRead(int isRead) {
         this.isRead = isRead;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (o instanceof MessagesLogItem)
-            return ((MessagesLogItem) o).id.equals(id);
-        else return false;
+    public boolean equals(Object object) {
+        if (object == null || !(object instanceof MessagesLogItem)) {
+            return false;
+        }
+        return ((MessagesLogItem) object).id.equals(id);
     }
 
 }

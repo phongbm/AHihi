@@ -99,8 +99,8 @@ public class MessagesLogDBManager {
         ArrayList<MessagesLogItem> messagesLogItems = new ArrayList<>();
         int indexId, indexFullName, indexMessage, indexDate, indexIsRead;
         String id, fullName, message, date;
-        boolean isRead;
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Messages", null);
+        int isRead;
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM Messages ORDER BY date DESC", null);
         if (cursor == null)
             return null;
         cursor.moveToFirst();
@@ -114,7 +114,7 @@ public class MessagesLogDBManager {
             fullName = cursor.getString(indexFullName);
             message = cursor.getString(indexMessage);
             date = cursor.getString(indexDate);
-            isRead = Boolean.parseBoolean(cursor.getString(indexIsRead));
+            isRead = cursor.getInt(indexIsRead);
             messagesLogItems.add(new MessagesLogItem(id, fullName, message, date, isRead));
             cursor.moveToNext();
         }

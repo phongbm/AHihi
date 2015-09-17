@@ -41,7 +41,7 @@ import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
-import com.phongbm.common.OnLoadedAvatar;
+import com.phongbm.common.OnLoadedInformation;
 import com.phongbm.music.Sound;
 
 import java.text.SimpleDateFormat;
@@ -80,6 +80,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private CollectionEmoticonAdapter collectionEmoticonAdapter;
     private Uri capturedImageURI;
     private Sound sound;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,21 +102,21 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         this.registerBroadcastMessage();
 
         messageAdapter = new MessageAdapter(this, inComingMessageId);
-        messageAdapter.setOnLoadedAvatar(new OnLoadedAvatar() {
+        messageAdapter.setOnLoadedInformation(new OnLoadedInformation() {
             @Override
-            public void onLoaded(boolean result) {
+            public void onLoaded(boolean result, boolean isOnline) {
                 listViewMessage.setAdapter(messageAdapter);
                 MessageActivity.this.getData();
+                toolbar.setSubtitle(isOnline ? "Online" : "Offline");
             }
         });
     }
 
     private void initializeToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setTitle(inComingFullName);
-        toolbar.setSubtitle("Online");
     }
 
     private void initializeComponent() {
@@ -275,7 +276,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 int emoticonId = Integer.parseInt(content);
                                 SpannableString emoticon = commonMethod.toSpannableString(
                                         MessageActivity.this, emoticonId);
-                                messageAdapter.addMessage(0, new MessageItem(type,   emoticon, 1, date));
+                                messageAdapter.addMessage(0, new MessageItem(type, emoticon, 1, date));
                                 break;
                             case CommonValue.AHIHI_KEY_FILE:
                                 messageAdapter.addMessage(0, new MessageItem(type,
@@ -441,7 +442,6 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         cursor.close();
         return path;
     }
-
 
 
     private class BroadcastMessage extends BroadcastReceiver {

@@ -20,7 +20,6 @@ public class GlobalApplication extends Application {
     private String fullName, phoneNumber, email;
     private Bitmap pictureSend;
     private ArrayList<AllFriendItem> allFriendItems;
-    private ArrayList<String> listIds;
 
     private ArrayList<String> idUsers;
     volatile public static boolean checkLoginThisId = false;
@@ -38,7 +37,6 @@ public class GlobalApplication extends Application {
         sharedPreferencesAHihi = new SharedPreferencesAHihi(this);
         idUsers = sharedPreferencesAHihi.readListID();
         allFriendItems = new ArrayList<>();
-        listIds = new ArrayList<>();
     }
 
     private void initializeComponent() {
@@ -104,14 +102,6 @@ public class GlobalApplication extends Application {
 
     public ArrayList<String> getIdUers() {
         return idUsers;
-    }
-
-    public ArrayList<String> getListIds() {
-        return listIds;
-    }
-
-    public void setListIds(ArrayList<String> listIds) {
-        this.listIds = listIds;
     }
 
 }

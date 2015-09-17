@@ -1,5 +1,6 @@
 package com.phongbm.common;
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -76,7 +77,6 @@ public class AHihiService extends Service implements SinchClientListener,
     private LayoutInflater layoutInflater;
     private RelativeLayout widget;
     private DisplayMetrics displayMetrics;
-    private boolean open;
 
     @Override
     public void onCreate() {
@@ -98,7 +98,6 @@ public class AHihiService extends Service implements SinchClientListener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        open = false;
         displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -226,17 +225,10 @@ public class AHihiService extends Service implements SinchClientListener,
     private class MessageListener implements MessageClientListener {
         @Override
         public void onIncomingMessage(MessageClient messageClient, Message message) {
-            /*ActivityManager activityManager = (ActivityManager) AHihiService.this
+            ActivityManager activityManager = (ActivityManager) AHihiService.this
                     .getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
-            Log.i(TAG, tasks.get(0).processName);
-            if (tasks.get(0).processName.equals(CommonValue.PACKAGE_NAME_MAIN)) {
-            } else {
-                if (!open) {
-                    open = true;
-                    AHihiService.this.openChatHead();
-                }
-            }*/
+
             String content = message.getTextBody();
             String key = null;
             if (content.contains(CommonValue.AHIHI_KEY)) {
@@ -255,27 +247,39 @@ public class AHihiService extends Service implements SinchClientListener,
             String id = message.getSenderId();
             Map<String, String> header = message.getHeaders();
             String fullName = header.get("senderName");
+            String name;
+            if (fullName.contains(" ")) {
+                name = fullName.substring(0, fullName.indexOf(" ") + 1);
+            } else {
+                name = fullName;
+            }
             String date = header.get("date");
             if (key != null) {
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
-                        content = "Has emotion";
+                        content = name + " sent a sticker";
                         break;
                     case CommonValue.AHIHI_KEY_FILE:
-                        content = "Has file";
+                        content = name + " sent a file";
                         break;
                     case CommonValue.AHIHI_KEY_PICTURE:
-                        content = "Has picture";
+                        content = name + " sent a picture";
                         break;
                 }
             }
-            AHihiService.this.updateMessagesLogDBManager(id, fullName, content, date);
+            int isRead;
+            if (tasks.get(0).processName.equals(CommonValue.PACKAGE_NAME_MAIN)) {
+                isRead = 1;
+            } else {
+                isRead = 0;
+            }
+            AHihiService.this.updateMessagesLogDBManager(id, fullName, content, date, isRead);
             if (!GlobalApplication.startWaitingAHihi) {
                 GlobalApplication.startWaitingAHihi = true;
                 GlobalApplication.checkLoginThisId = false;
                 Intent intent = new Intent();
                 intent.setAction(CommonValue.MESSAGE_LOG_STOP);
-                sendBroadcast(intent);
+                AHihiService.this.sendBroadcast(intent);
             }
             if (GlobalApplication.checkLoginThisId) {
                 Intent intentIncoming = new Intent();
@@ -284,6 +288,7 @@ public class AHihiService extends Service implements SinchClientListener,
                 intentIncoming.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
                 intentIncoming.putExtra(CommonValue.MESSAGE_LOG_CONTENT, content);
                 intentIncoming.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
+                intentIncoming.putExtra(CommonValue.MESSAGE_LOG_IS_READ, isRead);
                 AHihiService.this.sendBroadcast(intentIncoming);
             }
         }
@@ -312,17 +317,17 @@ public class AHihiService extends Service implements SinchClientListener,
             if (key != null) {
                 switch (key) {
                     case CommonValue.AHIHI_KEY_EMOTICON:
-                        content = "Has emotion";
+                        content = "Sent a sticker";
                         break;
                     case CommonValue.AHIHI_KEY_FILE:
-                        content = "Has file";
+                        content = "Sent a file";
                         break;
                     case CommonValue.AHIHI_KEY_PICTURE:
-                        content = "Has picture";
+                        content = "Sent a picture";
                         break;
                 }
             }
-            AHihiService.this.updateMessagesLogDBManager(id, fullName, "You:  " + content, date);
+            AHihiService.this.updateMessagesLogDBManager(id, fullName, "You:  " + content, date, 1);
             if (!GlobalApplication.startWaitingAHihi) {
                 GlobalApplication.startWaitingAHihi = true;
                 GlobalApplication.checkLoginThisId = false;
@@ -337,6 +342,7 @@ public class AHihiService extends Service implements SinchClientListener,
                 intentMessage.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
                 intentMessage.putExtra(CommonValue.MESSAGE_LOG_CONTENT, "You: " + content);
                 intentMessage.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
+                intentMessage.putExtra(CommonValue.MESSAGE_LOG_IS_READ, 1);
                 AHihiService.this.sendBroadcast(intentMessage);
             }
         }
@@ -623,7 +629,6 @@ public class AHihiService extends Service implements SinchClientListener,
 
     @Override
     public void onFinishFloatingView() {
-        open = false;
     }
 
     private void openChatHead() {
@@ -644,13 +649,13 @@ public class AHihiService extends Service implements SinchClientListener,
     }
 
     private synchronized void updateMessagesLogDBManager(String id, String fullName, String message,
-                                                         String date) {
+                                                         String date, int isRead) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("id", id);
         contentValues.put("fullName", fullName);
         contentValues.put("message", message);
         contentValues.put("date", date);
-        contentValues.put("isRead", false);
+        contentValues.put("isRead", isRead);
         if (messagesLogDBManager.conversationExist(id)) {
             messagesLogDBManager.update(contentValues);
         } else {

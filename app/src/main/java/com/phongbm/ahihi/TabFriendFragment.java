@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -55,20 +56,6 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
     private RelativeLayout layoutMe;
     private boolean enableTabAllFriend = false;
 
-    /*private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case CommonValue.ACTION_UPDATE_LIST_FRIEND:
-                    allFriendAdapter.notifyDataSetChanged();
-                    activeFriendAdapter.setActiveFriendItems(
-                            allFriendAdapter.getActiveFriendItems());
-                    activeFriendAdapter.notifyDataSetChanged();
-                    break;
-            }
-        }
-    };*/
-
     public TabFriendFragment(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         view = layoutInflater.inflate(R.layout.tab_friend, null);
@@ -80,9 +67,7 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
         context = this.getActivity();
-        // allFriendAdapter = new AllFriendAdapter(this.getActivity(), this.getActivity());
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity());
-        // allFriendAdapter.setOnShowPopupMenu(this);
         activeFriendAdapter.setOnShowPopupMenu(this);
         listViewFriend.setAdapter(activeFriendAdapter);
     }
@@ -207,7 +192,7 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
-    public void onShowPopupMenuListener(int position, View view) {
+    public void onShowPopupMenuListener(final int position, View view) {
         final String inComingId, inComingFullName;
         if (tabActive) {
             inComingId = activeFriendAdapter.getItem(position).getId();

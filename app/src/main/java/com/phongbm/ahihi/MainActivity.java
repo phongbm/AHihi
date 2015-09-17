@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements
     private Bitmap userAvatar;
     private CircleImageView imgAvatar;
     private FloatingActionButton btnAction;
-    // private ArrayList<AllFriendItem> allFriendItems;
     private ParseUser currentUser;
     private CallLogsDBManager callLogsDBManager;
     private CoordinatorLayout coordinator;
@@ -103,12 +102,11 @@ public class MainActivity extends AppCompatActivity implements
     private void loadListFriend() {
         currentUser = ParseUser.getCurrentUser();
         final ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
-        final ArrayList<String> listIds = ((GlobalApplication) this.getApplication()).getListIds();
-        final ArrayList<AllFriendItem> allFriendItems = ((GlobalApplication)
-                this.getApplication()).getAllFriendItems();
         if (listFriendId == null || listFriendId.size() == 0) {
             return;
         }
+        final ArrayList<AllFriendItem> allFriendItems = ((GlobalApplication)
+                this.getApplication()).getAllFriendItems();
         for (int i = 0; i < listFriendId.size(); i++) {
             ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
             parseQuery.getInBackground(listFriendId.get(i), new GetCallback<ParseUser>() {
@@ -132,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements
                             String id = parseUser.getObjectId();
                             allFriendItems.add(new AllFriendItem(id, avatar,
                                     parseUser.getUsername(), parseUser.getString("fullName")));
-                            listIds.add(id);
                             Collections.sort(allFriendItems);
                         }
                     });
@@ -337,8 +334,6 @@ public class MainActivity extends AppCompatActivity implements
                                     .getAllFriendItems().add(allFriendItem);
                             Collections.sort(((GlobalApplication) MainActivity.this.
                                     getApplication()).getAllFriendItems());
-                            ((GlobalApplication) MainActivity.this.getApplication())
-                                    .getListIds().add(id);
                         }
                     });
 
@@ -414,9 +409,20 @@ public class MainActivity extends AppCompatActivity implements
                                 return;
                             }
                             ArrayList<String> listFriend = (ArrayList<String>) currentUser.get("listFriend");
-                            if (listFriend == null)
+                            String newUserId = parseUser.getObjectId();
+                            if (listFriend == null) {
                                 listFriend = new ArrayList<String>();
-                            listFriend.add(parseUser.getObjectId());
+                            } else {
+                                if (listFriend.contains(newUserId)) {
+                                    progressDialog.dismiss();
+                                    Snackbar.make(coordinator, "That account has been identical",
+                                            Snackbar.LENGTH_LONG)
+                                            .setAction("ACTION", null)
+                                            .show();
+                                    return;
+                                }
+                            }
+                            listFriend.add(newUserId);
                             currentUser.put("listFriend", listFriend);
                             currentUser.saveInBackground();
                             MainActivity.this.createNewFriend(parseUser);

@@ -38,7 +38,7 @@ import com.parse.ParseUser;
 import com.parse.ProgressCallback;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.GlobalApplication;
-import com.phongbm.common.OnLoadedAvatar;
+import com.phongbm.common.OnLoadedInformation;
 import com.phongbm.libs.SquareImageView;
 import com.phongbm.libs.TriangleShapeView;
 
@@ -67,10 +67,10 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
     private ArrayList<MessageItem> messageItems;
     private LayoutInflater layoutInflater;
     private Bitmap outGoingMessageAvatar, inComingMessageAvatar;
-    private OnLoadedAvatar onLoadedAvatar;
+    private OnLoadedInformation onLoadedInformation;
 
-    public void setOnLoadedAvatar(OnLoadedAvatar onLoadedAvatar) {
-        this.onLoadedAvatar = onLoadedAvatar;
+    public void setOnLoadedInformation(OnLoadedInformation onLoadedInformation) {
+        this.onLoadedInformation = onLoadedInformation;
     }
 
     public MessageAdapter(Context context, final String inComingMessageId) {
@@ -92,6 +92,7 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                     e.printStackTrace();
                     return;
                 }
+                final boolean isOnline = parseUser.getBoolean("isOnline");
                 ParseFile parseFile = (ParseFile) parseUser.get("avatar");
                 if (parseFile != null) {
                     parseFile.getDataInBackground(new GetDataCallback() {
@@ -102,7 +103,7 @@ public class MessageAdapter extends BaseAdapter implements View.OnClickListener 
                                 return;
                             }
                             inComingMessageAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            onLoadedAvatar.onLoaded(true);
+                            onLoadedInformation.onLoaded(true, isOnline);
                             progressDialog.dismiss();
                         }
                     });

@@ -13,67 +13,33 @@ import com.phongbm.common.GlobalApplication;
 import com.phongbm.common.OnShowPopupMenu;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AllFriendAdapter extends BaseAdapter {
     private static final String TAG = "FriendAdapter";
 
-    // private Handler handler;
     private ArrayList<AllFriendItem> allFriendItems;
-    // private ArrayList<ActiveFriendItem> activeFriendItems;
     private LayoutInflater layoutInflater;
     private OnShowPopupMenu onShowPopupMenu;
+    private HashMap<String, Integer> alphaIndexer;
 
     public AllFriendAdapter(Context context, Activity activity) {
         layoutInflater = LayoutInflater.from(context);
-        // this.handler = handler;
-        allFriendItems = ((GlobalApplication) activity.getApplication()).getAllFriendItems();
-        // activeFriendItems = new ArrayList<>();
-        // this.initializeListFriend();
+
+        allFriendItems = (ArrayList<AllFriendItem>) (((GlobalApplication)
+                activity.getApplication()).getAllFriendItems().clone());
+
+        alphaIndexer = new HashMap<>();
+        for (int i = 0; i < allFriendItems.size(); i++) {
+            String firstLetter = allFriendItems.get(i).getFullName().substring(0, 1).toUpperCase();
+            if (!alphaIndexer.containsKey(firstLetter)) {
+                alphaIndexer.put(firstLetter, i);
+                allFriendItems.add(i, new AllFriendItem(firstLetter, 0));
+            }
+        }
     }
-
-    /*private void initializeListFriend() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        ArrayList<String> listFriendId = (ArrayList<String>) currentUser.get("listFriend");
-        if (listFriendId == null || listFriendId.size() == 0) {
-            return;
-        }
-        for (int i = 0; i < listFriendId.size(); i++) {
-            ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
-            parseQuery.whereEqualTo("objectId", listFriendId.get(i));
-            parseQuery.getFirstInBackground(new GetCallback<ParseUser>() {
-                @Override
-                public void done(final ParseUser parseUser, ParseException e) {
-                    ParseFile parseFile = (ParseFile) parseUser.get("avatar");
-                    if (parseFile == null) {
-                        return;
-                    }
-                    parseFile.getDataInBackground(new GetDataCallback() {
-                        @Override
-                        public void done(byte[] bytes, ParseException e) {
-                            if (e != null) {
-                                return;
-                            }
-                            Bitmap avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                            allFriendItems.add(new AllFriendItem(parseUser.getObjectId(), avatar,
-                                    parseUser.getUsername(), parseUser.getString("fullName")));
-                            Collections.sort(allFriendItems);
-
-                            if (parseUser.getBoolean("isOnline")) {
-                                activeFriendItems.add(new ActiveFriendItem(parseUser.getObjectId(),
-                                        avatar, parseUser.getUsername(), parseUser.getString("fullName")));
-                            }
-                        }
-                    });
-                    Message message = new Message();
-                    message.what = CommonValue.ACTION_UPDATE_LIST_FRIEND;
-                    message.setTarget(handler);
-                    message.sendToTarget();
-                }
-            });
-        }
-    }*/
 
     @Override
     public int getCount() {
@@ -91,26 +57,47 @@ public class AllFriendAdapter extends BaseAdapter {
     }
 
     @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (allFriendItems.get(position).getType() == 1) {
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         final ViewHolder viewHolder;
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
+            if (getItemViewType(position) == 1) {
+                convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
+                viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
+                viewHolder.menu = (ImageView) convertView.findViewById(R.id.menu);
+            } else {
+                convertView = layoutInflater.inflate(R.layout.item_all_friend_header, parent, false);
+            }
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.txtName);
-            viewHolder.menu = (ImageView) convertView.findViewById(R.id.menu);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.imgAvatar.setImageBitmap(allFriendItems.get(position).getAvatar());
-        viewHolder.txtName.setText(allFriendItems.get(position).getFullName());
-        viewHolder.menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onShowPopupMenu.onShowPopupMenuListener(position, viewHolder.menu);
-            }
-        });
+        if (getItemViewType(position) == 1) {
+            viewHolder.imgAvatar.setImageBitmap(allFriendItems.get(position).getAvatar());
+            viewHolder.txtName.setText(allFriendItems.get(position).getFullName());
+            viewHolder.menu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onShowPopupMenu.onShowPopupMenuListener(position, viewHolder.menu);
+                }
+            });
+        } else {
+            viewHolder.txtName.setText(allFriendItems.get(position).getId());
+        }
         return convertView;
     }
 

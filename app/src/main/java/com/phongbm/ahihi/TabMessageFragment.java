@@ -3,32 +3,47 @@ package com.phongbm.ahihi;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
+import com.phongbm.message.MessageActivity;
 import com.phongbm.message.MessagesLogDBManager;
 import com.phongbm.message.MessagesLogItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 @SuppressLint("ValidFragment")
-public class TabMessageFragment extends Fragment {
+public class TabMessageFragment extends Fragment implements AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener {
     private static final String TAG = "TabMessageFragment";
 
     private View view;
@@ -39,6 +54,7 @@ public class TabMessageFragment extends Fragment {
     private BroadcastMessageLog broadcastMessageLog;
     private ProgressDialog progressDialog;
     private RelativeLayout layoutNoConversations;
+    private int positionLongItemClick = -1;
 
     public TabMessageFragment(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -63,6 +79,7 @@ public class TabMessageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.registerForContextMenu(listViewMessage);
         Log.i(TAG, "onCreate()...TabMessageFragment");
     }
 
@@ -74,7 +91,77 @@ public class TabMessageFragment extends Fragment {
 
     private void initializeComponent() {
         listViewMessage = (ListView) view.findViewById(R.id.listViewMessage);
+        listViewMessage.setOnItemClickListener(this);
+        listViewMessage.setOnItemLongClickListener(this);
         layoutNoConversations = (RelativeLayout) view.findViewById(R.id.layoutNoConversations);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+        final MessagesLogItem messagesLogItem = messagesLogItems.get(position);
+        if (messagesLogItems.get(position).isRead() == 0) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    messagesLogItems.get(position).setIsRead(1);
+                    messageLogAdapter.notifyDataSetChanged();
+
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("id", messagesLogItem.getId());
+                    contentValues.put("fullName", messagesLogItem.getFullName());
+                    contentValues.put("message", messagesLogItem.getMessage());
+                    contentValues.put("date", messagesLogItem.getDate());
+                    contentValues.put("isRead", true);
+                    messagesLogDBManager.update(contentValues);
+
+                    messagesLogDBManager.getData();
+                }
+            });
+        }
+        Intent intentChat = new Intent(TabMessageFragment.this.getActivity(), MessageActivity.class);
+        intentChat.putExtra(CommonValue.INCOMING_CALL_ID, messagesLogItem.getId());
+        intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, messagesLogItem.getFullName());
+        TabMessageFragment.this.getActivity().startActivity(intentChat);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        this.getActivity().openContextMenu(parent);
+        positionLongItemClick = position;
+        return true;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        if (view.getId() == R.id.listViewMessage) {
+            menu.setHeaderTitle("Conversation");
+            MenuInflater menuInflater = this.getActivity().getMenuInflater();
+            menuInflater.inflate(R.menu.menu_more_options, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                Log.i(TAG, "action_delete... " + positionLongItemClick);
+                messagesLogDBManager.deleteData(messagesLogItems.get(positionLongItemClick).getId());
+                messagesLogItems.remove(positionLongItemClick);
+                messageLogAdapter.notifyDataSetChanged();
+                positionLongItemClick = -1;
+                CoordinatorLayout coordinator = (CoordinatorLayout) TabMessageFragment.this
+                        .getActivity().findViewById(R.id.coordinator);
+                Snackbar snackbar = Snackbar.make(coordinator, "Delete successfully", Snackbar.LENGTH_LONG)
+                        .setAction("ACTION", null);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#4caf50"));
+                snackbar.show();
+                break;
+            default:
+                super.onContextItemSelected(item);
+        }
+        return true;
     }
 
     /**
@@ -106,29 +193,54 @@ public class TabMessageFragment extends Fragment {
                 viewHolder = new ViewHolder();
                 viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
                 viewHolder.txtFullName = (TextView) convertView.findViewById(R.id.txtFullName);
-                viewHolder.txtConent = (TextView) convertView.findViewById(R.id.txtContent);
+                viewHolder.txtContent = (TextView) convertView.findViewById(R.id.txtContent);
+                viewHolder.txtDate = (TextView) convertView.findViewById(R.id.txtDate);
+                viewHolder.imgOK = (ImageView) convertView.findViewById(R.id.imgOK);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            viewHolder.txtFullName.setText(messagesLogItems.get(position).getFullName());
-            viewHolder.txtConent.setText(messagesLogItems.get(position).getMessage());
 
-            int index = ((GlobalApplication) getActivity().getApplication()).getListIds()
-                    .indexOf(messagesLogItems.get(position).getId());
+            String id = messagesLogItems.get(position).getId();
+            int index = ((GlobalApplication) getActivity().getApplication()).getAllFriendItems()
+                    .indexOf(new AllFriendItem(id, 1));
             if (index > -1) {
                 viewHolder.imgAvatar.setImageBitmap(((GlobalApplication) getActivity()
                         .getApplication()).getAllFriendItems().get(index).getAvatar());
             } else {
                 viewHolder.imgAvatar.setImageResource(R.drawable.ic_avatar_default);
             }
+            viewHolder.txtFullName.setText(messagesLogItems.get(position).getFullName());
+            viewHolder.txtContent.setText(messagesLogItems.get(position).getMessage());
+
+            String date = messagesLogItems.get(position).getDate();
+            String day = date.substring(0, 10);
+            String time = date.substring(11);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+            String currentDay = simpleDateFormat.format(Calendar.getInstance().getTime());
+            if (day.compareTo(currentDay) < 0) {
+                viewHolder.txtDate.setText(day);
+            } else {
+                viewHolder.txtDate.setText(time);
+            }
+            if (messagesLogItems.get(position).isRead() == 1) {
+                viewHolder.imgOK.setVisibility(View.VISIBLE);
+                viewHolder.txtFullName.setTypeface(null, Typeface.NORMAL);
+                viewHolder.txtContent.setTypeface(null, Typeface.NORMAL);
+            } else {
+                Log.i(TAG, "Not read");
+                viewHolder.imgOK.setVisibility(View.GONE);
+                viewHolder.txtFullName.setTypeface(null, Typeface.BOLD);
+                viewHolder.txtContent.setTypeface(null, Typeface.BOLD);
+            }
             return convertView;
         }
     }
 
     private class ViewHolder {
-        private CircleImageView imgAvatar;
-        private TextView txtFullName, txtConent;
+        CircleImageView imgAvatar;
+        TextView txtFullName, txtContent, txtDate;
+        ImageView imgOK;
     }
 
     private void registerBroadcastMessageLog(Context context) {
@@ -155,15 +267,14 @@ public class TabMessageFragment extends Fragment {
                     String fullName = intent.getStringExtra(CommonValue.MESSAGE_LOG_FULL_NAME);
                     String content = intent.getStringExtra(CommonValue.MESSAGE_LOG_CONTENT);
                     String date = intent.getStringExtra(CommonValue.MESSAGE_LOG_DATE);
+                    int isRead = intent.getIntExtra(CommonValue.MESSAGE_LOG_IS_READ, -1);
 
-                    int indexSame = messagesLogItems.indexOf(new MessagesLogItem(id, fullName,
-                            content, date, false));
+                    int indexSame = messagesLogItems.indexOf(new MessagesLogItem(id, null,
+                            null, null, -1));
                     if (indexSame >= 0) {
-                        Log.i(TAG, "indexSame: " + indexSame);
                         messagesLogItems.remove(indexSame);
                     }
-                    messagesLogItems.add(0, new MessagesLogItem(id, fullName, content, date, false));
-
+                    messagesLogItems.add(0, new MessagesLogItem(id, fullName, content, date, isRead));
                     messageLogAdapter.notifyDataSetChanged();
                     break;
                 case CommonValue.MESSAGE_LOG_STOP:
@@ -191,6 +302,7 @@ public class TabMessageFragment extends Fragment {
         Log.i(TAG, "onDestroy... tab message...");
         messagesLogDBManager.closeDatabase();
         this.getActivity().unregisterReceiver(broadcastMessageLog);
+        this.unregisterForContextMenu(listViewMessage);
         broadcastMessageLog = null;
         super.onDestroy();
     }

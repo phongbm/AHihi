@@ -16,6 +16,7 @@ public class CommonValue {
     public static final String MESSAGE_LOG_FULL_NAME = "MESSAGE_LOG_FULL_NAME";
     public static final String MESSAGE_LOG_CONTENT = "MESSAGE_LOG_CONTENT";
     public static final String MESSAGE_LOG_DATE = "MESSAGE_LOG_DATE";
+    public static final String MESSAGE_LOG_IS_READ = "MESSAGE_LOG_IS_READ";
 
     public static final String OUTGOING_CALL_ID = "OUTGOING_CALL_ID";
     public static final String INCOMING_CALL_ID = "INCOMING_CALL_ID";
