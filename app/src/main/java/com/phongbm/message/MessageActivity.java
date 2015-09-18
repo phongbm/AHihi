@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -67,7 +68,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
     private String outGoingMessageId, inComingMessageId;
     private ReentrantLock reentrantLock = new ReentrantLock();
     private EditText edtContent;
-    private ImageView btnAttach, btnSend, imgEmoticon, btnPicture, btnCamera;
+    private TextView txtStatus;
+    private ImageView btnAttach, btnSend, imgEmoticon, btnPicture, btnCamera, btnMap;
     private BroadcastMessage broadcastMessage;
     private String inComingFullName, content;
     private CommonMethod commonMethod;
@@ -126,18 +128,18 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         layoutMain = (RelativeLayout) findViewById(R.id.layoutMain);
         layoutMain.getViewTreeObserver().addOnGlobalLayoutListener(this);
         menu = (RelativeLayout) findViewById(R.id.menu);
-
         emoticons = (LinearLayout) findViewById(R.id.emoticons);
-
+        txtStatus = (TextView) findViewById(R.id.txtStatus);
         listViewMessage = (ListView) findViewById(R.id.listViewMessage);
         listViewMessage.setSelected(false);
-
         btnAttach = (ImageView) findViewById(R.id.btnAttach);
         btnAttach.setOnClickListener(this);
         btnPicture = (ImageView) findViewById(R.id.btnPicture);
         btnPicture.setOnClickListener(this);
         btnCamera = (ImageView) findViewById(R.id.btnCamera);
         btnCamera.setOnClickListener(this);
+        btnMap = (ImageView) findViewById(R.id.btnMap);
+        btnMap.setOnClickListener(this);
         btnSend = (ImageView) findViewById(R.id.btnSend);
         btnSend.setEnabled(false);
         btnSend.setOnClickListener(this);
@@ -307,6 +309,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.btnSend:
                 content = edtContent.getText().toString();
                 edtContent.setText("");
+                txtStatus.setText("Sending...");
                 Intent intentSend = new Intent();
                 intentSend.setAction(CommonValue.ACTION_SEND_MESSAGE);
                 intentSend.putExtra(CommonValue.INCOMING_MESSAGE_ID, inComingMessageId);
@@ -346,6 +349,14 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                     this.startActivityForResult(intentCamera, REQUEST_CAMERA);
                 }
                 break;
+            case R.id.btnMap:
+                Intent intentMap = new Intent();
+                intentMap.setAction(CommonValue.ACTION_MAP);
+                intentMap.putExtra(CommonValue.USER_ID, inComingMessageId);
+                intentMap.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME,
+                        ((GlobalApplication) MessageActivity.this.getApplication()).getFullName());
+                this.sendBroadcast(intentMap);
+                break;
         }
     }
 
@@ -355,6 +366,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(CommonValue.STATE_MESSAGE_SENT);
             intentFilter.addAction(CommonValue.STATE_MESSAGE_INCOMING);
+            intentFilter.addAction(CommonValue.STATE_MESSAGE_DELIVERED);
             MessageActivity.this.registerReceiver(broadcastMessage, intentFilter);
         }
     }
@@ -481,6 +493,8 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
+
+                    txtStatus.setText("Sent");
                     break;
                 case CommonValue.STATE_MESSAGE_INCOMING:
                     String keyIncoming = intent.getStringExtra(CommonValue.AHIHI_KEY);
@@ -512,6 +526,9 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                                 break;
                         }
                     }
+                    break;
+                case CommonValue.STATE_MESSAGE_DELIVERED:
+                    txtStatus.setText("Delivered");
                     break;
             }
             listViewMessage.setSelection(messageAdapter.getCount());

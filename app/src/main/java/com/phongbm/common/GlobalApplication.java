@@ -28,6 +28,7 @@ public class GlobalApplication extends Application {
     volatile public static boolean startActivityMessage = false;
     volatile public static boolean startWaitingAHihi = false;
     private SharedPreferencesAHihi sharedPreferencesAHihi;
+    public static float DENSITY_DPI;
 
     @Override
     public void onCreate() {
@@ -48,6 +49,7 @@ public class GlobalApplication extends Application {
         windowManager.getDefaultDisplay().getMetrics(metrics);
         WIDTH_SCREEN = metrics.widthPixels;
         HEIGHT_SCREEN = metrics.heightPixels;
+        DENSITY_DPI = metrics.densityDpi;
     }
 
     public Bitmap getAvatar() {

@@ -28,12 +28,14 @@ public class CommonValue {
     public static final String STATE_PICK_UP = "STATE_PICK_UP";
     public static final String STATE_ANSWER = "STATE_ANSWER";
 
+    public static final String ACTION_MAP = "ACTION_MAP";
     public static final String INCOMING_MESSAGE_FULL_NAME = "INCOMING_MESSAGE_FULL_NAME";
     public static final String INCOMING_MESSAGE_ID = "INCOMING_MESSAGE_ID";
     public static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
     public static final String MESSAGE_CONTENT = "MESSAGE_CONTENT";
     public static final String STATE_MESSAGE_SENT = "STATE_MESSAGE_SENT";
     public static final String STATE_MESSAGE_INCOMING = "STATE_MESSAGE_INCOMING";
+    public static final String STATE_MESSAGE_DELIVERED = "STATE_MESSAGE_DELIVERED";
 
     public static final int KEY_LENGTH = 13;
     public static final int MAX_FILE_SIZE = 10485760;

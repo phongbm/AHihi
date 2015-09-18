@@ -1,16 +1,26 @@
 package com.phongbm.common;
 
+import android.Manifest;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
@@ -26,8 +36,11 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
+import com.phongbm.ahihi.AllFriendItem;
 import com.phongbm.ahihi.R;
+import com.phongbm.message.MessageActivity;
 import com.phongbm.message.MessagesLogDBManager;
+import com.phongbm.music.Sound;
 import com.sinch.android.rtc.ClientRegistration;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
@@ -51,6 +64,7 @@ import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import jp.co.recruit_lifestyle.android.floatingview.FloatingViewListener;
 import jp.co.recruit_lifestyle.android.floatingview.FloatingViewManager;
 
@@ -77,6 +91,8 @@ public class AHihiService extends Service implements SinchClientListener,
     private LayoutInflater layoutInflater;
     private RelativeLayout widget;
     private DisplayMetrics displayMetrics;
+    private boolean open;
+    private Sound sound;
 
     @Override
     public void onCreate() {
@@ -89,6 +105,7 @@ public class AHihiService extends Service implements SinchClientListener,
         if (messagesLogDBManager == null) {
             messagesLogDBManager = new MessagesLogDBManager(this);
         }
+        sound = new Sound(this, 10);
     }
 
     @Override
@@ -98,6 +115,7 @@ public class AHihiService extends Service implements SinchClientListener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        open = false;
         displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
@@ -224,7 +242,84 @@ public class AHihiService extends Service implements SinchClientListener,
 
     private class MessageListener implements MessageClientListener {
         @Override
-        public void onIncomingMessage(MessageClient messageClient, Message message) {
+        public void onIncomingMessage(final MessageClient messageClient, final Message message) {
+            sound.playMessageTone();
+
+            if (message.getHeaders().get("MAP") != null) {
+                String body = message.getTextBody();
+                if (body.equals("MAP_OK")) {
+                    Log.i(TAG, "MAP_OK");
+                    if (!isGPSOn()) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                    double latitude = Double.parseDouble(message.getHeaders().get("LATITUDE"));
+                    double longitude = Double.parseDouble(message.getHeaders().get("LONGITUDE"));
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setFlags(mapIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    if (mapIntent.resolveActivity(AHihiService.this.getPackageManager()) != null) {
+                        AHihiService.this.startActivity(mapIntent);
+                    }
+                    return;
+                }
+                final AlertDialog alertDialog = new AlertDialog.Builder(AHihiService.this).create();
+                alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                alertDialog.setTitle("Confirm");
+                alertDialog.setMessage(body + " want to take your current address?");
+                alertDialog.setCanceledOnTouchOutside(false);
+                alertDialog.setCancelable(false);
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                alertDialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i(TAG, "Get location... OK");
+                                LocationManager locationManager = (LocationManager)
+                                        context.getSystemService(Context.LOCATION_SERVICE);
+                                if (!isGPSOn()) {
+                                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    context.startActivity(intent);
+                                }
+                                Criteria criteria = new Criteria();
+                                criteria.setPowerRequirement(Criteria.ACCURACY_LOW);
+                                String provider = locationManager.getBestProvider(criteria, true);
+
+                                if (ContextCompat.checkSelfPermission(AHihiService.this,
+                                        Manifest.permission.ACCESS_FINE_LOCATION)
+                                        != PackageManager.PERMISSION_GRANTED
+                                        && ContextCompat.checkSelfPermission(AHihiService.this,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                                        != PackageManager.PERMISSION_GRANTED) {
+                                    return;
+                                }
+                                Location location = locationManager.getLastKnownLocation(provider);
+                                if (location != null) {
+                                    double latitude = location.getLatitude();
+                                    double longitude = location.getLongitude();
+                                    Log.i(TAG, "Location: " + latitude + ", " + longitude);
+                                    WritableMessage writableMessage = new
+                                            WritableMessage(message.getSenderId(), "MAP_OK");
+                                    writableMessage.addHeader("MAP", "GET_LOCATION");
+                                    writableMessage.addHeader("LATITUDE", latitude + "");
+                                    writableMessage.addHeader("LONGITUDE", longitude + "");
+                                    messageClient.send(writableMessage);
+                                }
+                            }
+                        });
+                alertDialog.show();
+                return;
+            }
             ActivityManager activityManager = (ActivityManager) AHihiService.this
                     .getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.RunningAppProcessInfo> tasks = activityManager.getRunningAppProcesses();
@@ -273,6 +368,16 @@ public class AHihiService extends Service implements SinchClientListener,
             } else {
                 isRead = 0;
             }
+
+            if (tasks.get(0).processName.equals(CommonValue.PACKAGE_NAME_MAIN)) {
+            } else {
+                if (!open) {
+                    open = true;
+                    AHihiService.this.openChatHead(message.getSenderId(),
+                            message.getHeaders().get("senderName"), content, date);
+                }
+            }
+
             AHihiService.this.updateMessagesLogDBManager(id, fullName, content, date, isRead);
             if (!GlobalApplication.startWaitingAHihi) {
                 GlobalApplication.startWaitingAHihi = true;
@@ -295,55 +400,59 @@ public class AHihiService extends Service implements SinchClientListener,
 
         @Override
         public void onMessageSent(MessageClient messageClient, final Message message, String s) {
-            String content = message.getTextBody();
-            String key = null;
-            if (content.contains(CommonValue.AHIHI_KEY)) {
-                key = content.substring(0, CommonValue.KEY_LENGTH + 1);
-                content = content.substring(CommonValue.KEY_LENGTH + 1);
-            }
-
-            if (GlobalApplication.startActivityMessage) {
-                Intent intentSent = new Intent();
-                intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
-                intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, date);
-                intentSent.putExtra(CommonValue.AHIHI_KEY, key);
-                intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
-                AHihiService.this.sendBroadcast(intentSent);
-            }
-            String id = message.getRecipientIds().get(0);
-            Map<String, String> header = message.getHeaders();
-            String fullName = header.get("fullName");
-            String date = header.get("date");
-            if (key != null) {
-                switch (key) {
-                    case CommonValue.AHIHI_KEY_EMOTICON:
-                        content = "Sent a sticker";
-                        break;
-                    case CommonValue.AHIHI_KEY_FILE:
-                        content = "Sent a file";
-                        break;
-                    case CommonValue.AHIHI_KEY_PICTURE:
-                        content = "Sent a picture";
-                        break;
+            if (message.getHeaders().get("MAP") != null) {
+                Log.i(TAG, "onMessageSent... MAP");
+            } else {
+                String content = message.getTextBody();
+                String key = null;
+                if (content.contains(CommonValue.AHIHI_KEY)) {
+                    key = content.substring(0, CommonValue.KEY_LENGTH + 1);
+                    content = content.substring(CommonValue.KEY_LENGTH + 1);
                 }
-            }
-            AHihiService.this.updateMessagesLogDBManager(id, fullName, "You:  " + content, date, 1);
-            if (!GlobalApplication.startWaitingAHihi) {
-                GlobalApplication.startWaitingAHihi = true;
-                GlobalApplication.checkLoginThisId = false;
-                Intent intent = new Intent();
-                intent.setAction(CommonValue.MESSAGE_LOG_STOP);
-                sendBroadcast(intent);
-            }
-            if (GlobalApplication.checkLoginThisId) {
-                Intent intentMessage = new Intent();
-                intentMessage.setAction(CommonValue.UPDATE_MESSAGE_LOG);
-                intentMessage.putExtra(CommonValue.MESSAGE_LOG_ID, id);
-                intentMessage.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
-                intentMessage.putExtra(CommonValue.MESSAGE_LOG_CONTENT, "You: " + content);
-                intentMessage.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
-                intentMessage.putExtra(CommonValue.MESSAGE_LOG_IS_READ, 1);
-                AHihiService.this.sendBroadcast(intentMessage);
+
+                if (GlobalApplication.startActivityMessage) {
+                    Intent intentSent = new Intent();
+                    intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
+                    intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, date);
+                    intentSent.putExtra(CommonValue.AHIHI_KEY, key);
+                    intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
+                    AHihiService.this.sendBroadcast(intentSent);
+                }
+                String id = message.getRecipientIds().get(0);
+                Map<String, String> header = message.getHeaders();
+                String fullName = header.get("fullName");
+                String date = header.get("date");
+                if (key != null) {
+                    switch (key) {
+                        case CommonValue.AHIHI_KEY_EMOTICON:
+                            content = "Sent a sticker";
+                            break;
+                        case CommonValue.AHIHI_KEY_FILE:
+                            content = "Sent a file";
+                            break;
+                        case CommonValue.AHIHI_KEY_PICTURE:
+                            content = "Sent a picture";
+                            break;
+                    }
+                }
+                AHihiService.this.updateMessagesLogDBManager(id, fullName, "You:  " + content, date, 1);
+                if (!GlobalApplication.startWaitingAHihi) {
+                    GlobalApplication.startWaitingAHihi = true;
+                    GlobalApplication.checkLoginThisId = false;
+                    Intent intent = new Intent();
+                    intent.setAction(CommonValue.MESSAGE_LOG_STOP);
+                    sendBroadcast(intent);
+                }
+                if (GlobalApplication.checkLoginThisId) {
+                    Intent intentMessage = new Intent();
+                    intentMessage.setAction(CommonValue.UPDATE_MESSAGE_LOG);
+                    intentMessage.putExtra(CommonValue.MESSAGE_LOG_ID, id);
+                    intentMessage.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
+                    intentMessage.putExtra(CommonValue.MESSAGE_LOG_CONTENT, "You: " + content);
+                    intentMessage.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
+                    intentMessage.putExtra(CommonValue.MESSAGE_LOG_IS_READ, 1);
+                    AHihiService.this.sendBroadcast(intentMessage);
+                }
             }
         }
 
@@ -354,6 +463,9 @@ public class AHihiService extends Service implements SinchClientListener,
 
         @Override
         public void onMessageDelivered(MessageClient messageClient, MessageDeliveryInfo messageDeliveryInfo) {
+            Intent intentDelivered = new Intent();
+            intentDelivered.setAction(CommonValue.STATE_MESSAGE_DELIVERED);
+            AHihiService.this.sendBroadcast(intentDelivered);
         }
 
         @Override
@@ -373,6 +485,8 @@ public class AHihiService extends Service implements SinchClientListener,
             intentFilter.addAction(CommonValue.ACTION_LOGOUT);
             // Message
             intentFilter.addAction(CommonValue.ACTION_SEND_MESSAGE);
+            // Map
+            intentFilter.addAction(CommonValue.ACTION_MAP);
             context.registerReceiver(aHihiBroadcast, intentFilter);
         }
     }
@@ -438,6 +552,14 @@ public class AHihiService extends Service implements SinchClientListener,
                                 break;
                         }
                     }
+                    break;
+                case CommonValue.ACTION_MAP:
+                    Log.i(TAG, "ACTION_MAP...");
+                    String userId = intent.getStringExtra(CommonValue.USER_ID);
+                    String name = intent.getStringExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME);
+                    WritableMessage message = new WritableMessage(userId, name);
+                    message.addHeader("MAP", "GET_LOCATION");
+                    messageClient.send(message);
                     break;
             }
         }
@@ -629,15 +751,46 @@ public class AHihiService extends Service implements SinchClientListener,
 
     @Override
     public void onFinishFloatingView() {
+        open = false;
     }
 
-    private void openChatHead() {
+    private void openChatHead(final String id, final String fullName, final String content, final String date) {
         layoutInflater = LayoutInflater.from(this);
         widget = (RelativeLayout) layoutInflater.inflate(R.layout.widget_chathead, null, false);
+        CircleImageView imgAvatar = (CircleImageView) widget.findViewById(R.id.imgAvatar);
+        int index = ((GlobalApplication) AHihiService.this.getApplication()).getAllFriendItems()
+                .indexOf(new AllFriendItem(id, 1));
+        if (index > -1) {
+            imgAvatar.setImageBitmap(((GlobalApplication) AHihiService.this
+                    .getApplication()).getAllFriendItems().get(index).getAvatar());
+        } else {
+            imgAvatar.setImageResource(R.drawable.ic_avatar_default);
+        }
         widget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(AHihiService.this, "OK", Toast.LENGTH_SHORT).show();
+                Intent intentChat = new Intent(AHihiService.this, MessageActivity.class);
+                intentChat.putExtra(CommonValue.INCOMING_CALL_ID, id);
+                intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, fullName);
+                intentChat.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                AHihiService.this.startActivity(intentChat);
+
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AHihiService.this.updateMessagesLogDBManager(id, fullName, content, date, 1);
+                        Intent intentIncoming = new Intent();
+                        intentIncoming.setAction(CommonValue.UPDATE_MESSAGE_LOG);
+                        intentIncoming.putExtra(CommonValue.MESSAGE_LOG_ID, id);
+                        intentIncoming.putExtra(CommonValue.MESSAGE_LOG_FULL_NAME, fullName);
+                        intentIncoming.putExtra(CommonValue.MESSAGE_LOG_CONTENT, content);
+                        intentIncoming.putExtra(CommonValue.MESSAGE_LOG_DATE, date);
+                        intentIncoming.putExtra(CommonValue.MESSAGE_LOG_IS_READ, 1);
+                        AHihiService.this.sendBroadcast(intentIncoming);
+                    }
+                });
+
+                floatingViewManager.removeAllViewToWindow();
             }
         });
 
@@ -661,6 +814,12 @@ public class AHihiService extends Service implements SinchClientListener,
         } else {
             messagesLogDBManager.insertData(contentValues);
         }
+    }
+
+    public boolean isGPSOn() {
+        LocationManager locationManager = (LocationManager)
+                context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     @Override

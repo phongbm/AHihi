@@ -253,4 +253,8 @@ public class CommonMethod {
         }
     }
 
+    public int convertSizeIcon(float density, int sizeDp) {
+        return (int) (sizeDp * (density / 160));
+    }
+
 }

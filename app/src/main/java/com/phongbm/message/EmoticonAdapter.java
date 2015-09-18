@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import com.phongbm.ahihi.R;
 import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
 import com.phongbm.libs.SquareImageView;
 import com.squareup.picasso.Picasso;
 
@@ -19,9 +20,12 @@ public class EmoticonAdapter extends BaseAdapter {
     private ArrayList<EmoticonItem> emoticonItems;
     private LayoutInflater layoutInflater;
     private String inComingMessageId, inComingFullName;
+    private final int SIZE_EMOTION;
 
     public EmoticonAdapter(Context context, ArrayList<EmoticonItem> emoticonItems,
                            String inComingMessageId, String inComingFullName) {
+        SIZE_EMOTION = (int) (GlobalApplication.WIDTH_SCREEN -
+                5 * 12 * (GlobalApplication.DENSITY_DPI / 160)) / 4;
         this.emoticonItems = emoticonItems;
         this.inComingMessageId = inComingMessageId;
         this.inComingFullName = inComingFullName;
@@ -56,6 +60,8 @@ public class EmoticonAdapter extends BaseAdapter {
         }
         Picasso.with(parent.getContext())
                 .load(emoticonItems.get(position).getEmotionId())
+                .resize(SIZE_EMOTION, SIZE_EMOTION)
+                .centerCrop()
                 .into(viewHolder.imgEmoticon);
         viewHolder.imgEmoticon.setOnClickListener(new View.OnClickListener() {
             @Override

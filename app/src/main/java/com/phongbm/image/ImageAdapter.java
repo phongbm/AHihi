@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.phongbm.ahihi.R;
+import com.phongbm.common.CommonMethod;
+import com.phongbm.common.GlobalApplication;
 import com.phongbm.libs.SquareImageView;
 import com.squareup.picasso.Picasso;
 
@@ -22,6 +24,7 @@ public class ImageAdapter extends BaseAdapter {
     private ArrayList<String> imageURLs;
     // volatile private ArrayList<ImageState> imageStates;
     private LayoutInflater layoutInflater;
+    private final int SIZE_IMAGE;
 
     public ImageAdapter(Context context) {
         this.context = context;
@@ -30,6 +33,9 @@ public class ImageAdapter extends BaseAdapter {
         for (String i : imageURLs) {
             Log.i(TAG, "uri: " + i);
         }
+        SIZE_IMAGE = (GlobalApplication.WIDTH_SCREEN - CommonMethod.getInstance().
+                convertSizeIcon(GlobalApplication.DENSITY_DPI, 4) * 4) / 3;
+
         // initializeListImageState();
     }
 
@@ -81,7 +87,7 @@ public class ImageAdapter extends BaseAdapter {
         }
         Picasso.with(parent.getContext())
                 .load(new File(imageURLs.get(position)))
-                .resize(300, 300)
+                .resize(SIZE_IMAGE, SIZE_IMAGE)
                 .placeholder(R.drawable.image_placeholder)
                 .error(R.drawable.warning)
                 .centerCrop()
