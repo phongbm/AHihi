@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.WindowManager;
 
 import com.parse.Parse;
+import com.phongbm.ahihi.ActiveFriendItem;
 import com.phongbm.ahihi.AllFriendItem;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class GlobalApplication extends Application {
     private String fullName, phoneNumber, email;
     private Bitmap pictureSend;
     private ArrayList<AllFriendItem> allFriendItems;
+    private ArrayList<ActiveFriendItem> activeFriendItems;
 
     private ArrayList<String> idUsers;
     volatile public static boolean checkLoginThisId = false;
@@ -37,6 +39,7 @@ public class GlobalApplication extends Application {
         sharedPreferencesAHihi = new SharedPreferencesAHihi(this);
         idUsers = sharedPreferencesAHihi.readListID();
         allFriendItems = new ArrayList<>();
+        activeFriendItems = new ArrayList<>();
     }
 
     private void initializeComponent() {
@@ -93,6 +96,14 @@ public class GlobalApplication extends Application {
 
     public void setAllFriendItems(ArrayList<AllFriendItem> allFriendItems) {
         this.allFriendItems = allFriendItems;
+    }
+
+    public ArrayList<ActiveFriendItem> getActiveFriendItems() {
+        return activeFriendItems;
+    }
+
+    public void setActiveFriendItems(ArrayList<ActiveFriendItem> activeFriendItems) {
+        this.activeFriendItems = activeFriendItems;
     }
 
     public void addIdUser(String idUser) {

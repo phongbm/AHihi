@@ -13,7 +13,6 @@ import com.phongbm.common.GlobalApplication;
 import com.phongbm.common.OnShowPopupMenu;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -23,21 +22,14 @@ public class AllFriendAdapter extends BaseAdapter {
     private ArrayList<AllFriendItem> allFriendItems;
     private LayoutInflater layoutInflater;
     private OnShowPopupMenu onShowPopupMenu;
-    private HashMap<String, Integer> alphaIndexer;
 
     public AllFriendAdapter(Context context, Activity activity) {
         layoutInflater = LayoutInflater.from(context);
 
-        allFriendItems = (ArrayList<AllFriendItem>) (((GlobalApplication)
-                activity.getApplication()).getAllFriendItems().clone());
-
-        alphaIndexer = new HashMap<>();
-        for (int i = 0; i < allFriendItems.size(); i++) {
-            String firstLetter = allFriendItems.get(i).getFullName().substring(0, 1).toUpperCase();
-            if (!alphaIndexer.containsKey(firstLetter)) {
-                alphaIndexer.put(firstLetter, i);
-                allFriendItems.add(i, new AllFriendItem(firstLetter, 0));
-            }
+        if (((GlobalApplication) activity.getApplication()).getAllFriendItems() != null) {
+            allFriendItems = ((GlobalApplication) activity.getApplication()).getAllFriendItems();
+        } else {
+            allFriendItems = new ArrayList<>();
         }
     }
 
@@ -56,7 +48,7 @@ public class AllFriendAdapter extends BaseAdapter {
         return position;
     }
 
-    @Override
+    /*@Override
     public int getViewTypeCount() {
         return 2;
     }
@@ -67,37 +59,37 @@ public class AllFriendAdapter extends BaseAdapter {
             return 1;
         }
         return 0;
-    }
+    }*/
 
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         final ViewHolder viewHolder;
         if (convertView == null) {
             viewHolder = new ViewHolder();
-            if (getItemViewType(position) == 1) {
-                convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
-                viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
-                viewHolder.menu = (ImageView) convertView.findViewById(R.id.menu);
-            } else {
+            //if (getItemViewType(position) == 1) {
+            convertView = layoutInflater.inflate(R.layout.item_all_friend, parent, false);
+            viewHolder.imgAvatar = (CircleImageView) convertView.findViewById(R.id.imgAvatar);
+            viewHolder.menu = (ImageView) convertView.findViewById(R.id.menu);
+            /*} else {
                 convertView = layoutInflater.inflate(R.layout.item_all_friend_header, parent, false);
-            }
+            }*/
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.txtName);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        if (getItemViewType(position) == 1) {
-            viewHolder.imgAvatar.setImageBitmap(allFriendItems.get(position).getAvatar());
-            viewHolder.txtName.setText(allFriendItems.get(position).getFullName());
-            viewHolder.menu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onShowPopupMenu.onShowPopupMenuListener(position, viewHolder.menu);
-                }
-            });
-        } else {
+        //if (getItemViewType(position) == 1) {
+        viewHolder.imgAvatar.setImageBitmap(allFriendItems.get(position).getAvatar());
+        viewHolder.txtName.setText(allFriendItems.get(position).getFullName());
+        viewHolder.menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onShowPopupMenu.onShowPopupMenuListener(position, viewHolder.menu);
+            }
+        });
+       /* } else {
             viewHolder.txtName.setText(allFriendItems.get(position).getId());
-        }
+        }*/
         return convertView;
     }
 

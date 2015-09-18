@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 public class AllFriendItem extends FriendItem implements Comparable {
     private String urlAvatar;
-    private int type;
+    // private int type;
 
     public AllFriendItem(String id, int type) {
         super.setId(id);
@@ -12,13 +12,13 @@ public class AllFriendItem extends FriendItem implements Comparable {
         this.urlAvatar = null;
         super.setPhoneNumber(null);
         super.setFullName(null);
-        this.type = type;
+        //this.type = type;
     }
 
     public AllFriendItem(String id, Bitmap avatar, String phoneNumber, String fullName) {
         super(id, avatar, phoneNumber, fullName);
         this.urlAvatar = null;
-        this.type = 1;
+        // this.type = 1;
     }
 
     public AllFriendItem(String id, String urlAvatar, String phoneNumber, String fullName) {
@@ -27,7 +27,7 @@ public class AllFriendItem extends FriendItem implements Comparable {
         this.urlAvatar = urlAvatar;
         super.setPhoneNumber(phoneNumber);
         super.setFullName(fullName);
-        this.type = 1;
+        // this.type = 1;
     }
 
     @Override
@@ -52,8 +52,8 @@ public class AllFriendItem extends FriendItem implements Comparable {
         return ((AllFriendItem) object).getId().equals(this.getId());
     }
 
-    public int getType() {
+   /* public int getType() {
         return type;
-    }
+    }*/
 
 }

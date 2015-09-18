@@ -157,6 +157,10 @@ public class TabMessageFragment extends Fragment implements AdapterView.OnItemCl
                 View snackbarView = snackbar.getView();
                 snackbarView.setBackgroundColor(Color.parseColor("#4caf50"));
                 snackbar.show();
+                if (messagesLogItems.size() == 0) {
+                    listViewMessage.setVisibility(View.GONE);
+                    layoutNoConversations.setVisibility(View.VISIBLE);
+                }
                 break;
             default:
                 super.onContextItemSelected(item);
