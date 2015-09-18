@@ -50,14 +50,14 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
     private TextView btnTabActive, btnTabAllFriends;
     private BroadcastUpdateListFriend broadcastUpdateListFriend = new BroadcastUpdateListFriend();
     private boolean tabActive = true;
-    // private SwipeToDismissTouchListener<ListViewAdapter> touchListener;
     private Context context;
     private CircleImageView imgAvatar;
     private TextView txtFullName, txtStatus;
     private Switch switchOnline;
     private RelativeLayout layoutMe;
-    private boolean enableTabAllFriend = false;
+    private boolean enableTabAllFriend = false, isOnline = true;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private RelativeLayout layoutNote;
 
     public TabFriendFragment(Context context) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -70,18 +70,6 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         this.registerUpdateListFriend();
         context = this.getActivity();
-
-        final ProgressDialog progressDialog = new ProgressDialog(this.getActivity());
-        progressDialog.setMessage("Loading...");
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.dismiss();
-            }
-        }, 3000);
-
         activeFriendAdapter = new ActiveFriendAdapter(this.getActivity(), this.getActivity());
         activeFriendAdapter.setOnShowPopupMenu(this);
         listViewFriend.setAdapter(activeFriendAdapter);
@@ -102,6 +90,8 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
         listViewFriend = (ListView) view.findViewById(R.id.listViewFriend);
         listViewFriend.setOnScrollListener(this);
 
+        layoutNote = (RelativeLayout) view.findViewById(R.id.layoutNote);
+
         btnTabActive = (TextView) view.findViewById(R.id.btnTabActive);
         btnTabActive.setOnClickListener(this);
         btnTabAllFriends = (TextView) view.findViewById(R.id.btnTabAllFriends);
@@ -109,28 +99,9 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
 
         layoutMe = (RelativeLayout) view.findViewById(R.id.layoutMe);
 
-        /*touchListener = new SwipeToDismissTouchListener<>(new ListViewAdapter(listViewFriend),
-                new SwipeToDismissTouchListener.DismissCallbacks<ListViewAdapter>() {
-                    @Override
-                    public boolean canDismiss(int position) {
-                        return true;
-                    }
-
-                    @Override
-                    public void onDismiss(ListViewAdapter view, int position) {
-                        Toast.makeText(context, "onDismiss...", Toast.LENGTH_SHORT).show();
-                    }
-                });
-        listViewFriend.setOnTouchListener(touchListener);
-        listViewFriend.setOnScrollListener((AbsListView.OnScrollListener) touchListener.makeScrollListener());
-        */
-
         listViewFriend.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                /*if (touchListener.existPendingDismisses()) {
-                    touchListener.undoPendingDismiss();
-                } else {*/
                 String inComingId, inComingFullName;
                 if (tabActive) {
                     inComingId = activeFriendAdapter.getItem(position).getId();
@@ -143,7 +114,6 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                 intentChat.putExtra(CommonValue.INCOMING_CALL_ID, inComingId);
                 intentChat.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME, inComingFullName);
                 context.startActivity(intentChat);
-                //}
             }
         });
     }
@@ -163,10 +133,24 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                     txtStatus.setText("ONLINE");
                     txtStatus.setTextColor(ContextCompat.getColor(context, R.color.green_500));
                     listViewFriend.setAdapter(activeFriendAdapter);
+                    isOnline = true;
+                    listViewFriend.setVisibility(View.VISIBLE);
+                    layoutNote.setVisibility(View.GONE);
+
+                    ParseUser currentUser = ParseUser.getCurrentUser();
+                    currentUser.put("isOnline", true);
+                    currentUser.saveInBackground();
                 } else {
                     txtStatus.setText("OFFLINE");
                     txtStatus.setTextColor(Color.GRAY);
                     listViewFriend.setAdapter(null);
+                    isOnline = false;
+                    layoutNote.setVisibility(View.VISIBLE);
+                    listViewFriend.setVisibility(View.GONE);
+
+                    ParseUser currentUser = ParseUser.getCurrentUser();
+                    currentUser.put("isOnline", false);
+                    currentUser.saveInBackground();
                 }
             }
         });
@@ -185,6 +169,13 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                 this.changeStateShow(btnTabActive);
                 this.changeStateHide(btnTabAllFriends);
                 listViewFriend.setAdapter(activeFriendAdapter);
+                if (isOnline) {
+                    listViewFriend.setVisibility(View.VISIBLE);
+                    layoutNote.setVisibility(View.GONE);
+                } else {
+                    listViewFriend.setVisibility(View.GONE);
+                    layoutNote.setVisibility(View.VISIBLE);
+                }
                 layoutMe.setVisibility(View.VISIBLE);
                 tabActive = true;
                 break;
@@ -198,6 +189,8 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                 this.changeStateShow(btnTabAllFriends);
                 this.changeStateHide(btnTabActive);
                 listViewFriend.setAdapter(allFriendAdapter);
+                listViewFriend.setVisibility(View.VISIBLE);
+                layoutNote.setVisibility(View.GONE);
                 layoutMe.setVisibility(View.GONE);
                 tabActive = false;
                 break;
@@ -275,7 +268,8 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                         int totalItemCount) {
         boolean enable = false;
         if (listViewFriend != null && listViewFriend.getChildCount() > 0) {
             boolean firstItemVisible = listViewFriend.getFirstVisiblePosition() == 0;

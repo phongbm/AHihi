@@ -115,7 +115,41 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@+id/divider"
-            android:background="#ffffff" />
+            android:background="#ffffff"
+            android:visibility="visible" />
+
+        <RelativeLayout
+            android:id="@+id/layoutNote"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/divider"
+            android:background="#ffffff"
+            android:padding="32dp"
+            android:visibility="gone">
+
+
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="144dp"
+                android:layout_height="105dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="32dp"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/icic_2" />
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imgLogo"
+                android:layout_marginTop="16dp"
+                android:text="You'll still get all your messages if chat is off, but you can turn it on to see who's active on AHhihi."
+                android:textColor="#666666"
+                android:textSize="16sp"
+                android:textStyle="normal" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

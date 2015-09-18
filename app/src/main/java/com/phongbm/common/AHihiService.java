@@ -333,7 +333,7 @@ public class AHihiService extends Service implements SinchClientListener,
 
             if (GlobalApplication.startActivityMessage) {
                 Intent intentSent = new Intent();
-                intentSent.setAction(CommonValue.STATE_MESSAGE_SENT);
+                intentSent.setAction(CommonValue.STATE_MESSAGE_INCOMING);
                 intentSent.putExtra(CommonValue.AHIHI_KEY_DATE, message.getHeaders().get("date"));
                 intentSent.putExtra(CommonValue.AHIHI_KEY, key);
                 intentSent.putExtra(CommonValue.MESSAGE_CONTENT, content);
@@ -731,7 +731,7 @@ public class AHihiService extends Service implements SinchClientListener,
                         .getStandSizeBitmap(bitmapSend.getWidth(), bitmapSend.getHeight(),
                                 WIDTH_IMAGE_MAX, HEIGHT_IMAGE_MAX);
                 bitmapSend = Bitmap.createScaledBitmap(bitmapSend, pair.first, pair.second, true);
-                Toast.makeText(this, "IF ELSE", Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "IF ELSE");
             }
         } catch (OutOfMemoryError e) {
             BitmapFactory.Options options = new BitmapFactory.Options();

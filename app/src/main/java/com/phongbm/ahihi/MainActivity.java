@@ -248,6 +248,10 @@ public class MainActivity extends AppCompatActivity implements
                 Intent intentAboutUs = new Intent(this, AboutUsActivity.class);
                 this.startActivity(intentAboutUs);
                 break;
+            case R.id.nav_settings:
+                drawerLayout.closeDrawers();
+                viewPager.setCurrentItem(3);
+                break;
         }
         return true;
     }

@@ -37,6 +37,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.phongbm.ahihi.DetailActivity;
 import com.phongbm.ahihi.R;
 import com.phongbm.call.OutgoingCallActivity;
 import com.phongbm.common.CommonMethod;
@@ -401,6 +402,7 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
+        txtStatus.setText("Sending...");
         switch (requestCode) {
             case REQUEST_ATTACH:
                 String pathFile = data.getData().getPath();
@@ -551,6 +553,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 Intent intentCall = new Intent(this, OutgoingCallActivity.class);
                 intentCall.putExtra(CommonValue.INCOMING_CALL_ID, inComingMessageId);
                 this.startActivity(intentCall);
+                break;
+            case R.id.action_view_profile:
+                Intent intentProfile = new Intent(this, DetailActivity.class);
+                intentProfile.putExtra(CommonValue.USER_ID, inComingMessageId);
+                this.startActivity(intentProfile);
                 break;
         }
         return super.onOptionsItemSelected(item);
