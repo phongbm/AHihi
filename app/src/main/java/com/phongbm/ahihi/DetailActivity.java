@@ -1,13 +1,20 @@
 package com.phongbm.ahihi;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
@@ -16,14 +23,22 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
+import com.phongbm.common.GlobalApplication;
+import com.phongbm.image.ImageActivity;
 import com.phongbm.libs.SquareImageView;
 
 @SuppressWarnings("ConstantConditions")
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final String TAG = "DetailActivity";
+    private static final int REQUEST_UPLOAD_PHOTO = 10;
+
     private CollapsingToolbarLayout collapsingToolbar;
     private SquareImageView imgAvatar;
     private TextView txtFullName, txtPhoneNumber, txtEmail, txtBirthday, txtSex;
+    private String id;
+    private ParseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +71,7 @@ public class DetailActivity extends AppCompatActivity {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
-        String id = this.getIntent().getStringExtra(CommonValue.USER_ID);
+        id = this.getIntent().getStringExtra(CommonValue.USER_ID);
         final ParseQuery<ParseUser> parseQuery = ParseUser.getQuery();
         parseQuery.getInBackground(id, new GetCallback<ParseUser>() {
             @Override
@@ -90,6 +105,13 @@ public class DetailActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         });
+
+        currentUser = ParseUser.getCurrentUser();
+        if (currentUser.getObjectId().equals(id)) {
+            imgAvatar.setOnClickListener(this);
+        } else {
+            imgAvatar.setOnClickListener(null);
+        }
     }
 
     @Override
@@ -100,6 +122,34 @@ public class DetailActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intentUpload = new Intent();
+        intentUpload.setClass(this, ImageActivity.class);
+        startActivityForResult(intentUpload, REQUEST_UPLOAD_PHOTO);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult...");
+        if (requestCode == REQUEST_UPLOAD_PHOTO && resultCode == Activity.RESULT_OK) {
+            Log.i(TAG, "onActivityResult...");
+            byte[] bytes = data.getByteArrayExtra(CommonValue.BYTE_AVATAR);
+            Bitmap bitmapAvatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            ((GlobalApplication) DetailActivity.this.getApplication()).setAvatar(bitmapAvatar);
+            imgAvatar.setImageBitmap(bitmapAvatar);
+            Intent intent = new Intent();
+            intent.setAction("MAIN");
+            sendBroadcast(intent);
+            CommonMethod.getInstance().uploadAvatar(currentUser, bitmapAvatar);
+//            Snackbar snackbar = Snackbar.make(collapsingToolbar, "Successfully", Snackbar.LENGTH_LONG)
+//                    .setAction("ACTION", null);
+//            View snackbarView = snackbar.getView();
+//            snackbarView.setBackgroundColor(Color.parseColor("#4caf50"));
+//            snackbar.show();
+        }
     }
 
 }

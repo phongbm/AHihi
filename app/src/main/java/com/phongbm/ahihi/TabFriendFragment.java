@@ -286,6 +286,10 @@ public class TabFriendFragment extends Fragment implements View.OnClickListener,
                 FriendItem newFriend = ((MainActivity) TabFriendFragment.this.getActivity()).getNewFriend();
                 AllFriendItem allFriendItem = new AllFriendItem(newFriend.getId(),
                         newFriend.getAvatar(), newFriend.getPhoneNumber(), newFriend.getFullName());
+                if (allFriendAdapter == null) {
+                    allFriendAdapter = new AllFriendAdapter(TabFriendFragment.this.getActivity(),
+                            TabFriendFragment.this.getActivity());
+                }
                 allFriendAdapter.getAllFriendItems().add(allFriendItem);
                 Collections.sort(allFriendAdapter.getAllFriendItems());
                 allFriendAdapter.notifyDataSetChanged();

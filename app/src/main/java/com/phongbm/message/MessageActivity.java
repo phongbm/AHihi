@@ -8,11 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -357,6 +359,11 @@ public class MessageActivity extends AppCompatActivity implements View.OnClickLi
                 intentMap.putExtra(CommonValue.INCOMING_MESSAGE_FULL_NAME,
                         ((GlobalApplication) MessageActivity.this.getApplication()).getFullName());
                 this.sendBroadcast(intentMap);
+                Snackbar snackbar = Snackbar.make(view, "Please waiting...", Snackbar.LENGTH_LONG)
+                        .setAction("ACTION", null);
+                View snackbarView = snackbar.getView();
+                snackbarView.setBackgroundColor(Color.parseColor("#4caf50"));
+                snackbar.show();
                 break;
         }
     }

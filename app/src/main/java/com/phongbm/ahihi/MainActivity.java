@@ -3,9 +3,11 @@ package com.phongbm.ahihi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -24,6 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -54,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG = "MainActivity";
     private static final int REQUEST_ADDITION_FRIEND = 0;
 
+
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigation;
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements
     private ParseUser currentUser;
     private CallLogsDBManager callLogsDBManager;
     private CoordinatorLayout coordinator;
+    private BroadcastMain broadcastMain;
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(
@@ -81,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements
 
         currentUser = ParseUser.getCurrentUser();
         CommonMethod.getInstance().loadListFriend(currentUser, this);
+        registerBroastCastMain();
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCanceledOnTouchOutside(false);
@@ -413,12 +419,31 @@ public class MainActivity extends AppCompatActivity implements
             currentUser.put("isOnline", false);
             currentUser.saveInBackground();
         }
+
+        if ( broadcastMain != null ) {
+            unregisterReceiver(broadcastMain);
+            broadcastMain = null;
+        }
         super.onDestroy();
     }
 
     @Override
     public void finish() {
         super.finish();
+    }
+    private void registerBroastCastMain() {
+        if ( broadcastMain == null ) {
+            broadcastMain = new BroadcastMain();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("MAIN");
+            registerReceiver(broadcastMain, intentFilter);
+        }
+    }
+    private class BroadcastMain extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            imgAvatar.setImageBitmap(((GlobalApplication)getApplication()).getAvatar());
+        }
     }
 
 }
