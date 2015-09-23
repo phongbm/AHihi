@@ -26,12 +26,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.parse.GetCallback;
@@ -46,6 +46,7 @@ import com.phongbm.common.CommonMethod;
 import com.phongbm.common.CommonValue;
 import com.phongbm.common.GlobalApplication;
 import com.phongbm.loginsignup.MainFragment;
+import com.phongbm.settings.MyAccountActivity;
 
 import java.util.ArrayList;
 
@@ -198,11 +199,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
-        if (menuItem.isChecked()) {
+        /*if (menuItem.isChecked()) {
             menuItem.setChecked(false);
         } else {
             menuItem.setChecked(true);
-        }
+        }*/
+        menuItem.setChecked(true);
         switch (menuItem.getItemId()) {
             case R.id.nav_call_logs:
                 Intent intentCallLogs = new Intent(MainActivity.this, CallLogActivity.class);
@@ -257,6 +259,10 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.nav_settings:
                 drawerLayout.closeDrawers();
                 viewPager.setCurrentItem(3);
+                break;
+            case R.id.nav_my_account:
+                Intent intentMyAccount = new Intent(this, MyAccountActivity.class);
+                this.startActivity(intentMyAccount);
                 break;
         }
         return true;
@@ -420,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements
             currentUser.saveInBackground();
         }
 
-        if ( broadcastMain != null ) {
+        if (broadcastMain != null) {
             unregisterReceiver(broadcastMain);
             broadcastMain = null;
         }
@@ -431,18 +437,20 @@ public class MainActivity extends AppCompatActivity implements
     public void finish() {
         super.finish();
     }
+
     private void registerBroastCastMain() {
-        if ( broadcastMain == null ) {
+        if (broadcastMain == null) {
             broadcastMain = new BroadcastMain();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction("MAIN");
             registerReceiver(broadcastMain, intentFilter);
         }
     }
+
     private class BroadcastMain extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            imgAvatar.setImageBitmap(((GlobalApplication)getApplication()).getAvatar());
+            imgAvatar.setImageBitmap(((GlobalApplication) getApplication()).getAvatar());
         }
     }
 
